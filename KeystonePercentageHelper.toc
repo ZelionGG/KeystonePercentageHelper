@@ -16,5 +16,6 @@
 ## X-Wago-ID: b6XVj1Gp
 
 embeds.xml
+locales/locales.xml
 
 core.lua
