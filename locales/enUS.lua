@@ -4,70 +4,77 @@ local LibStub = LibStub;
 local AceLocale = LibStub:GetLibrary("AceLocale-3.0");
 local L = AceLocale:NewLocale(AddonName, "enUS", true, false); ---@class XIV_DatabarLocale
 
--- Dungeon Names
-L["AKCE"] = "|T5899326:16:16:0:0|t Ara-Kara, City of Echoes"
-L["CoT"] = "|T5899328:16:16:0:0|t City of Threads"
-L["GB"] = "|T409596:16:16:0:0|t Grim Batol"
-L["MoTS"] = "|T3601531:16:16:0:0|t Mists of Tirna Scithe"
-L["NW"] = "|T3601560:16:16:0:0|t The Necrotic Wake"
-L["SoB"] = "|T2011139:16:16:0:0|t Siege of Boralus"
-L["TDB"] = "|T5899330:16:16:0:0|t The Dawnbreaker"
-L["TSV"] = "|T5899333:16:16:0:0|t The Stonevault"
-
 -- Dungeons Group
 L["DUNGEONS"] = "Current Season"
 L["CURRENT_SEASON"] = "Current Season"
-L["EXPANSION_DF"] = "Dragonflight Dungeons"
-L["EXPANSION_CATA"] = "Cataclysm Dungeons"
-L["EXPANSION_WW"] = "The War Within Dungeons"
-L["EXPANSION_SL"] = "Shadowlands Dungeons"
-L["EXPANSION_BFA"] = "Battle for Azeroth Dungeons"
+L["EXPANSION_DF"] = "Dragonflight"
+L["EXPANSION_CATA"] = "Cataclysm"
+L["EXPANSION_WW"] = "The War Within"
+L["EXPANSION_SL"] = "Shadowlands"
+L["EXPANSION_BFA"] = "Battle for Azeroth"
 
--- Boss Names
+-- The War Within
 -- Ara-Kara, City of Echoes
+L["AKCE"] = "|T5899326:16:16:0:0|t Ara-Kara, City of Echoes"
 L["AKCE_BOSS1"] = "Avanoxx"
 L["AKCE_BOSS2"] = "Anub'zekt"
 L["AKCE_BOSS3"] = "Ki'katal the Harvester"
 
 -- City of Threads
+L["CoT"] = "|T5899328:16:16:0:0|t City of Threads"
 L["CoT_BOSS1"] = "Orator Krix'vizk"
-L["CoT_BOSS2"] = "Tyr's Vanguard"
-L["CoT_BOSS3"] = "Time-Lost Battlefield"
-L["CoT_BOSS4"] = "Timeline Marauder"
+L["CoT_BOSS2"] = "Fangs of the Queen"
+L["CoT_BOSS3"] = "The Coaglamation"
+L["CoT_BOSS4"] = "Izo, the Grand Splicer"
 
--- Grim Batol
-L["GB_BOSS1"] = "Chrono-Lord Deios"
-L["GB_BOSS2"] = "Thief of Time"
-L["GB_BOSS3"] = "Blight of Galakrond"
-L["GB_BOSS4"] = "Iridikron"
+-- The Dawnbreaker
+L["TDB"] = "|T5899330:16:16:0:0|t The Dawnbreaker"
+L["TDB_BOSS1"] = "Speaker Shadowcrown"
+L["TDB_BOSS2"] = "Anub'ikkaj"
+L["TDB_BOSS3"] = "Rasha'nan"
 
+-- The Stonevault
+L["TSV"] = "|T5899333:16:16:0:0|t The Stonevault"
+L["TSV_BOSS1"] = "E.D.N.A."
+L["TSV_BOSS2"] = "Skarmorak"
+L["TSV_BOSS3"] = "Master Machinists"
+L["TSV_BOSS4"] = "Void Speaker Eirich"
+
+
+-- Dragonflight
+
+
+-- Shadowlands
 -- Mists of Tirna Scithe
+L["MoTS"] = "|T3601531:16:16:0:0|t Mists of Tirna Scithe"
 L["MoTS_BOSS1"] = "Ingra Maloch"
 L["MoTS_BOSS2"] = "Mistcaller"
 L["MoTS_BOSS3"] = "Tred'ova"
 
 -- The Necrotic Wake
+L["NW"] = "|T3601560:16:16:0:0|t The Necrotic Wake"
 L["NW_BOSS1"] = "Blightbone"
 L["NW_BOSS2"] = "Amarth"
 L["NW_BOSS3"] = "Surgeon Stitchflesh"
 L["NW_BOSS4"] = "Nalthor the Rimebinder"
 
+
+-- Battle for Azeroth
 -- Siege of Boralus
+L["SoB"] = "|T2011139:16:16:0:0|t Siege of Boralus"
 L["SoB_BOSS1"] = "Chopper Redhook"
 L["SoB_BOSS2"] = "Dread Captain Lockwood"
 L["SoB_BOSS3"] = "Hadal Darkfathom"
 L["SoB_BOSS4"] = "Viq'Goth"
 
--- The Dawnbreaker
-L["TDB_BOSS1"] = "Chronikar"
-L["TDB_BOSS2"] = "Manifested Timeways"
-L["TDB_BOSS3"] = "Morchie"
 
--- The Stonevault
-L["TSV_BOSS1"] = "Granyth"
-L["TSV_BOSS2"] = "Emberon"
-L["TSV_BOSS3"] = "Crystal Thrasher"
-L["TSV_BOSS4"] = "Magmatusk"
+-- Cataclysm
+-- Grim Batol
+L["GB"] = "|T409596:16:16:0:0|t Grim Batol"
+L["GB_BOSS1"] = "General Umbriss"
+L["GB_BOSS2"] = "Forgemaster Throngus"
+L["GB_BOSS3"] = "Drahga Shadowburner"
+L["GB_BOSS4"] = "Erudax, the Duke of Below"
 
 -- UI Strings
 L["ADVANCED_SETTINGS"] = "Advanced Settings"
