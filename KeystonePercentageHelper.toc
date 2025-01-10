@@ -9,12 +9,11 @@
 ## Notes: 
 ## SavedVariables: KeystonePercentageHelperDB
 
-## X-Website: https://github.com/ZelionGG/XIV_Databar-Continued
-## X-Issues: https://github.com/ZelionGG/XIV_Databar-Continued/issues
+## X-Website: https://github.com/ZelionGG/KeystonePercentageHelper
+## X-Issues: https://github.com/ZelionGG/KeystonePercentageHelper/issues
 
-## X-Curse-Project-ID: 787614
-## X-WoWI-ID: 26826
-## X-Wago-ID: WqKQVaGx
+## X-Curse-Project-ID: 1175416
+## X-Wago-ID: b6XVj1Gp
 
 embeds.xml
 
