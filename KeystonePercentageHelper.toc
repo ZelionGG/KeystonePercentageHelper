@@ -1,0 +1,21 @@
+## Interface: 110007, 110100
+## X-Interface: 110007, 110100
+## Title: Keystone Percentage Helper
+## Author: ZelionGG
+## Version: 1.0
+## IconTexture: Interface\Addons\KeyStonePercentageHelper\icon.png
+## AddonCompartmentFunc: KeystonePercentageHelper_OnAddonCompartmentClick
+
+## Notes: 
+## SavedVariables: KeystonePercentageHelperDB
+
+## X-Website: https://github.com/ZelionGG/XIV_Databar-Continued
+## X-Issues: https://github.com/ZelionGG/XIV_Databar-Continued/issues
+
+## X-Curse-Project-ID: 787614
+## X-WoWI-ID: 26826
+## X-Wago-ID: WqKQVaGx
+
+embeds.xml
+
+core.lua
