@@ -5,7 +5,7 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![Discord][discord-shield]][discord-url]
-[![All Rights Reserved][license-shield]][license-url]
+[![License][license-shield]][license-url]
 
 <!-- PROJECT LOGO -->
 <br />
@@ -120,7 +120,7 @@ Distributed under the All Rights Reserved License. See `LICENSE` for more inform
 [issues-url]: https://github.com/ZelionGG/KeystonePercentageHelper/issues
 [discord-shield]: https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white
 [discord-url]: https://discord.gg/g7JZNGSU32
-[license-shield]: https://img.shields.io/github/license/ZelionGG/KeystonePercentageHelper.svg?style=for-the-badge
-[license-url]: https://github.com/ZelionGG/KeystonePercentageHelper/blob/master/LICENSE
+[license-shield]: https://img.shields.io/badge/License-All%20Rights%20Reserved-red.svg?style=for-the-badge
+[license-url]: https://github.com/ZelionGG/KeystonePercentageHelper/blob/master/LICENSE.txt
 [Lua]: https://img.shields.io/badge/lua-000000?style=for-the-badge&logo=lua&logoColor=white
 [Lua-url]: https://www.lua.org/
