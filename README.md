@@ -65,9 +65,7 @@ This addon is a port of the WeakAura [WA RM+](https://wago.io/4pHPrk9NM).
 
 ## Features
 
-- In-Game Config
-- Full profile support
-- LibSharedMedia support
+WIP
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
