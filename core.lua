@@ -2,40 +2,49 @@ local AddOnName, KeystonePercentageHelper = ...;
 local _G = _G;
 local pairs, unpack, select = pairs, unpack, select
 local floor = math.floor
-local AceAddon, AceAddonMinor = _G.LibStub('AceAddon-3.0')
-local AceConfig = LibStub("AceConfig-3.0")
-local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+local format = string.format
 
-KeystonePercentageHelper.LSM = LibStub('LibSharedMedia-3.0');
+local AceAddon = LibStub("AceAddon-3.0")
+KeystonePercentageHelper = AceAddon:NewAddon(KeystonePercentageHelper, AddOnName, "AceConsole-3.0", "AceEvent-3.0");
 
 KeystonePercentageHelper.constants = {
     mediaPath = "Interface\\AddOns\\" .. AddOnName .. "\\media\\"
 }
 
-AceAddon:NewAddon(KeystonePercentageHelper, AddOnName, "AceConsole-3.0", "AceEvent-3.0");
+local AceConfig = LibStub("AceConfig-3.0")
+local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+
+KeystonePercentageHelper.LSM = LibStub('LibSharedMedia-3.0');
+
 local success, result = pcall(function() return LibStub("AceLocale-3.0"):GetLocale(AddOnName, false) end)
 local L = success and result or LibStub("AceLocale-3.0"):GetLocale(AddOnName, true, "enUS")
 local options 
 
 KeystonePercentageHelper.DUNGEONS = {}
 
--- Load expansion-specific dungeon data
+-- List of expansions and their corresponding data
+local expansions = {
+    {id = "TWW", name = "EXPANSION_WW", order = 4},        -- The War Within
+    --{id = "DF", name = "EXPANSION_DF", order = 5},         -- Dragonflight
+    {id = "SL", name = "EXPANSION_SL", order = 6},         -- Shadowlands
+    {id = "BFA", name = "EXPANSION_BFA", order = 7},       -- Battle for Azeroth
+    {id = "LEGION", name = "EXPANSION_LEGION", order = 8}, -- Legion
+    --{id = "WOD", name = "EXPANSION_WOD", order = 9},       -- Warlords of Draenor
+    --{id = "MOP", name = "EXPANSION_MOP", order = 10},      -- Mists of Pandaria
+    {id = "CATACLYSM", name = "EXPANSION_CATA", order = 11}, -- Cataclysm
+    --{id = "TBC", name = "EXPANSION_TBC", order = 12} -- The Burning Crusade
+    --{id = "Vanilla", name = "EXPANSION_VANILLA", order = 12} -- Vanilla WoW
+}
+
 local function LoadExpansionDungeons()
-    -- War Within dungeons
-    for id, data in pairs(KeystonePercentageHelper.WW_DUNGEONS or {}) do
-        KeystonePercentageHelper.DUNGEONS[id] = data
-    end
-    -- Shadowlands dungeons
-    for id, data in pairs(KeystonePercentageHelper.SL_DUNGEONS or {}) do
-        KeystonePercentageHelper.DUNGEONS[id] = data
-    end
-    -- BFA dungeons
-    for id, data in pairs(KeystonePercentageHelper.BFA_DUNGEONS or {}) do
-        KeystonePercentageHelper.DUNGEONS[id] = data
-    end
-    -- Cataclysm dungeons
-    for id, data in pairs(KeystonePercentageHelper.CATACLYSM_DUNGEONS or {}) do
-        KeystonePercentageHelper.DUNGEONS[id] = data
+    -- Load dungeons from all expansions
+    for _, expansion in ipairs(expansions) do
+        local dungeons = KeystonePercentageHelper[expansion.id .. "_DUNGEONS"]
+        if dungeons then
+            for id, data in pairs(dungeons) do
+                KeystonePercentageHelper.DUNGEONS[id] = data
+            end
+        end
     end
 end
 
@@ -45,7 +54,6 @@ KeystonePercentageHelper.currentSection = 1
 KeystonePercentageHelper.defaults = {
     profile = {
         general = {
-            enabled = true,
             fontSize = 12,
             position = "CENTER",
             xOffset = 0,
@@ -65,59 +73,95 @@ KeystonePercentageHelper.defaults = {
     }
 }
 
--- Load expansion-specific defaults
-for k, v in pairs(KeystonePercentageHelper.WW_DEFAULTS or {}) do
-    KeystonePercentageHelper.defaults.profile.advanced[k] = v
-end
-for k, v in pairs(KeystonePercentageHelper.SL_DEFAULTS or {}) do
-    KeystonePercentageHelper.defaults.profile.advanced[k] = v
-end
-for k, v in pairs(KeystonePercentageHelper.BFA_DEFAULTS or {}) do
-    KeystonePercentageHelper.defaults.profile.advanced[k] = v
-end
-for k, v in pairs(KeystonePercentageHelper.CATACLYSM_DEFAULTS or {}) do
-    KeystonePercentageHelper.defaults.profile.advanced[k] = v
+-- Load defaults from all expansions
+for _, expansion in ipairs(expansions) do
+    local defaults = KeystonePercentageHelper[expansion.id .. "_DEFAULTS"]
+    if defaults then
+        for k, v in pairs(defaults) do
+            KeystonePercentageHelper.defaults.profile.advanced[k] = v
+        end
+    end
 end
 
 function KeystonePercentageHelper:GetAdvancedOptions()
+    -- Helper function to get dungeon name with icon
+    local function GetDungeonNameWithIcon(dungeonKey)
+        local icon = self.dungeonIcons and self.dungeonIcons[dungeonKey] or ""
+        return icon .. " " .. L[dungeonKey]
+    end
+
+    -- Helper function to format dungeon text
+    local function FormatDungeonText(self, dungeonKey, defaults)
+        local text = ""
+        if defaults then
+            text = text .. "|cffffd700" .. GetDungeonNameWithIcon(dungeonKey) .. "|r:\n"
+            local bossNum = 1
+            while defaults["Boss" .. self:GetBossNumberString(bossNum)] do
+                local bossKey = "Boss" .. self:GetBossNumberString(bossNum)
+                local informKey = bossKey .. "Inform"
+                text = text .. string.format("  %s: |cff40E0D0%.2f%%|r - Inform group: %s\n",
+                    L[dungeonKey .. "_BOSS" .. bossNum],
+                    defaults[bossKey],
+                    defaults[informKey] and '|cff00ff00Yes|r' or '|cffff0000No|r')
+                bossNum = bossNum + 1
+            end
+            text = text .. "\n"
+        end
+        return text
+    end
+
     -- Create shared dungeon options
     local sharedDungeonOptions = {}
-    for dungeonKey, dungeonId in pairs(self.WW_DUNGEON_IDS) do
-        sharedDungeonOptions[dungeonKey] = self:CreateDungeonOptions(dungeonKey, 0)
+    for _, expansion in ipairs(expansions) do
+        local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
+        if dungeonIds then
+            for dungeonKey, dungeonId in pairs(dungeonIds) do
+                sharedDungeonOptions[dungeonKey] = self:CreateDungeonOptions(dungeonKey, 0)
+            end
+        end
     end
-    for dungeonKey, dungeonId in pairs(self.SL_DUNGEON_IDS) do
-        sharedDungeonOptions[dungeonKey] = self:CreateDungeonOptions(dungeonKey, 0)
-    end
-    for dungeonKey, dungeonId in pairs(self.BFA_DUNGEON_IDS) do
-        sharedDungeonOptions[dungeonKey] = self:CreateDungeonOptions(dungeonKey, 0)
-    end
-    for dungeonKey, dungeonId in pairs(self.CATACLYSM_DUNGEON_IDS) do
-        sharedDungeonOptions[dungeonKey] = self:CreateDungeonOptions(dungeonKey, 0)
+
+    -- Create expansion-specific dungeon args
+    local function CreateExpansionDungeonArgs(dungeonIds, defaults)
+        local args = {
+            defaultPercentages = {
+                order = 0,
+                type = "description",
+                fontSize = "medium",
+                name = function()
+                    local text = "Default percentages:\n\n"
+                    for dungeonKey, _ in pairs(dungeonIds or {}) do
+                        if defaults and defaults[dungeonKey] then
+                            text = text .. FormatDungeonText(self, dungeonKey, defaults[dungeonKey])
+                        end
+                    end
+                    return text
+                end
+            }
+        }
+        
+        -- Add dungeon options
+        if dungeonIds then
+            for dungeonKey, _ in pairs(dungeonIds) do
+                args[dungeonKey] = sharedDungeonOptions[dungeonKey]
+            end
+        end
+        
+        return args
     end
 
     -- Create current season options
-    local currentSeasonOptions = {}
     local currentSeasonDungeons = {}
     
     -- Collect all current season dungeons
-    for dungeonKey, dungeonId in pairs(self.WW_DUNGEON_IDS) do
-        if self:IsCurrentSeasonDungeon(dungeonId) then
-            table.insert(currentSeasonDungeons, {key = dungeonKey, id = dungeonId})
-        end
-    end
-    for dungeonKey, dungeonId in pairs(self.SL_DUNGEON_IDS) do
-        if self:IsCurrentSeasonDungeon(dungeonId) then
-            table.insert(currentSeasonDungeons, {key = dungeonKey, id = dungeonId})
-        end
-    end
-    for dungeonKey, dungeonId in pairs(self.BFA_DUNGEON_IDS) do
-        if self:IsCurrentSeasonDungeon(dungeonId) then
-            table.insert(currentSeasonDungeons, {key = dungeonKey, id = dungeonId})
-        end
-    end
-    for dungeonKey, dungeonId in pairs(self.CATACLYSM_DUNGEON_IDS) do
-        if self:IsCurrentSeasonDungeon(dungeonId) then
-            table.insert(currentSeasonDungeons, {key = dungeonKey, id = dungeonId})
+    for _, expansion in ipairs(expansions) do
+        local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
+        if dungeonIds then
+            for dungeonKey, dungeonId in pairs(dungeonIds) do
+                if self:IsCurrentSeasonDungeon(dungeonId) then
+                    table.insert(currentSeasonDungeons, {key = dungeonKey, id = dungeonId})
+                end
+            end
         end
     end
     
@@ -125,15 +169,8 @@ function KeystonePercentageHelper:GetAdvancedOptions()
     table.sort(currentSeasonDungeons, function(a, b)
         return L[a.key] < L[b.key]
     end)
-    
-    -- Create options in sorted order
-    for i, dungeon in ipairs(currentSeasonDungeons) do
-        local dungeonKey = dungeon.key
-        -- Create a new option with the correct order
-        currentSeasonOptions[dungeonKey] = self:CreateDungeonOptions(dungeonKey, i + 1)  -- +1 because defaultPercentages is order 0
-    end
 
-    -- Add current season dungeons to args table
+    -- Create current season dungeon args
     local dungeonArgs = {
         defaultPercentages = {
             order = 0,
@@ -141,48 +178,60 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             fontSize = "medium",
             name = function()
                 local text = "Default percentages:\n\n"
-                
-                -- Show dungeons in the same sorted order as the options
                 for _, dungeon in ipairs(currentSeasonDungeons) do
                     local dungeonKey = dungeon.key
                     local defaults
-                    if self.WW_DUNGEON_IDS[dungeonKey] then
-                        defaults = self.WW_DEFAULTS[dungeonKey]
-                    elseif self.SL_DUNGEON_IDS[dungeonKey] then
-                        defaults = self.SL_DEFAULTS[dungeonKey]
-                    elseif self.BFA_DUNGEON_IDS[dungeonKey] then
-                        defaults = self.BFA_DEFAULTS[dungeonKey]
-                    elseif self.CATACLYSM_DUNGEON_IDS[dungeonKey] then
-                        defaults = self.CATACLYSM_DEFAULTS[dungeonKey]
+                    for _, expansion in ipairs(expansions) do
+                        if self[expansion.id .. "_DUNGEON_IDS"][dungeonKey] then
+                            defaults = self[expansion.id .. "_DEFAULTS"][dungeonKey]
+                            break
+                        end
                     end
                     
-                    if defaults then
-                        text = text .. string.format("|cffffd700%s|r:\n", L[dungeonKey])
-                        if defaults.BossOne then
-                            text = text .. string.format("  %s: %.2f%%\n", L[dungeonKey.."_BOSS1"], defaults.BossOne)
-                        end
-                        if defaults.BossTwo then
-                            text = text .. string.format("  %s: %.2f%%\n", L[dungeonKey.."_BOSS2"], defaults.BossTwo)
-                        end
-                        if defaults.BossThree then
-                            text = text .. string.format("  %s: %.2f%%\n", L[dungeonKey.."_BOSS3"], defaults.BossThree)
-                        end
-                        if defaults.BossFour then
-                            text = text .. string.format("  %s: %.2f%%\n", L[dungeonKey.."_BOSS4"], defaults.BossFour)
-                        end
-                        text = text .. "\n"
-                    end
+                    text = text .. FormatDungeonText(self, dungeonKey, defaults)
                 end
-                
                 return text
             end
         }
     }
     
-    -- Add dungeon options in sorted order
+    -- Add current season dungeon options
     for _, dungeon in ipairs(currentSeasonDungeons) do
-        local dungeonKey = dungeon.key
-        dungeonArgs[dungeonKey] = currentSeasonOptions[dungeonKey]
+        dungeonArgs[dungeon.key] = sharedDungeonOptions[dungeon.key]
+    end
+
+    -- Create expansion sections
+    local args = {
+        enabled = {
+            name = L["ENABLE_ADVANCED_OPTIONS"],
+            desc = L["ADVANCED_OPTIONS_DESC"],
+            type = "toggle",
+            order = 2,
+            get = function() return self.db.profile.general.advancedOptionsEnabled end,
+            set = function(_, value)
+                self.db.profile.general.advancedOptionsEnabled = value
+                self:UpdateDungeonData()
+            end
+        },
+        dungeons = {
+            name = "|cff40E0D0" .. L["CURRENT_SEASON"] .. "|r",
+            type = "group",
+            childGroups = "tree",
+            order = 3,
+            args = dungeonArgs
+        }
+    }
+
+    -- Add expansion sections
+    for _, expansion in ipairs(expansions) do
+        local sectionKey = expansion.id:lower()
+        args[sectionKey] = {
+            name = L[expansion.name],
+            type = "group",
+            childGroups = "tree",
+            order = expansion.order,
+            args = CreateExpansionDungeonArgs(self[expansion.id .. "_DUNGEON_IDS"], self[expansion.id .. "_DEFAULTS"])
+        }
     end
 
     return {
@@ -190,90 +239,46 @@ function KeystonePercentageHelper:GetAdvancedOptions()
         type = "group",
         childGroups = "tree",
         order = 2,
-        args = {
-            header = {
-                name = L["TANK_GROUP_HEADER"],
-                type = "header",
-                order = 1,
-            },
-            enabled = {
-                name = L["ENABLE_ADVANCED_OPTIONS"],
-                desc = L["ADVANCED_OPTIONS_DESC"],
-                type = "toggle",
-                order = 2,
-                get = function() return self.db.profile.general.advancedOptionsEnabled end,
-                set = function(_, value)
-                    self.db.profile.general.advancedOptionsEnabled = value
-                    self:UpdateDungeonData()
-                end
-            },
-            dungeons = {
-                name = L["CURRENT_SEASON"],
-                type = "group",
-                childGroups = "tree",
-                order = 3,
-                args = dungeonArgs
-            },
-            war_within = {
-                name = L["EXPANSION_WW"],
-                type = "group",
-                childGroups = "tree",
-                order = 4,
-                args = {
-                    AKCE = sharedDungeonOptions.AKCE,
-                    CoT = sharedDungeonOptions.CoT,
-                    TSV = sharedDungeonOptions.TSV,
-                    TDB = sharedDungeonOptions.TDB
-                }
-            },
-            dragonflight = {
-                name = L["EXPANSION_DF"],
-                type = "group",
-                childGroups = "tree",
-                order = 5,
-                args = {}
-            },
-            shadowlands = {
-                name = L["EXPANSION_SL"],
-                type = "group",
-                childGroups = "tree",
-                order = 6,
-                args = {
-                    MoTS = sharedDungeonOptions.MoTS,
-                    NW = sharedDungeonOptions.NW
-                }
-            },
-            bfa = {
-                name = L["EXPANSION_BFA"],
-                type = "group",
-                childGroups = "tree",
-                order = 7,
-                args = {
-                    SoB = sharedDungeonOptions.SoB
-                }
-            },
-            cataclysm = {
-                name = L["EXPANSION_CATA"],
-                type = "group",
-                childGroups = "tree",
-                order = 8,
-                args = {
-                    GB = sharedDungeonOptions.GB
-                }
-            }
-        }
+        args = args
     }
+end
+
+function KeystonePercentageHelper:GetBossNumberString(num)
+    if num == 1 then return "One"
+    elseif num == 2 then return "Two"
+    elseif num == 3 then return "Three"
+    elseif num == 4 then return "Four"
+    elseif num == 5 then return "Five"
+    end
+    return tostring(num)
 end
 
 function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
     local numBosses = #self.DUNGEONS[self:GetDungeonIdByKey(dungeonKey)]
     local options = {
-        name = L[dungeonKey] or dungeonKey,
+        name = function()
+            local icon = self.dungeonIcons and self.dungeonIcons[dungeonKey] or ""
+            return icon .. " " .. (L[dungeonKey] or dungeonKey)
+        end,
         type = "group",
         order = order,
         args = {
-            reset = {
+            dungeonHeader = {
                 order = 0,
+                type = "description",
+                fontSize = "large",
+                name = function()
+                    local icon = self.dungeonIcons and self.dungeonIcons[dungeonKey] or ""
+                    return "|cffffd700" .. icon .. " " .. (L[dungeonKey] or dungeonKey) .. "|r"
+                end,
+            },
+            dungeonSecondHeader = {
+                type = "header",
+                name = "",
+                order = 1,
+            },
+            reset = {
+                order = 2,
                 type = "execute",
                 name = L["RESET_DUNGEON"],
                 desc = L["RESET_DUNGEON_DESC"],
@@ -287,14 +292,11 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
 
                         -- Get the appropriate defaults
                         local defaults
-                        if self.WW_DUNGEON_IDS[dungeonKey] then
-                            defaults = self.WW_DEFAULTS[dungeonKey]
-                        elseif self.SL_DUNGEON_IDS[dungeonKey] then
-                            defaults = self.SL_DEFAULTS[dungeonKey]
-                        elseif self.BFA_DUNGEON_IDS[dungeonKey] then
-                            defaults = self.BFA_DEFAULTS[dungeonKey]
-                        elseif self.CATACLYSM_DUNGEON_IDS[dungeonKey] then
-                            defaults = self.CATACLYSM_DEFAULTS[dungeonKey]
+                        for _, expansion in ipairs(expansions) do
+                            if self[expansion.id .. "_DUNGEON_IDS"][dungeonKey] then
+                                defaults = self[expansion.id .. "_DEFAULTS"][dungeonKey]
+                                break
+                            end
                         end
 
                         if defaults then
@@ -314,7 +316,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
             header = {
                 name = L["TANK_GROUP_HEADER"],
                 type = "header",
-                order = 1,
+                order = 3,
             },
         }
     }
@@ -362,21 +364,14 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
 end
 
 function KeystonePercentageHelper:GetDungeonKeyById(dungeonId)
-    -- Check War Within dungeons
-    for key, id in pairs(self.WW_DUNGEON_IDS or {}) do
-        if id == dungeonId then return key end
-    end
-    -- Check Shadowlands dungeons
-    for key, id in pairs(self.SL_DUNGEON_IDS or {}) do
-        if id == dungeonId then return key end
-    end
-    -- Check BFA dungeons
-    for key, id in pairs(self.BFA_DUNGEON_IDS or {}) do
-        if id == dungeonId then return key end
-    end
-    -- Check Cataclysm dungeons
-    for key, id in pairs(self.CATACLYSM_DUNGEON_IDS or {}) do
-        if id == dungeonId then return key end
+    -- Check all expansions for the dungeon ID
+    for _, expansion in ipairs(expansions) do
+        local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
+        if dungeonIds then
+            for key, id in pairs(dungeonIds) do
+                if id == dungeonId then return key end
+            end
+        end
     end
     return nil
 end
@@ -396,58 +391,19 @@ function KeystonePercentageHelper:OnInitialize()
                 type = "group",
                 order = 1,
                 args = {
-                    enabled = {
-                        name = "Enable",
-                        desc = "Enable/disable the addon",
-                        type = "toggle",
-                        order = 1,
-                        get = function() return self.db.profile.general.enabled end,
-                        set = function(_, value)
-                            self.db.profile.general.enabled = value
-                            self:Refresh()
-                        end
-                    },
-                    font = {
-                        name = "Font",
-                        type = "select",
-                        dialogControl = 'LSM30_Font',
-                        order = 2,
-                        values = AceGUIWidgetLSMlists.font,
-                        style = "dropdown",
-                        get = function()
-                            return self.db.profile.text.font
-                        end,
-                        set = function(_, value)
-                            self.db.profile.text.font = value
-                            self:Refresh()
-                        end
-                    },
-                    fontSize = {
-                        name = "Font Size",
-                        desc = "Adjust the size of the text",
-                        type = "range",
-                        order = 3,
-                        min = 8,
-                        max = 24,
-                        step = 1,
-                        get = function() return self.db.profile.general.fontSize end,
-                        set = function(_, value)
-                            self.db.profile.general.fontSize = value
-                            self:Refresh()
-                        end
-                    },
+                    positioning = self:GetPositioningOptions(),
+                    font = self:GetFontOptions(),
+                    colors = self:GetColorOptions(),
                     informGroup = {
                         name = "Inform Group",
                         desc = "Send messages to the party chat when reaching important percentage thresholds",
                         type = "toggle",
-                        order = 4,
+                        order = 10,
                         get = function() return self.db.profile.general.informGroup end,
                         set = function(_, value)
                             self.db.profile.general.informGroup = value
                         end
                     },
-                    positioning = self:GetPositioningOptions(),
-                    colors = self:GetColorOptions()
                 }
             },
             advanced = self:GetAdvancedOptions()
@@ -461,6 +417,46 @@ function KeystonePercentageHelper:OnInitialize()
     
     -- Create display after DB is initialized
     self:CreateDisplay()
+end
+
+function KeystonePercentageHelper:GetFontOptions()
+    return {
+        name = "Font",
+        type = "group",
+        inline = true,
+        order = 5.5,
+        args = {
+            font = {
+                name = "Font",
+                type = "select",
+                dialogControl = 'LSM30_Font',
+                order = 1,
+                values = AceGUIWidgetLSMlists.font,
+                style = "dropdown",
+                get = function()
+                    return self.db.profile.text.font
+                end,
+                set = function(_, value)
+                    self.db.profile.text.font = value
+                    self:Refresh()
+                end
+            },
+            fontSize = {
+                name = "Font Size",
+                desc = "Adjust the size of the text",
+                type = "range",
+                order = 2,
+                min = 8,
+                max = 24,
+                step = 1,
+                get = function() return self.db.profile.general.fontSize end,
+                set = function(_, value)
+                    self.db.profile.general.fontSize = value
+                    self:Refresh()
+                end
+            }
+        }
+    }
 end
 
 function KeystonePercentageHelper:ToggleConfig()
@@ -660,11 +656,36 @@ function KeystonePercentageHelper:Refresh()
     self:UpdateDungeonData()
     
     -- Show/hide based on enabled state
-    if self.db.profile.general.enabled then
-        self.displayFrame:Show()
-    else
-        self.displayFrame:Hide()
+    self.displayFrame:Show()
+
+end
+
+function KeystonePercentageHelper:UpdateDungeonData()
+    if self.db.profile.general.advancedOptionsEnabled then
+        for dungeonId, dungeonData in pairs(self.DUNGEONS) do
+            local dungeonKey = self:GetDungeonKeyById(dungeonId)
+            if dungeonKey and self.db.profile.advanced[dungeonKey] then
+                local advancedData = self.db.profile.advanced[dungeonKey]
+                for i, bossData in ipairs(dungeonData) do
+                    local bossNumStr = i == 1 and "One" or i == 2 and "Two" or i == 3 and "Three" or "Four"
+                    bossData[2] = advancedData["Boss"..bossNumStr]
+                    bossData[3] = advancedData["Boss" .. bossNumStr .. "Inform"]
+                    bossData[4] = false -- Reset informed status
+                end
+            end
+        end
     end
+end
+
+function KeystonePercentageHelper:GetDungeonIdByKey(dungeonKey)
+    -- Check each expansion's dungeon IDs table
+    for _, expansion in ipairs(expansions) do
+        local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
+        if dungeonIds and dungeonIds[dungeonKey] then
+            return dungeonIds[dungeonKey]
+        end
+    end
+    return nil
 end
 
 function KeystonePercentageHelper:GetColorOptions()
@@ -672,7 +693,7 @@ function KeystonePercentageHelper:GetColorOptions()
         name = "Colors",
         type = "group",
         inline = true,
-        order = 2,
+        order = 6,
         args = {
             inProgressColor = {
                 name = "In progress",
@@ -719,7 +740,7 @@ function KeystonePercentageHelper:GetPositioningOptions()
         name = "Positioning",
         type = "group",
         inline = true,
-        order = 1,
+        order = 5,
         args = {
             position = {
                 name = "Anchor Position",
@@ -764,35 +785,4 @@ function KeystonePercentageHelper:GetPositioningOptions()
             }
         }
     }
-end
-
-function KeystonePercentageHelper:UpdateDungeonData()
-    if self.db.profile.general.advancedOptionsEnabled then
-        for dungeonId, dungeonData in pairs(self.DUNGEONS) do
-            local dungeonKey = self:GetDungeonKeyById(dungeonId)
-            if dungeonKey and self.db.profile.advanced[dungeonKey] then
-                local advancedData = self.db.profile.advanced[dungeonKey]
-                for i, bossData in ipairs(dungeonData) do
-                    local bossNumStr = i == 1 and "One" or i == 2 and "Two" or i == 3 and "Three" or "Four"
-                    bossData[2] = advancedData["Boss"..bossNumStr]
-                    bossData[3] = advancedData["Boss" .. bossNumStr .. "Inform"]
-                    bossData[4] = false -- Reset informed status
-                end
-            end
-        end
-    end
-end
-
-function KeystonePercentageHelper:GetDungeonIdByKey(dungeonKey)
-    local dungeonIds = {
-        ["AKCE"] = 503,
-        ["CoT"] = 502,
-        ["GB"] = 507,
-        ["MoTS"] = 375,
-        ["SoB"] = 353,
-        ["TDB"] = 505,
-        ["NW"] = 376,
-        ["TSV"] = 501
-    }
-    return dungeonIds[dungeonKey]
 end

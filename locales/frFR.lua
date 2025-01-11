@@ -12,6 +12,7 @@ L["EXPANSION_CATA"] = "Cataclysm"
 L["EXPANSION_WW"] = "The War Within"
 L["EXPANSION_SL"] = "Shadowlands"
 L["EXPANSION_BFA"] = "Battle for Azeroth"
+L["EXPANSION_LEGION"] = "Legion"
 
 -- The War Within
 -- Ara-Kara, City of Echoes
