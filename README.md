@@ -1,3 +1,4 @@
+<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a name="readme-top"></a>
 
 [![Contributors][contributors-shield]][contributors-url]
@@ -48,13 +49,23 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-This addon is a port of the WeakAura [WA RM+](https://wago.io/4pHPrk9NM).
+Keystone Percentage Helper is an addon designed to assist players in tracking enemy forces percentage during Mythic+ dungeon runs. Originally inspired by the WeakAura [WA RM+](https://wago.io/4pHPrk9NM), this WeakAura has been completely rewritten as a standalone addon to provide better performance and reliability.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+The addon helps you optimize your routes by:
+- Displaying the current enemy forces percentage
+- Showing target percentages for each boss
+- Warning you and your group when approaching important percentage thresholds
+- Supporting all current season dungeons and previous expansions
+- Allowing full customization of percentage targets for each dungeon
 
-### Built With
+Whether you're a seasoned Mythic+ runner or just starting out, this addon helps ensure you reach the required enemy forces percentage at the right time, making your runs more efficient and organized.
 
-* [![Lua][Lua]][Lua-url]
+### Why an Addon Instead of a WeakAura?
+While the original WeakAura served its purpose well, converting it to a standalone addon brings several significant advantages:
+- **Better Performance**: Uses significantly less memory and CPU resources compared to the WeakAura version
+- **Faster Response**: More reactive to game events, providing real-time percentage updates
+- **Easier Maintenance**: Structured codebase makes it easier to update for new seasons and expansions
+- **Enhanced Reliability**: Built using WoW's addon framework for more stable operation
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -65,7 +76,23 @@ This addon is a port of the WeakAura [WA RM+](https://wago.io/4pHPrk9NM).
 
 ## Features
 
-WIP
+### Core Features
+- Real-time enemy forces percentage tracking
+- Target percentages to reach before each boss encounter
+- Group notifications for important percentage thresholds
+- Support for all dungeons (Current Season, The War Within, Dragonflight, ...)
+
+### Customization
+- Fully customizable text display (font, size, colors)
+- Adjustable position on screen
+- Custom percentage thresholds for each dungeon
+- Per-boss notification settings
+
+### User Interface
+- Clean and intuitive options panel
+- Easy-to-navigate dungeon selection tree
+- Quick access to default routes
+- One-click reset to default values
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
