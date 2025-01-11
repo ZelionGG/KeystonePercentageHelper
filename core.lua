@@ -13,7 +13,8 @@ KeystonePercentageHelper.constants = {
 }
 
 AceAddon:NewAddon(KeystonePercentageHelper, AddOnName, "AceConsole-3.0", "AceEvent-3.0");
-local L = LibStub("AceLocale-3.0"):GetLocale(AddOnName, true);
+local success, result = pcall(function() return LibStub("AceLocale-3.0"):GetLocale(AddOnName, false) end)
+local L = success and result or LibStub("AceLocale-3.0"):GetLocale(AddOnName, true, "enUS")
 local options 
 
 KeystonePercentageHelper.DUNGEONS = {}
@@ -590,6 +591,21 @@ function KeystonePercentageHelper:UpdatePercentageText()
             color = self.db.profile.color.finished
             self.displayFrame.text:SetText("Finished")
             self.currentSection = self.currentSection + 1
+            if self.currentSection <= #self.DUNGEONS[self.currentDungeonID] then
+                C_Timer.After(2, function()
+                    local nextRequired = self.DUNGEONS[self.currentDungeonID][self.currentSection][2] - currentPercentage
+                    if currentPercentage >= 100 then
+                        color = self.db.profile.color.finished
+                        self.displayFrame.text:SetText("Finished")
+                    else
+                        color = self.db.profile.color.inProgress
+                        self.displayFrame.text:SetText(string.format("%.2f%%", nextRequired))
+                    end
+                    self.displayFrame.text:SetTextColor(color.r, color.g, color.b, color.a)
+                end)
+            else
+                self.displayFrame.text:SetText("Finished")
+            end
         end
         
         self.displayFrame.text:SetTextColor(color.r, color.g, color.b, color.a)
