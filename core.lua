@@ -59,6 +59,7 @@ KeystonePercentageHelper.defaults = {
             xOffset = 0,
             yOffset = 0,
             informGroup = true,
+            informChannel = "PARTY",
             advancedOptionsEnabled = false,
         },
         text = {
@@ -202,15 +203,43 @@ function KeystonePercentageHelper:GetAdvancedOptions()
 
     -- Create expansion sections
     local args = {
-        enabled = {
-            name = L["ENABLE_ADVANCED_OPTIONS"],
-            desc = L["ADVANCED_OPTIONS_DESC"],
-            type = "toggle",
-            order = 2,
-            get = function() return self.db.profile.general.advancedOptionsEnabled end,
-            set = function(_, value)
-                self.db.profile.general.advancedOptionsEnabled = value
+        resetAll = {
+            order = 1,
+            type = "execute",
+            name = L["RESET_ALL_DUNGEONS"],
+            desc = L["RESET_ALL_DUNGEONS_DESC"],
+            confirm = true,
+            confirmText = L["RESET_ALL_DUNGEONS_CONFIRM"],
+            func = function()
+                -- Reset all dungeons to their defaults
+                for _, expansion in ipairs(expansions) do
+                    local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
+                    if dungeonIds then
+                        for dungeonKey, _ in pairs(dungeonIds) do
+                            -- Get the appropriate defaults
+                            local defaults
+                            for _, exp in ipairs(expansions) do
+                                if self[exp.id .. "_DUNGEON_IDS"][dungeonKey] then
+                                    defaults = self[exp.id .. "_DEFAULTS"][dungeonKey]
+                                    break
+                                end
+                            end
+
+                            if defaults then
+                                if not self.db.profile.advanced[dungeonKey] then
+                                    self.db.profile.advanced[dungeonKey] = {}
+                                end
+                                for key, value in pairs(defaults) do
+                                    self.db.profile.advanced[dungeonKey][key] = value
+                                end
+                            end
+                        end
+                    end
+                end
+                
+                -- Update the display
                 self:UpdateDungeonData()
+                LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePercentageHelper")
             end
         },
         dungeons = {
@@ -404,6 +433,34 @@ function KeystonePercentageHelper:OnInitialize()
                             self.db.profile.general.informGroup = value
                         end
                     },
+                    informChannel = {
+                        name = L["MESSAGE_CHANNEL"],
+                        desc = L["MESSAGE_CHANNEL_DESC"],
+                        type = "select",
+                        order = 11,
+                        values = {
+                            PARTY = L["PARTY"],
+                            SAY = L["SAY"],
+                            YELL = L["YELL"]
+                        },
+                        disabled = function() return not self.db.profile.general.informGroup end,
+                        get = function() return self.db.profile.general.informChannel end,
+                        set = function(_, value)
+                            self.db.profile.general.informChannel = value
+                        end
+                    },
+                    enabled = {
+                        name = L["ENABLE_ADVANCED_OPTIONS"],
+                        desc = L["ADVANCED_OPTIONS_DESC"],
+                        type = "toggle",
+                        width = "full",
+                        order = 12,
+                        get = function() return self.db.profile.general.advancedOptionsEnabled end,
+                        set = function(_, value)
+                            self.db.profile.general.advancedOptionsEnabled = value
+                            self:UpdateDungeonData()
+                        end
+                    },
                 }
             },
             advanced = self:GetAdvancedOptions()
@@ -534,7 +591,7 @@ end
 function KeystonePercentageHelper:InformGroup(percentage)
     if not self.db.profile.general.informGroup then return end
     
-    local channel = "PARTY"
+    local channel = self.db.profile.general.informChannel
     local percentageStr = string.format("%.2f%%", percentage)
     if percentageStr == "0.00%" then return end
     SendChatMessage("[KPH]: We still need " .. percentageStr, channel)
