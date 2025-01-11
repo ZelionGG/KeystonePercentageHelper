@@ -49,7 +49,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Keystone Percentage Helper is an addon designed to assist players in tracking enemy forces percentage during Mythic+ dungeon runs. Originally inspired by the WeakAura [WA RM+](https://wago.io/4pHPrk9NM), this WeakAura has been completely rewritten as a standalone addon to provide better performance and reliability.
+Keystone Percentage Helper is an addon designed to assist players in tracking enemy forces percentage during Mythic+ dungeon runs. Originally inspired by the WeakAura [WA RM+](https://wago.io/4pHPrk9NM), this WeakAura has been rewritten as a standalone addon to provide better performance and reliability.
 
 The addon helps you optimize your routes by:
 - Displaying the current enemy forces percentage
@@ -84,7 +84,7 @@ While the original WeakAura served its purpose well, converting it to a standalo
 
 ### Customization
 - Fully customizable text display (font, size, colors)
-- Adjustable position on screen
+- Adjustable position on screen with draggable anchor
 - Custom percentage thresholds for each dungeon
 - Per-boss notification settings
 
