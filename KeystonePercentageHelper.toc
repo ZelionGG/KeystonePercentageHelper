@@ -2,11 +2,11 @@
 ## X-Interface: 110007, 110100
 ## Title: Keystone Percentage Helper
 ## Author: ZelionGG
-## Version: 1.0
+## Version: @project-version@
 ## IconTexture: Interface\Addons\KeyStonePercentageHelper\icon.png
 ## AddonCompartmentFunc: KeystonePercentageHelper_OnAddonCompartmentClick
 
-## Notes: 
+## Notes: Addon designed to help you keep track of the percentage to make in each M+ dungeon section.
 ## SavedVariables: KeystonePercentageHelperDB
 
 ## X-Website: https://github.com/ZelionGG/KeystonePercentageHelper
