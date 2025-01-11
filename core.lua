@@ -411,6 +411,48 @@ function KeystonePercentageHelper:OnInitialize()
     self.LSM:Register(self.LSM.MediaType.FONT, 'Friz Quadrata TT',
                       self.constants.mediaPath .. "FrizQuadrata.ttf")
     
+    -- Create main display frame
+    self.displayFrame = CreateFrame("Frame", "KeystonePercentageHelperFrame", UIParent)
+    self.displayFrame:SetSize(200, 20)
+    self.displayFrame:SetPoint(self.db.profile.general.position, UIParent, self.db.profile.general.position, self.db.profile.general.xOffset, self.db.profile.general.yOffset)
+    
+    -- Create text for display frame
+    self.displayFrame.text = self.displayFrame:CreateFontString(nil, "OVERLAY")
+    self.displayFrame.text:SetPoint("CENTER")
+    self.displayFrame.text:SetFont(self.LSM:Fetch('font', self.db.profile.text.font), self.db.profile.general.fontSize, "OUTLINE")
+    
+    -- Create anchor frame
+    self.anchorFrame = CreateFrame("Frame", "KeystonePercentageHelperAnchorFrame", UIParent, "BackdropTemplate")
+    self.anchorFrame:SetSize(200, 20)
+    self.anchorFrame:SetPoint("CENTER", self.displayFrame, "CENTER", 0, 0)
+    self.anchorFrame:SetBackdrop({
+        bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
+        edgeFile = "Interface\\ChatFrame\\ChatFrameBackground",
+        tile = true, tileSize = 16, edgeSize = 1,
+    })
+    self.anchorFrame:SetBackdropColor(0, 0, 0, 0.5)
+    self.anchorFrame:SetBackdropBorderColor(1, 1, 1, 1)
+    
+    local text = self.anchorFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    text:SetPoint("CENTER")
+    text:SetText(L["ANCHOR_TEXT"])
+    
+    self.anchorFrame:EnableMouse(true)
+    self.anchorFrame:SetMovable(true)
+    self.anchorFrame:RegisterForDrag("LeftButton")
+    self.anchorFrame:SetScript("OnDragStart", function() self.anchorFrame:StartMoving() end)
+    self.anchorFrame:SetScript("OnDragStop", function()
+        self.anchorFrame:StopMovingOrSizing()
+        -- Update position based on anchor
+        local point, _, relativePoint, xOffset, yOffset = self.anchorFrame:GetPoint()
+        self.db.profile.general.position = point
+        self.db.profile.general.xOffset = xOffset
+        self.db.profile.general.yOffset = yOffset
+        self:Refresh()
+    end)
+    
+    self.anchorFrame:Hide()
+    
     options = {
         name = "Keystone Percentage Helper",
         type = "group",
@@ -423,44 +465,7 @@ function KeystonePercentageHelper:OnInitialize()
                     positioning = self:GetPositioningOptions(),
                     font = self:GetFontOptions(),
                     colors = self:GetColorOptions(),
-                    informGroup = {
-                        name = L["INFORM_GROUP"],
-                        desc = L["INFORM_GROUP_DESC"],
-                        type = "toggle",
-                        order = 10,
-                        get = function() return self.db.profile.general.informGroup end,
-                        set = function(_, value)
-                            self.db.profile.general.informGroup = value
-                        end
-                    },
-                    informChannel = {
-                        name = L["MESSAGE_CHANNEL"],
-                        desc = L["MESSAGE_CHANNEL_DESC"],
-                        type = "select",
-                        order = 11,
-                        values = {
-                            PARTY = L["PARTY"],
-                            SAY = L["SAY"],
-                            YELL = L["YELL"]
-                        },
-                        disabled = function() return not self.db.profile.general.informGroup end,
-                        get = function() return self.db.profile.general.informChannel end,
-                        set = function(_, value)
-                            self.db.profile.general.informChannel = value
-                        end
-                    },
-                    enabled = {
-                        name = L["ENABLE_ADVANCED_OPTIONS"],
-                        desc = L["ADVANCED_OPTIONS_DESC"],
-                        type = "toggle",
-                        width = "full",
-                        order = 12,
-                        get = function() return self.db.profile.general.advancedOptionsEnabled end,
-                        set = function(_, value)
-                            self.db.profile.general.advancedOptionsEnabled = value
-                            self:UpdateDungeonData()
-                        end
-                    },
+                    otherOptions = self:GetOtherOptions(),
                 }
             },
             advanced = self:GetAdvancedOptions()
@@ -490,9 +495,7 @@ function KeystonePercentageHelper:GetFontOptions()
                 order = 1,
                 values = AceGUIWidgetLSMlists.font,
                 style = "dropdown",
-                get = function()
-                    return self.db.profile.text.font
-                end,
+                get = function() return self.db.profile.text.font end,
                 set = function(_, value)
                     self.db.profile.text.font = value
                     self:Refresh()
@@ -702,6 +705,10 @@ function KeystonePercentageHelper:Refresh()
         self.db.profile.general.yOffset
     )
     
+    -- Update anchor frame position
+    self.anchorFrame:ClearAllPoints()
+    self.anchorFrame:SetPoint("CENTER", self.displayFrame, "CENTER", 0, 0)
+    
     -- Update font size and font
     self.displayFrame.text:SetFont(self.LSM:Fetch('font', self.db.profile.text.font), self.db.profile.general.fontSize, "OUTLINE")
     
@@ -714,7 +721,6 @@ function KeystonePercentageHelper:Refresh()
     
     -- Show/hide based on enabled state
     self.displayFrame:Show()
-
 end
 
 function KeystonePercentageHelper:UpdateDungeonData()
@@ -792,6 +798,55 @@ function KeystonePercentageHelper:GetColorOptions()
     }
 end
 
+function KeystonePercentageHelper:GetOtherOptions()
+    return {
+        name = L["OPTIONS"],
+        type = "group",
+        inline = true,
+        order = 10,
+        args = {
+            informGroup = {
+                name = L["INFORM_GROUP"],
+                desc = L["INFORM_GROUP_DESC"],
+                type = "toggle",
+                order = 10,
+                get = function() return self.db.profile.general.informGroup end,
+                set = function(_, value)
+                    self.db.profile.general.informGroup = value
+                end
+            },
+            informChannel = {
+                name = L["MESSAGE_CHANNEL"],
+                desc = L["MESSAGE_CHANNEL_DESC"],
+                type = "select",
+                order = 11,
+                values = {
+                    PARTY = L["PARTY"],
+                    SAY = L["SAY"],
+                    YELL = L["YELL"]
+                },
+                disabled = function() return not self.db.profile.general.informGroup end,
+                get = function() return self.db.profile.general.informChannel end,
+                set = function(_, value)
+                    self.db.profile.general.informChannel = value
+                end
+            },
+            enabled = {
+                name = L["ENABLE_ADVANCED_OPTIONS"],
+                desc = L["ADVANCED_OPTIONS_DESC"],
+                type = "toggle",
+                width = "full",
+                order = 12,
+                get = function() return self.db.profile.general.advancedOptionsEnabled end,
+                set = function(_, value)
+                    self.db.profile.general.advancedOptionsEnabled = value
+                    self:UpdateDungeonData()
+                end
+            },
+        }
+    }
+end
+
 function KeystonePercentageHelper:GetPositioningOptions()
     return {
         name = L["POSITIONING"],
@@ -838,6 +893,20 @@ function KeystonePercentageHelper:GetPositioningOptions()
                 set = function(_, value)
                     self.db.profile.general.yOffset = value
                     self:Refresh()
+                end
+            },
+            showAnchor = {
+                name = L["SHOW_ANCHOR"],
+                type = "toggle",
+                order = 4,
+                width = "full",
+                get = function() return self.anchorFrame:IsShown() end,
+                set = function(_, value)
+                    if value then
+                        self.anchorFrame:Show()
+                    else
+                        self.anchorFrame:Hide()
+                    end
                 end
             }
         }
