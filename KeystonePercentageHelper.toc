@@ -20,4 +20,5 @@ locales/locales.xml
 expansions/expansions.xml
 
 core.lua
+dungeonIcons.lua
 season.lua
