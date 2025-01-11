@@ -130,7 +130,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
                 type = "description",
                 fontSize = "medium",
                 name = function()
-                    local text = "Default percentages:\n\n"
+                    local text = L["DEFAULT_PERCENTAGES"] .. ":\n\n"
                     for dungeonKey, _ in pairs(dungeonIds or {}) do
                         if defaults and defaults[dungeonKey] then
                             text = text .. FormatDungeonText(self, dungeonKey, defaults[dungeonKey])
@@ -178,7 +178,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             type = "description",
             fontSize = "medium",
             name = function()
-                local text = "Default percentages:\n\n"
+                local text = L["DEFAULT_PERCENTAGES"] .. ":\n\n"
                 for _, dungeon in ipairs(currentSeasonDungeons) do
                     local dungeonKey = dungeon.key
                     local defaults
@@ -416,7 +416,7 @@ function KeystonePercentageHelper:OnInitialize()
         type = "group",
         args = {
             general = {
-                name = "General Settings",
+                name = L["GENERAL_SETTINGS"],
                 type = "group",
                 order = 1,
                 args = {
@@ -424,8 +424,8 @@ function KeystonePercentageHelper:OnInitialize()
                     font = self:GetFontOptions(),
                     colors = self:GetColorOptions(),
                     informGroup = {
-                        name = "Inform Group",
-                        desc = "Send messages to the party chat when reaching important percentage thresholds",
+                        name = L["INFORM_GROUP"],
+                        desc = L["INFORM_GROUP_DESC"],
                         type = "toggle",
                         order = 10,
                         get = function() return self.db.profile.general.informGroup end,
@@ -478,13 +478,13 @@ end
 
 function KeystonePercentageHelper:GetFontOptions()
     return {
-        name = "Font",
+        name = L["FONT"],
         type = "group",
         inline = true,
         order = 5.5,
         args = {
             font = {
-                name = "Font",
+                name = L["FONT"],
                 type = "select",
                 dialogControl = 'LSM30_Font',
                 order = 1,
@@ -499,8 +499,8 @@ function KeystonePercentageHelper:GetFontOptions()
                 end
             },
             fontSize = {
-                name = "Font Size",
-                desc = "Adjust the size of the text",
+                name = L["FONT_SIZE"],
+                desc = L["FONT_SIZE_DESC"],
                 type = "range",
                 order = 2,
                 min = 8,
@@ -747,13 +747,13 @@ end
 
 function KeystonePercentageHelper:GetColorOptions()
     return {
-        name = "Colors",
+        name = L["COLORS"],
         type = "group",
         inline = true,
         order = 6,
         args = {
             inProgressColor = {
-                name = "In progress",
+                name = L["IN_PROGRESS"],
                 type = "color",
                 hasAlpha = true,
                 order = 1,
@@ -765,7 +765,7 @@ function KeystonePercentageHelper:GetColorOptions()
                 end
             },
             finishedColor = {
-                name = "Finished",
+                name = L["FINISHED"],
                 type = "color",
                 hasAlpha = true,
                 order = 2,
@@ -777,7 +777,7 @@ function KeystonePercentageHelper:GetColorOptions()
                 end
             },
             missingColor = {
-                name = "Missing",
+                name = L["MISSING"],
                 type = "color",
                 hasAlpha = true,
                 order = 3,
@@ -794,19 +794,19 @@ end
 
 function KeystonePercentageHelper:GetPositioningOptions()
     return {
-        name = "Positioning",
+        name = L["POSITIONING"],
         type = "group",
         inline = true,
         order = 5,
         args = {
             position = {
-                name = "Anchor Position",
+                name = L["ANCHOR_POSITION"],
                 type = "select",
                 order = 1,
                 values = {
-                    ["TOP"] = "Top",
-                    ["CENTER"] = "Center",
-                    ["BOTTOM"] = "Bottom"
+                    ["TOP"] = L["TOP"],
+                    ["CENTER"] = L["CENTER"],
+                    ["BOTTOM"] = L["BOTTOM"]
                 },
                 get = function() return self.db.profile.general.position end,
                 set = function(_, value)
@@ -815,7 +815,7 @@ function KeystonePercentageHelper:GetPositioningOptions()
                 end
             },
             xOffset = {
-                name = "X Offset",
+                name = L["X_OFFSET"],
                 type = "range",
                 order = 2,
                 min = -500,
@@ -828,7 +828,7 @@ function KeystonePercentageHelper:GetPositioningOptions()
                 end
             },
             yOffset = {
-                name = "Y Offset",
+                name = L["Y_OFFSET"],
                 type = "range",
                 order = 3,
                 min = -500,
