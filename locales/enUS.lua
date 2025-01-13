@@ -128,3 +128,4 @@ L["RESET_DUNGEON_CONFIRM"] = "Are you sure you want to reset all boss percentage
 L["RESET_ALL_DUNGEONS"] = "Reset All Dungeons"
 L["RESET_ALL_DUNGEONS_DESC"] = "Reset all dungeons to their default values"
 L["RESET_ALL_DUNGEONS_CONFIRM"] = "Are you sure you want to reset all dungeons to their default values?"
+L["NEW_SEASON_RESET_PROMPT"] = "A new Mythic+ season has started. Would you like to reset all dungeon values to their defaults?"

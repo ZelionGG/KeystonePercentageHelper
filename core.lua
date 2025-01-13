@@ -36,6 +36,89 @@ local expansions = {
     --{id = "Vanilla", name = "EXPANSION_VANILLA", order = 12} -- Vanilla WoW
 }
 
+KeystonePercentageHelper.SEASON_START_DATES = {
+    ["2025-01-08"] = true,  -- TWW Season 1
+    ["2025-02-08"] = true,  -- TWW Season 2
+}
+
+function KeystonePercentageHelper:CheckForNewSeason()
+    local currentDate = date("%Y-%m-%d", time())
+    
+    -- Check if we've already shown the popup for this date
+    if self.db.profile.lastSeasonCheck == currentDate then
+        return
+    end
+    
+    -- Convert current date to timestamp for comparison
+    local year, month, day = currentDate:match("(%d+)-(%d+)-(%d+)")
+    local currentTimestamp = time({year = tonumber(year), month = tonumber(month), day = tonumber(day)})
+    
+    -- Check each season start date
+    for dateStr, _ in pairs(self.SEASON_START_DATES) do
+        local sYear, sMonth, sDay = dateStr:match("(%d+)-(%d+)-(%d+)")
+        local seasonTimestamp = time({year = tonumber(sYear), month = tonumber(sMonth), day = tonumber(sDay)})
+        
+        -- Check if we're after the season start date
+        if currentTimestamp >= seasonTimestamp then
+            -- Show popup
+            StaticPopupDialogs["KPH_NEW_SEASON"] = {
+                text = "|cffffd100Keystone Percentage Helper|r\n\n" .. (L["NEW_SEASON_RESET_PROMPT"] or "A new Mythic+ season has started. Would you like to reset all dungeon values to their defaults?") .. "\n\n",
+                button1 = YES,
+                button2 = NO,
+                OnAccept = function()
+                    -- Reset only current season dungeon values
+                    self:ResetCurrentSeasonDungeons()
+                    --self.db.profile.lastSeasonCheck = currentDate
+                end,
+                OnCancel = function()
+                    --self.db.profile.lastSeasonCheck = currentDate
+                end,
+                timeout = 0,
+                whileDead = true,
+                hideOnEscape = true,
+                preferredIndex = 3,
+                showAlert = true,
+                title = "Keystone Percentage Helper",
+            }
+            StaticPopup_Show("KPH_NEW_SEASON")
+            return
+        end
+    end
+    
+    -- If we get here, no season start was found
+    self.db.profile.lastSeasonCheck = currentDate
+end
+
+function KeystonePercentageHelper:ResetCurrentSeasonDungeons()
+    -- Reset only the current season dungeons to their defaults
+    for dungeonId, _ in pairs(self.CURRENT_SEASON_DUNGEONS) do
+        local dungeonKey = self:GetDungeonKeyById(dungeonId)
+        if dungeonKey then
+            -- Find the appropriate defaults for this dungeon
+            local defaults
+            for _, expansion in ipairs(expansions) do
+                if self[expansion.id .. "_DUNGEON_IDS"][dungeonKey] then
+                    defaults = self[expansion.id .. "_DEFAULTS"][dungeonKey]
+                    break
+                end
+            end
+
+            if defaults then
+                if not self.db.profile.advanced[dungeonKey] then
+                    self.db.profile.advanced[dungeonKey] = {}
+                end
+                for key, value in pairs(defaults) do
+                    self.db.profile.advanced[dungeonKey][key] = value
+                end
+            end
+        end
+    end
+    
+    -- Update the display
+    self:UpdateDungeonData()
+    LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePercentageHelper")
+end
+
 local function LoadExpansionDungeons()
     -- Load dungeons from all expansions
     for _, expansion in ipairs(expansions) do
@@ -61,6 +144,7 @@ KeystonePercentageHelper.defaults = {
             informGroup = true,
             informChannel = "PARTY",
             advancedOptionsEnabled = false,
+            lastSeasonCheck = "",
         },
         text = {
             font = "Friz Quadrata TT",
@@ -212,34 +296,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             confirmText = L["RESET_ALL_DUNGEONS_CONFIRM"],
             func = function()
                 -- Reset all dungeons to their defaults
-                for _, expansion in ipairs(expansions) do
-                    local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
-                    if dungeonIds then
-                        for dungeonKey, _ in pairs(dungeonIds) do
-                            -- Get the appropriate defaults
-                            local defaults
-                            for _, exp in ipairs(expansions) do
-                                if self[exp.id .. "_DUNGEON_IDS"][dungeonKey] then
-                                    defaults = self[exp.id .. "_DEFAULTS"][dungeonKey]
-                                    break
-                                end
-                            end
-
-                            if defaults then
-                                if not self.db.profile.advanced[dungeonKey] then
-                                    self.db.profile.advanced[dungeonKey] = {}
-                                end
-                                for key, value in pairs(defaults) do
-                                    self.db.profile.advanced[dungeonKey][key] = value
-                                end
-                            end
-                        end
-                    end
-                end
-                
-                -- Update the display
-                self:UpdateDungeonData()
-                LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePercentageHelper")
+                self:ResetAllDungeons()
             end
         },
         dungeons = {
@@ -273,13 +330,19 @@ function KeystonePercentageHelper:GetAdvancedOptions()
 end
 
 function KeystonePercentageHelper:GetBossNumberString(num)
-    if num == 1 then return "One"
-    elseif num == 2 then return "Two"
-    elseif num == 3 then return "Three"
-    elseif num == 4 then return "Four"
-    elseif num == 5 then return "Five"
-    end
-    return tostring(num)
+    local numbers = {
+        [1] = "One",
+        [2] = "Two",
+        [3] = "Three",
+        [4] = "Four",
+        [5] = "Five",
+        [6] = "Six",
+        [7] = "Seven",
+        [8] = "Eight",
+        [9] = "Nine",
+        [10] = "Ten"
+    }
+    return numbers[num] or tostring(num)
 end
 
 function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
@@ -359,7 +422,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
             type = "group",
             name = bossName,
             inline = true,
-            order = i + 2,
+            order = i + 3,  -- Start boss orders at 4 (after header)
             args = {
                 percent = {
                     name = L["PERCENTAGE"],
@@ -405,11 +468,52 @@ function KeystonePercentageHelper:GetDungeonKeyById(dungeonId)
     return nil
 end
 
+function KeystonePercentageHelper:ResetAllDungeons()
+    -- Reset all dungeons to their defaults
+    for _, expansion in ipairs(expansions) do
+        local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
+        if dungeonIds then
+            for dungeonKey, _ in pairs(dungeonIds) do
+                -- Get the appropriate defaults
+                local defaults
+                for _, exp in ipairs(expansions) do
+                    if self[exp.id .. "_DUNGEON_IDS"][dungeonKey] then
+                        defaults = self[exp.id .. "_DEFAULTS"][dungeonKey]
+                        break
+                    end
+                end
+
+                if defaults then
+                    if not self.db.profile.advanced[dungeonKey] then
+                        self.db.profile.advanced[dungeonKey] = {}
+                    end
+                    for key, value in pairs(defaults) do
+                        self.db.profile.advanced[dungeonKey][key] = value
+                    end
+                end
+            end
+        end
+    end
+    
+    -- Update the display
+    self:UpdateDungeonData()
+    LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePercentageHelper")
+end
+
 function KeystonePercentageHelper:OnInitialize()
     LoadExpansionDungeons()
     self.db = LibStub("AceDB-3.0"):New("KeystonePercentageHelperDB", self.defaults, "Default")
+    
+    -- Add lastSeasonCheck to defaults if it doesn't exist
+    if not self.defaults.profile.lastSeasonCheck then
+        self.defaults.profile.lastSeasonCheck = ""
+    end
+    
     self.LSM:Register(self.LSM.MediaType.FONT, 'Friz Quadrata TT',
                       self.constants.mediaPath .. "FrizQuadrata.ttf")
+    
+    -- Check for new season
+    self:CheckForNewSeason()
     
     -- Create main display frame
     self.displayFrame = CreateFrame("Frame", "KeystonePercentageHelperFrame", UIParent)
@@ -730,7 +834,7 @@ function KeystonePercentageHelper:UpdateDungeonData()
             if dungeonKey and self.db.profile.advanced[dungeonKey] then
                 local advancedData = self.db.profile.advanced[dungeonKey]
                 for i, bossData in ipairs(dungeonData) do
-                    local bossNumStr = i == 1 and "One" or i == 2 and "Two" or i == 3 and "Three" or "Four"
+                    local bossNumStr = self:GetBossNumberString(i)
                     bossData[2] = advancedData["Boss"..bossNumStr]
                     bossData[3] = advancedData["Boss" .. bossNumStr .. "Inform"]
                     bossData[4] = false -- Reset informed status
