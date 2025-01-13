@@ -37,56 +37,50 @@ local expansions = {
 }
 
 KeystonePercentageHelper.SEASON_START_DATES = {
-    ["2025-01-08"] = true,  -- TWW Season 1
-    ["2025-02-08"] = true,  -- TWW Season 2
+    ["2025-01-08"] = true,  -- TWW Season 1 start date
+    --["2025-02-08"] = true,  -- TWW Season 2 start date
 }
 
 function KeystonePercentageHelper:CheckForNewSeason()
     local currentDate = date("%Y-%m-%d", time())
     
-    -- Check if we've already shown the popup for this date
-    if self.db.profile.lastSeasonCheck == currentDate then
+    -- If this is first load (lastSeasonCheck is empty), just set the date and don't show popup
+    if self.db.profile.lastSeasonCheck == "" then
+        self.db.profile.lastSeasonCheck = currentDate
         return
     end
     
-    -- Convert current date to timestamp for comparison
-    local year, month, day = currentDate:match("(%d+)-(%d+)-(%d+)")
-    local currentTimestamp = time({year = tonumber(year), month = tonumber(month), day = tonumber(day)})
-    
-    -- Check each season start date
-    for dateStr, _ in pairs(self.SEASON_START_DATES) do
-        local sYear, sMonth, sDay = dateStr:match("(%d+)-(%d+)-(%d+)")
-        local seasonTimestamp = time({year = tonumber(sYear), month = tonumber(sMonth), day = tonumber(sDay)})
-        
-        -- Check if we're after the season start date
-        if currentTimestamp >= seasonTimestamp then
-            -- Show popup
-            StaticPopupDialogs["KPH_NEW_SEASON"] = {
-                text = "|cffffd100Keystone Percentage Helper|r\n\n" .. (L["NEW_SEASON_RESET_PROMPT"] or "A new Mythic+ season has started. Would you like to reset all dungeon values to their defaults?") .. "\n\n",
-                button1 = YES,
-                button2 = NO,
-                OnAccept = function()
-                    -- Reset only current season dungeon values
-                    self:ResetCurrentSeasonDungeons()
-                    --self.db.profile.lastSeasonCheck = currentDate
-                end,
-                OnCancel = function()
-                    --self.db.profile.lastSeasonCheck = currentDate
-                end,
-                timeout = 0,
-                whileDead = true,
-                hideOnEscape = true,
-                preferredIndex = 3,
-                showAlert = true,
-                title = "Keystone Percentage Helper",
-            }
-            StaticPopup_Show("KPH_NEW_SEASON")
-            return
+    -- Find the most recent season start date
+    local mostRecentSeasonDate = nil
+    for seasonDate, _ in pairs(self.SEASON_START_DATES) do
+        if seasonDate <= currentDate and (not mostRecentSeasonDate or seasonDate > mostRecentSeasonDate) then
+            mostRecentSeasonDate = seasonDate
         end
     end
     
-    -- If we get here, no season start was found
-    self.db.profile.lastSeasonCheck = currentDate
+    -- If last check was before the most recent season start, show popup
+    if mostRecentSeasonDate and self.db.profile.lastSeasonCheck < mostRecentSeasonDate and not InCombatLockdown() then    
+        StaticPopupDialogs["KPH_NEW_SEASON"] = {
+            text = "|cffffd100Keystone Percentage Helper|r\n\n" .. L["NEW_SEASON_RESET_PROMPT"] .. "\n\n",
+            button1 = YES,
+            button2 = NO,
+            OnAccept = function()
+                -- Reset only current season dungeon values
+                self:ResetCurrentSeasonDungeons()
+                self.db.profile.lastSeasonCheck = currentDate
+            end,
+            OnCancel = function()
+                self.db.profile.lastSeasonCheck = currentDate
+            end,
+            timeout = 0,
+            whileDead = true,
+            hideOnEscape = true,
+            preferredIndex = 3,
+            showAlert = true,
+            title = "Keystone Percentage Helper",
+        }
+        StaticPopup_Show("KPH_NEW_SEASON")
+    end
 end
 
 function KeystonePercentageHelper:ResetCurrentSeasonDungeons()
