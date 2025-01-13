@@ -28,7 +28,7 @@ local expansions = {
     --{id = "DF", name = "EXPANSION_DF", order = 5},         -- Dragonflight
     {id = "SL", name = "EXPANSION_SL", order = 6},         -- Shadowlands
     {id = "BFA", name = "EXPANSION_BFA", order = 7},       -- Battle for Azeroth
-    {id = "LEGION", name = "EXPANSION_LEGION", order = 8}, -- Legion
+    --{id = "LEGION", name = "EXPANSION_LEGION", order = 8}, -- Legion
     --{id = "WOD", name = "EXPANSION_WOD", order = 9},       -- Warlords of Draenor
     --{id = "MOP", name = "EXPANSION_MOP", order = 10},      -- Mists of Pandaria
     {id = "CATACLYSM", name = "EXPANSION_CATA", order = 11}, -- Cataclysm
@@ -279,6 +279,56 @@ function KeystonePercentageHelper:GetAdvancedOptions()
         dungeonArgs[dungeon.key] = sharedDungeonOptions[dungeon.key]
     end
 
+    -- Create next season dungeon args
+    local nextSeasonDungeons = {}
+    
+    -- Collect all next season dungeons
+    for _, expansion in ipairs(expansions) do
+        local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
+        if dungeonIds then
+            for dungeonKey, dungeonId in pairs(dungeonIds) do
+                if self:IsNextSeasonDungeon(dungeonId) then
+                    table.insert(nextSeasonDungeons, {key = dungeonKey, id = dungeonId})
+                end
+            end
+        end
+    end
+    
+    -- Sort dungeons alphabetically by their localized names
+    table.sort(nextSeasonDungeons, function(a, b)
+        return L[a.key] < L[b.key]
+    end)
+
+    -- Create next season dungeon args
+    local nextSeasonDungeonArgs = {
+        defaultPercentages = {
+            order = 0,
+            type = "description",
+            fontSize = "medium",
+            name = function()
+                local text = L["DEFAULT_PERCENTAGES"] .. ":\n\n"
+                for _, dungeon in ipairs(nextSeasonDungeons) do
+                    local dungeonKey = dungeon.key
+                    local defaults
+                    for _, expansion in ipairs(expansions) do
+                        if self[expansion.id .. "_DUNGEON_IDS"][dungeonKey] then
+                            defaults = self[expansion.id .. "_DEFAULTS"][dungeonKey]
+                            break
+                        end
+                    end
+                    
+                    text = text .. FormatDungeonText(self, dungeonKey, defaults)
+                end
+                return text
+            end
+        }
+    }
+    
+    -- Add next season dungeon options
+    for _, dungeon in ipairs(nextSeasonDungeons) do
+        nextSeasonDungeonArgs[dungeon.key] = sharedDungeonOptions[dungeon.key]
+    end
+
     -- Create expansion sections
     local args = {
         resetAll = {
@@ -299,6 +349,13 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             childGroups = "tree",
             order = 3,
             args = dungeonArgs
+        },
+        nextseason = {
+            name = "|cffff5733" .. L["NEXT_SEASON"] .. "|r",
+            type = "group",
+            childGroups = "tree",
+            order = 4,
+            args = nextSeasonDungeonArgs
         }
     }
 
@@ -309,7 +366,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             name = L[expansion.name],
             type = "group",
             childGroups = "tree",
-            order = expansion.order,
+            order = expansion.order + 4,  -- Shift expansion orders to after next season
             args = CreateExpansionDungeonArgs(self[expansion.id .. "_DUNGEON_IDS"], self[expansion.id .. "_DEFAULTS"])
         }
     end

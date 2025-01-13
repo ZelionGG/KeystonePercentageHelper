@@ -28,11 +28,45 @@ L["CoT_BOSS2"] = "Crocs de la Reine"
 L["CoT_BOSS3"] = "La Coaglamation"
 L["CoT_BOSS4"] = "Izo le Grand Faisceau"
 
+-- Cinderbrew Meadery
+L["CBM"] = "Hydromelerie de Brassecendre"
+L["CBM_BOSS1"] = "Maître brasseur Aldryr"
+L["CBM_BOSS2"] = "I'pa"
+L["CBM_BOSS3"] = "Benk Bourdon"
+L["CBM_BOSS4"] = "Goldie Baronnie"
+
+-- Darkflame Cleft
+L["DFC"] = "Faille de Flamme-Noire"
+L["DFC_BOSS1"] = "Vieux Barbecire"
+L["DFC_BOSS2"] = "Blazikon"
+L["DFC_BOSS3"] = "Le roi-bougie"
+L["DFC_BOSS4"] = "Les Ténèbres"
+
+-- Operation: Floodgate
+-- To Translate
+L["OFG"] = "Operation: Floodgate"
+L["OFG_BOSS1"] = "Big M.O.M.M.A."
+L["OFG_BOSS2"] = "Demolition Duo"
+L["OFG_BOSS3"] = "Swampface"
+L["OFG_BOSS4"] = "Geezle Gigazap"
+
+-- Priory of the Sacred Flames
+L["PotSF"] = "Prieuré de la Flamme sacrée"
+L["PotSF_BOSS1"] = "Capitaine Dailcri"
+L["PotSF_BOSS2"] = "Baron Braunpique"
+L["PotSF_BOSS3"] = "Prieuresse Murrpray"
+
 -- The Dawnbreaker
 L["TDB"] = "Le Brise-Aube"
 L["TDB_BOSS1"] = "Mandataire Couronne d'ombre"
 L["TDB_BOSS2"] = "Anub'ikkaj"
 L["TDB_BOSS3"] = "Rasha'nan"
+
+-- The Rookery
+L["TR"] = "La colonie"
+L["TR_BOSS1"] = "Kyrioss"
+L["TR_BOSS2"] = "Garde de la tempête Gorren"
+L["TR_BOSS3"] = "Monstruosité de pierre du Vide"
 
 -- The Stonevault
 L["TSV"] = "La Cavepierre"
@@ -50,6 +84,14 @@ L["MoTS_BOSS1"] = "Ingra Maloch"
 L["MoTS_BOSS2"] = "Mandebrume"
 L["MoTS_BOSS3"] = "Tred'ova"
 
+-- Theater of Pain
+L["ToP"] = "Theater of Pain"
+L["ToP_BOSS1"] = "L'affrontement"
+L["ToP_BOSS2"] = "Trancheboyau"
+L["ToP_BOSS3"] = "Xav l'invaincu"
+L["ToP_BOSS4"] = "Kul'tharok"
+L["ToP_BOSS5"] = "Mordretha, l'impératrice immortelle"
+
 -- The Necrotic Wake
 L["NW"] = "Sillage nécrotique"
 L["NW_BOSS1"] = "Chancros"
@@ -58,12 +100,26 @@ L["NW_BOSS3"] = "Docteur Sutur"
 L["NW_BOSS4"] = "Nalthor le Lieur-de-Givre"
 
 -- Battle for Azeroth
+-- Operation: Mechagon - Workshop
+L["OMGW"] = "Operation: Mécagone - l'Atelier"
+L["OMGW_BOSS1"] = "Cogne-Chariottes"
+L["OMGW_BOSS2"] = "K.U.-J.0."
+L["OMGW_BOSS3"] = "Jardin du Machiniste"
+L["OMGW_BOSS4"] = "Roi Mécagone"
+
 -- Siege of Boralus
 L["SoB"] = "Siege of Boralus"
 L["SoB_BOSS1"] = "Crochesang"
 L["SoB_BOSS2"] = "Capitaine de l’effroi Boisclos"
 L["SoB_BOSS3"] = "Hadal Sombrabysse"
 L["SoB_BOSS4"] = "Viq'Goth"
+
+-- The MOTHERLODE!!
+L["TML"] = "The MOTHERLODE!!"
+L["TML_BOSS1"] = "Disperseur de foule automatique"
+L["TML_BOSS2"] = "Azerokk"
+L["TML_BOSS3"] = "Rixxa Fluxifuge"
+L["TML_BOSS4"] = "Nabab Razzbam"
 
 -- Cataclysm
 -- Grim Batol
