@@ -21,4 +21,6 @@ expansions/expansions.xml
 
 core.lua
 dungeonIcons.lua
-season.lua
+currentSeason.lua
+nextSeason.lua
+
