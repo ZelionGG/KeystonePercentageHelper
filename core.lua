@@ -37,7 +37,7 @@ local expansions = {
 }
 
 KeystonePercentageHelper.SEASON_START_DATES = {
-    ["2025-01-08"] = true,  -- TWW Season 1 start date
+    ["2024-09-10"] = true,  -- TWW Season 1 start date
     --["2025-02-08"] = true,  -- TWW Season 2 start date
 }
 
@@ -510,10 +510,8 @@ function KeystonePercentageHelper:GetDungeonKeyById(dungeonId)
     -- Check all expansions for the dungeon ID
     for _, expansion in ipairs(expansions) do
         local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
-        if dungeonIds then
-            for key, id in pairs(dungeonIds) do
-                if id == dungeonId then return key end
-            end
+        if dungeonIds and dungeonIds[dungeonKey] then
+            return key
         end
     end
     return nil
@@ -566,6 +564,35 @@ function KeystonePercentageHelper:OnInitialize()
     -- Check for new season
     self:CheckForNewSeason()
     
+    -- Create overlay frame
+    self.overlayFrame = CreateFrame("Frame", "KeystonePercentageHelperOverlay", UIParent, "BackdropTemplate")
+    self.overlayFrame:SetFrameStrata("FULLSCREEN_DIALOG")
+    self.overlayFrame:SetAllPoints()
+    self.overlayFrame:SetBackdrop({
+        bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
+        tile = true, tileSize = 16,
+    })
+    self.overlayFrame:SetBackdropColor(0, 0, 0, 0.7)
+
+    -- Create plus sign
+    local lineThickness = 2
+
+    -- Horizontal line
+    local horizontalLine = self.overlayFrame:CreateLine()
+    horizontalLine:SetThickness(lineThickness)
+    horizontalLine:SetColorTexture(1, 1, 1, 0.1)
+    horizontalLine:SetStartPoint("LEFT")
+    horizontalLine:SetEndPoint("RIGHT")
+
+    -- Vertical line
+    local verticalLine = self.overlayFrame:CreateLine()
+    verticalLine:SetThickness(lineThickness)
+    verticalLine:SetColorTexture(1, 1, 1, 0.1)
+    verticalLine:SetStartPoint("TOP")
+    verticalLine:SetEndPoint("BOTTOM")
+
+    self.overlayFrame:Hide()
+
     -- Create main display frame
     self.displayFrame = CreateFrame("Frame", "KeystonePercentageHelperFrame", UIParent)
     self.displayFrame:SetSize(200, 20)
@@ -577,8 +604,9 @@ function KeystonePercentageHelper:OnInitialize()
     self.displayFrame.text:SetFont(self.LSM:Fetch('font', self.db.profile.text.font), self.db.profile.general.fontSize, "OUTLINE")
     
     -- Create anchor frame
-    self.anchorFrame = CreateFrame("Frame", "KeystonePercentageHelperAnchorFrame", UIParent, "BackdropTemplate")
-    self.anchorFrame:SetSize(200, 20)
+    self.anchorFrame = CreateFrame("Frame", "KeystonePercentageHelperAnchorFrame", self.overlayFrame, "BackdropTemplate")
+    self.anchorFrame:SetFrameStrata("TOOLTIP")
+    self.anchorFrame:SetSize(200, 30)
     self.anchorFrame:SetPoint("CENTER", self.displayFrame, "CENTER", 0, 0)
     self.anchorFrame:SetBackdrop({
         bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -588,9 +616,73 @@ function KeystonePercentageHelper:OnInitialize()
     self.anchorFrame:SetBackdropColor(0, 0, 0, 0.5)
     self.anchorFrame:SetBackdropBorderColor(1, 1, 1, 1)
     
+    -- Create anchor frame text
     local text = self.anchorFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     text:SetPoint("CENTER")
     text:SetText(L["ANCHOR_TEXT"])
+    
+    -- Create validate button
+    local validateButton = CreateFrame("Button", nil, self.anchorFrame, "UIPanelButtonTemplate")
+    validateButton:SetSize(80, 30)
+    validateButton:SetPoint("BOTTOMRIGHT", self.anchorFrame, "BOTTOMRIGHT", -10, -40)
+    validateButton:SetText(L["VALIDATE"])
+    validateButton:SetScript("OnClick", function()
+        self.anchorFrame:Hide()
+        self.overlayFrame:Hide()
+        -- Show the settings panel and navigate to our addon
+        Settings.OpenToCategory("Keystone Percentage Helper")
+    end)
+
+    -- Create cancel button
+    local cancelButton = CreateFrame("Button", nil, self.anchorFrame, "UIPanelButtonTemplate")
+    cancelButton:SetSize(80, 30)
+    cancelButton:SetPoint("BOTTOMLEFT", self.anchorFrame, "BOTTOMLEFT", 10, -40)
+    cancelButton:SetText(L["CANCEL"])
+    
+    local function CancelPositioning()
+        self.anchorFrame:Hide()
+        self.overlayFrame:Hide()
+        -- Show the settings panel and navigate to our addon
+        Settings.OpenToCategory("Keystone Percentage Helper")
+    end
+    
+    cancelButton:SetScript("OnClick", CancelPositioning)
+
+    -- Handle ESC key
+    self.anchorFrame:SetScript("OnKeyDown", function(_, key)
+        if key == "ESCAPE" then
+            CancelPositioning()
+        end
+    end)
+    self.anchorFrame:EnableKeyboard(true)
+
+    -- Handle combat
+    local combatFrame = CreateFrame("Frame")
+    combatFrame.wasShown = false
+    combatFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+    combatFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    combatFrame:SetScript("OnEvent", function(_, event)
+        if event == "PLAYER_REGEN_DISABLED" then
+            if self.anchorFrame:IsShown() then
+                combatFrame.wasShown = true
+                self.anchorFrame:Hide()
+                self.overlayFrame:Hide()
+            end
+        elseif event == "PLAYER_REGEN_ENABLED" and combatFrame.wasShown then
+            combatFrame.wasShown = false
+            self.anchorFrame:Show()
+            self.overlayFrame:Show()
+        end
+    end)
+
+    -- Apply ElvUI skin if available
+    if ElvUI then
+        local E = unpack(ElvUI)
+        if E and E.Skins then
+            E:GetModule('Skins'):HandleButton(validateButton)
+            E:GetModule('Skins'):HandleButton(cancelButton)
+        end
+    end
     
     self.anchorFrame:EnableMouse(true)
     self.anchorFrame:SetMovable(true)
@@ -634,44 +726,6 @@ function KeystonePercentageHelper:OnInitialize()
     
     -- Create display after DB is initialized
     self:CreateDisplay()
-end
-
-function KeystonePercentageHelper:GetFontOptions()
-    return {
-        name = L["FONT"],
-        type = "group",
-        inline = true,
-        order = 5.5,
-        args = {
-            font = {
-                name = L["FONT"],
-                type = "select",
-                dialogControl = 'LSM30_Font',
-                order = 1,
-                values = AceGUIWidgetLSMlists.font,
-                style = "dropdown",
-                get = function() return self.db.profile.text.font end,
-                set = function(_, value)
-                    self.db.profile.text.font = value
-                    self:Refresh()
-                end
-            },
-            fontSize = {
-                name = L["FONT_SIZE"],
-                desc = L["FONT_SIZE_DESC"],
-                type = "range",
-                order = 2,
-                min = 8,
-                max = 24,
-                step = 1,
-                get = function() return self.db.profile.general.fontSize end,
-                set = function(_, value)
-                    self.db.profile.general.fontSize = value
-                    self:Refresh()
-                end
-            }
-        }
-    }
 end
 
 function KeystonePercentageHelper:ToggleConfig()
@@ -997,26 +1051,46 @@ function KeystonePercentageHelper:GetOtherOptions()
                     self.db.profile.general.advancedOptionsEnabled = value
                     self:UpdateDungeonData()
                 end
-            },
+            }
         }
     }
 end
 
 function KeystonePercentageHelper:GetPositioningOptions()
+    local self = KeystonePercentageHelper
     return {
         name = L["POSITIONING"],
         type = "group",
         inline = true,
-        order = 5,
         args = {
-            position = {
-                name = L["ANCHOR_POSITION"],
-                type = "select",
+            showAnchor = {
+                name = L["SHOW_ANCHOR"],
+                type = "execute",
                 order = 1,
+                width = 2,
+                func = function()
+                    if self.anchorFrame then
+                        self.anchorFrame:Show()
+                        self.overlayFrame:Show()
+                        -- Hide the WoW settings frame
+                        HideUIPanel(SettingsPanel)
+                    end
+                end
+            },
+            position = {
+                name = L["POSITION"],
+                type = "select",
+                order = 2,
                 values = {
-                    ["TOP"] = L["TOP"],
-                    ["CENTER"] = L["CENTER"],
-                    ["BOTTOM"] = L["BOTTOM"]
+                    CENTER = L["CENTER"],
+                    TOP = L["TOP"],
+                    TOPLEFT = L["TOPLEFT"],
+                    TOPRIGHT = L["TOPRIGHT"],
+                    BOTTOM = L["BOTTOM"],
+                    BOTTOMLEFT = L["BOTTOMLEFT"],
+                    BOTTOMRIGHT = L["BOTTOMRIGHT"],
+                    LEFT = L["LEFT"],
+                    RIGHT = L["RIGHT"]
                 },
                 get = function() return self.db.profile.general.position end,
                 set = function(_, value)
@@ -1027,7 +1101,7 @@ function KeystonePercentageHelper:GetPositioningOptions()
             xOffset = {
                 name = L["X_OFFSET"],
                 type = "range",
-                order = 2,
+                order = 3,
                 min = -500,
                 max = 500,
                 step = 1,
@@ -1040,7 +1114,7 @@ function KeystonePercentageHelper:GetPositioningOptions()
             yOffset = {
                 name = L["Y_OFFSET"],
                 type = "range",
-                order = 3,
+                order = 4,
                 min = -500,
                 max = 500,
                 step = 1,
@@ -1049,19 +1123,43 @@ function KeystonePercentageHelper:GetPositioningOptions()
                     self.db.profile.general.yOffset = value
                     self:Refresh()
                 end
-            },
-            showAnchor = {
-                name = L["SHOW_ANCHOR"],
-                type = "toggle",
-                order = 4,
-                width = "full",
-                get = function() return self.anchorFrame:IsShown() end,
+            }
+        }
+    }
+end
+
+function KeystonePercentageHelper:GetFontOptions()
+    return {
+        name = L["FONT"],
+        type = "group",
+        inline = true,
+        order = 5.5,
+        args = {
+            font = {
+                name = L["FONT"],
+                type = "select",
+                dialogControl = 'LSM30_Font',
+                order = 1,
+                values = AceGUIWidgetLSMlists.font,
+                style = "dropdown",
+                get = function() return self.db.profile.text.font end,
                 set = function(_, value)
-                    if value then
-                        self.anchorFrame:Show()
-                    else
-                        self.anchorFrame:Hide()
-                    end
+                    self.db.profile.text.font = value
+                    self:Refresh()
+                end
+            },
+            fontSize = {
+                name = L["FONT_SIZE"],
+                desc = L["FONT_SIZE_DESC"],
+                type = "range",
+                order = 2,
+                min = 8,
+                max = 24,
+                step = 1,
+                get = function() return self.db.profile.general.fontSize end,
+                set = function(_, value)
+                    self.db.profile.general.fontSize = value
+                    self:Refresh()
                 end
             }
         }
