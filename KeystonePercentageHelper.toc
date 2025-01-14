@@ -24,3 +24,4 @@ dungeonIcons.lua
 currentSeason.lua
 nextSeason.lua
 
+changelog/Load_Changelog.xml
