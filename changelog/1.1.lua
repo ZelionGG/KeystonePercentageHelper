@@ -6,9 +6,7 @@ KeystonePercentageHelper.Changelog[1100] = {
     important = {
         ["zhCN"] = {},
         ["zhTW"] = {},
-        ["enUS"] = {
-            "Fixed incorrect season start date",
-        },
+        ["enUS"] = {},
         ["frFR"] = {},
         ["koKR"] = {},
         ["ruRU"] = {}
@@ -17,11 +15,17 @@ KeystonePercentageHelper.Changelog[1100] = {
         ["zhCN"] = {},
         ["zhTW"] = {},
         ["enUS"] = {
-            "Added a fullscreen overlay when positioning the frame",
-            "Added Cancel button and ESC key support for frame positioning",
-            "Added automatic hiding of positioning UI during combat",
+            "New anchor moving system in the options that allows you to position the text visually.",
+            "[Changelog] system implementation.",
+            "Added [Next season] to the options.",
+            "New mythic+ restart popup that will allow you to reset the custom routes you made for all of the dungeons in the new season at their default values set by the addon, allowing you to start fresh."
         },
-        ["frFR"] = {},
+        ["frFR"] = {
+            "Nouveau système de positionnement de l'ancrage dans les options qui permet de positionner le texte visuellement.",
+            "Implémentation de la fonctionnalité de suivi des [Mises à jours].",
+            "Ajout de la [Prochaine saison] dans les options.",
+            "Création d'une popup de redémarrage Mythique+ permettant de réinitialiser les routes personnalisées paramétrées pour tous les donjons de la nouvelle saison, aux valeurs par défaut de l'addon, vous permettant de repartir de zéro."
+        },
         ["koKR"] = {},
         ["ruRU"] = {}
     },
@@ -37,10 +41,11 @@ KeystonePercentageHelper.Changelog[1100] = {
         ["zhCN"] = {},
         ["zhTW"] = {},
         ["enUS"] = {
-            "Improved frame positioning interface with better visibility",
-            "Added changelog system",
+            "Code restructuring to make it easier to maintain and update."
         },
-        ["frFR"] = {},
+        ["frFR"] = {
+            "Restructuration du code pour faciliter la maintenance et la mise à jour."
+        },
         ["koKR"] = {},
         ["ruRU"] = {}
     }
