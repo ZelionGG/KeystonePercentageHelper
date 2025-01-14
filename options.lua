@@ -129,15 +129,9 @@ function KeystonePercentageHelper:GetPositioningOptions()
                 type = "select",
                 order = 2,
                 values = {
-                    CENTER = L["CENTER"],
                     TOP = L["TOP"],
-                    TOPLEFT = L["TOPLEFT"],
-                    TOPRIGHT = L["TOPRIGHT"],
-                    BOTTOM = L["BOTTOM"],
-                    BOTTOMLEFT = L["BOTTOMLEFT"],
-                    BOTTOMRIGHT = L["BOTTOMRIGHT"],
-                    LEFT = L["LEFT"],
-                    RIGHT = L["RIGHT"]
+                    CENTER = L["CENTER"],
+                    BOTTOM = L["BOTTOM"]
                 },
                 get = function() return self.db.profile.general.position end,
                 set = function(_, value)
