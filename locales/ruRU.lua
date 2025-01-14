@@ -189,3 +189,4 @@ L["RESET_ALL_DUNGEONS_CONFIRM"] = "Вы уверены, что хотите сб
 L["NEW_SEASON_RESET_PROMPT"] = "Начался новый сезон M+. Хотите сбросить все значения подземелий на значения по умолчанию?"
 L["YES"] = "Да"
 L["NO"] = "Нет"
+L["WE_STILL_NEED"] = "We still need"
