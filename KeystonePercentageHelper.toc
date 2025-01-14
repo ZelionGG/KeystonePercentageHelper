@@ -19,6 +19,7 @@ embeds.xml
 locales/locales.xml
 expansions/expansions.xml
 
+options.lua
 core.lua
 dungeonIcons.lua
 currentSeason.lua
