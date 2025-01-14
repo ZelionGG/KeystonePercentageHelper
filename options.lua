@@ -331,10 +331,10 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             while defaults["Boss" .. self:GetBossNumberString(bossNum)] do
                 local bossKey = "Boss" .. self:GetBossNumberString(bossNum)
                 local informKey = bossKey .. "Inform"
-                text = text .. string.format("  %s: |cff40E0D0%.2f%%|r - Inform group: %s\n",
+                text = text .. string.format("  %s: |cff40E0D0%.2f%%|r - " .. L["INFORM_GROUP"] .. ": %s\n",
                     L[dungeonKey .. "_BOSS" .. bossNum],
                     defaults[bossKey],
-                    defaults[informKey] and '|cff00ff00Yes|r' or '|cffff0000No|r')
+                    defaults[informKey] and '|cff00ff00' .. L["YES"] .. '|r' or '|cffff0000' .. L["NO"] .. '|r')
                 bossNum = bossNum + 1
             end
             text = text .. "\n"

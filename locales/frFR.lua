@@ -181,3 +181,5 @@ L["RESET_DUNGEON_CONFIRM"] = "Êtes-vous sûr de vouloir réinitialiser tous les
 L["RESET_ALL_DUNGEONS"] = "Réinitialiser tous les donjons"
 L["RESET_ALL_DUNGEONS_DESC"] = "Réinitialiser tous les donjons à leurs valeurs par défaut"
 L["RESET_ALL_DUNGEONS_CONFIRM"] = "Êtes-vous sûr de vouloir réinitialiser tous les donjons à leurs valeurs par défaut ?"
+L["YES"] = "Oui"
+L["NO"] = "Non"

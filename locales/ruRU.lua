@@ -2,7 +2,8 @@ local AddonName, Engine = ...;
 
 local LibStub = LibStub;
 local AceLocale = LibStub:GetLibrary("AceLocale-3.0");
-local L = AceLocale:NewLocale(AddonName, "ruRU", true, false); ---@class XIV_DatabarLocale
+local L = AceLocale:NewLocale(AddonName, "ruRU", false, false);
+if not L then return end
 
 -- Translated January 14th, 2025 year.
 -- Translation by Hollicsh (https://github.com/Hollicsh)
@@ -151,7 +152,6 @@ L["TANK_GROUP_HEADER"] = "Проценты босса"
 L["ENABLE_ADVANCED_OPTIONS"] = "Включить пользовательские маршруты"
 L["ADVANCED_OPTIONS_DESC"] = "Это позволит Вам устанавливать индивидуальные проценты, которые необходимо набрать перед каждым боссом, и выбирать, хотите ли Вы информировать группу о каких-либо пропущенных процентах"
 L["INFORM_GROUP"] = "Сообщение группе"
-L["INFORM_GROUP_SHORT"] = "Сообщение (%s)"
 L["INFORM_GROUP_DESC"] = "Отправлять сообщения в чат, когда не хватает процентов"
 L["MESSAGE_CHANNEL"] = "Канал чата"
 L["MESSAGE_CHANNEL_DESC"] = "Выберите, какой канал чата использовать для уведомлений"
@@ -187,3 +187,5 @@ L["RESET_ALL_DUNGEONS"] = "Сбросить все подземелья"
 L["RESET_ALL_DUNGEONS_DESC"] = "Сбросить все подземелья до значений по умолчанию"
 L["RESET_ALL_DUNGEONS_CONFIRM"] = "Вы уверены, что хотите сбросить все подземелья до значений по умолчанию?"
 L["NEW_SEASON_RESET_PROMPT"] = "Начался новый сезон M+. Хотите сбросить все значения подземелий на значения по умолчанию?"
+L["YES"] = "Да"
+L["NO"] = "Нет"
