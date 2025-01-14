@@ -1,7 +1,7 @@
 local AddOnName, KeystonePercentageHelper = ...;
 
-KeystonePercentageHelper.Changelog[1100] = {
-    version_string = "1.1",
+KeystonePercentageHelper.Changelog[1200] = {
+    version_string = "1.2",
     release_date = "2025/01/14",
     important = {
         ["zhCN"] = {},

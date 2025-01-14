@@ -1,8 +1,8 @@
 # Keystone Percentage Helper
 
-## [1.1](https://github.com/ZelionGG/KeystonePercentageHelper/tree/1.1) (2025-01-14)
+## [1.2](https://github.com/ZelionGG/KeystonePercentageHelper/tree/1.2) (2025-01-14)
 
-[Full Changelog](https://github.com/ZelionGG/KeystonePercentageHelper/compare/1.0...1.1) [Previous Releases](https://github.com/ZelionGG/KeystonePercentageHelper/releases)
+[Full Changelog](https://github.com/ZelionGG/KeystonePercentageHelper/compare/1.0...1.2) [Previous Releases](https://github.com/ZelionGG/KeystonePercentageHelper/releases)
 
 - New anchor moving system in the options that allows you to position the text visually
 - Changelog system implementation
