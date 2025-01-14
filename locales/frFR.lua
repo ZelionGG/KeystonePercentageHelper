@@ -45,11 +45,10 @@ L["DFC_BOSS3"] = "Le roi-bougie"
 L["DFC_BOSS4"] = "Les Ténèbres"
 
 -- Operation: Floodgate
--- To Translate
-L["OFG"] = "Operation: Floodgate"
-L["OFG_BOSS1"] = "Big M.O.M.M.A."
-L["OFG_BOSS2"] = "Demolition Duo"
-L["OFG_BOSS3"] = "Swampface"
+L["OFG"] = "Operation: Vannes ouvertes"
+L["OFG_BOSS1"] = "Grand-M.A.M.A."
+L["OFG_BOSS2"] = "Duo de démolition"
+L["OFG_BOSS3"] = "Face de marais"
 L["OFG_BOSS4"] = "Geezle Gigazap"
 
 -- Priory of the Sacred Flames
