@@ -817,12 +817,12 @@ function KeystonePercentageHelper:GenerateChangelog()
 
             if improvment_localized and #improvment_localized > 0 then
                 page.improvmentHeader = {
-                    order = 7,
+                    order = 9,
                     type = "header",
                     name = orange(L["Improvment"])
                 }
                 page.improvment = {
-                    order = 8,
+                    order = 10,
                     type = "description",
                     name = function()
                         local text = ""
