@@ -2,7 +2,7 @@ local AddonName, Engine = ...;
 
 local LibStub = LibStub;
 local AceLocale = LibStub:GetLibrary("AceLocale-3.0");
-local L = AceLocale:NewLocale(AddonName, "enUS", true, false); ---@class XIV_DatabarLocale
+local L = AceLocale:NewLocale(AddonName, "enUS", true, false);
 
 -- Dungeons Group
 L["DUNGEONS"] = "Current Season"

@@ -9,8 +9,8 @@ local strsplit = strsplit
 local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
-local success, result = pcall(function() return LibStub("AceLocale-3.0"):GetLocale(AddOnName, false) end)
-local L = success and result or LibStub("AceLocale-3.0"):GetLocale(AddOnName, true, "enUS")
+local L = LibStub("AceLocale-3.0"):GetLocale(AddOnName, true);
+KeystonePercentageHelper.L = L
 
 KeystonePercentageHelper.defaults = {
     profile = {
@@ -516,7 +516,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
     for _, expansion in ipairs(expansions) do
         local sectionKey = expansion.id:lower()
         args[sectionKey] = {
-            name = L[expansion.name],
+            name = "|cffffffff" .. L[expansion.name] .. "|r",
             type = "group",
             childGroups = "tree",
             order = expansion.order + 4,  -- Shift expansion orders to after next season

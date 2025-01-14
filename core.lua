@@ -19,8 +19,7 @@ local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
 KeystonePercentageHelper.LSM = LibStub('LibSharedMedia-3.0');
 
-local success, result = pcall(function() return LibStub("AceLocale-3.0"):GetLocale(AddOnName, false) end)
-local L = success and result or LibStub("AceLocale-3.0"):GetLocale(AddOnName, true, "enUS")
+local L = KeystonePercentageHelper.L;
 
 KeystonePercentageHelper.DUNGEONS = {}
 

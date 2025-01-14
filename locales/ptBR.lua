@@ -2,7 +2,8 @@ local AddonName, Engine = ...;
 
 local LibStub = LibStub;
 local AceLocale = LibStub:GetLibrary("AceLocale-3.0");
-local L = AceLocale:NewLocale(AddonName, "ptBR", true, false); ---@class XIV_DatabarLocale
+local L = AceLocale:NewLocale(AddonName, "ptBR", false, false);
+if not L then return end
 
 -- TRANSLATION REQUIRED
 
