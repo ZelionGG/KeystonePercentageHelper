@@ -319,7 +319,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
     -- Helper function to get dungeon name with icon
     local function GetDungeonNameWithIcon(dungeonKey)
         local icon = self.dungeonIcons and self.dungeonIcons[dungeonKey] or ""
-        return icon .. " " .. L[dungeonKey]
+        return '|T' .. icon .. ":20:20:0:0|t " .. L[dungeonKey]
     end
 
     -- Helper function to format dungeon text
@@ -538,7 +538,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
     local options = {
         name = function()
             local icon = self.dungeonIcons and self.dungeonIcons[dungeonKey] or ""
-            return icon .. " " .. (L[dungeonKey] or dungeonKey)
+            return '|T' .. icon .. ":16:16:0:0|t " .. (L[dungeonKey] or dungeonKey)
         end,
         type = "group",
         order = order,
@@ -549,7 +549,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                 fontSize = "large",
                 name = function()
                     local icon = self.dungeonIcons and self.dungeonIcons[dungeonKey] or ""
-                    return "|cffffd700" .. icon .. " " .. (L[dungeonKey] or dungeonKey) .. "|r"
+                    return "|T" .. icon .. ":20:20:0:0|t |cff40E0D0" .. (L[dungeonKey] or dungeonKey) .. "|r"
                 end,
             },
             dungeonSecondHeader = {

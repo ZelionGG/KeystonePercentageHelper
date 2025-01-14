@@ -3,31 +3,33 @@ local AddonName, KeystonePercentageHelper, Engine = ...
 -- Add the dungeon icons after KeystonePercentageHelper is initialized
 local function OnLoad()
     KeystonePercentageHelper.dungeonIcons = {
+        -- Placeholder Keystone T525134
+
         -- The War Within
-        AKCE = "|T5899326:16:16:0:0|t",
-        CoT = "|T5899328:16:16:0:0|t",
-        CBM = "|T5899327:16:16:0:0|t",
-        DFC = "|T5899329:16:16:0:0|t",
-        OFG = "|T6392629:16:16:0:0|t",
-        PotSF = "|T5899331:16:16:0:0|t",
-        TDB = "|T5899330:16:16:0:0|t",
-        TR = "|T5899332:16:16:0:0|t",
-        TSV = "|T5899333:16:16:0:0|t",
+        AKCE = "5899326",
+        CoT = "5899328",
+        CBM = "5899327",
+        DFC = "5899329",
+        OFG = "525134",
+        PotSF = "5899331",
+        TDB = "5899330",
+        TR = "5899332",
+        TSV = "5899333",
 
         -- Shadowlands
-        MoTS = "|T3601531:16:16:0:0|t",
-        NW = "|T3601560:16:16:0:0|t",
-        ToP = "|T3601550:16:16:0:0|t",
+        MoTS = "3601531",
+        NW = "3601560",
+        ToP = "3601550",
 
         -- Battle for Azeroth
-        OMGW = "|T3024540:16:16:0:0|t",
-        SoB = "|T2011139:16:16:0:0|t",
-        TML = "|T2011121:16:16:0:0|t",
+        OMGW = "3024540",
+        SoB = "2011139",
+        TML = "2011121",
 
         -- Legion
 
         -- Cataclysm
-        GB = "|T409596:16:16:0:0|t",
+        GB = "409596",
     }
 end
 
