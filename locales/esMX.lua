@@ -188,3 +188,4 @@ L["RESET_ALL_DUNGEONS_CONFIRM"] = "Are you sure you want to reset all dungeons t
 L["NEW_SEASON_RESET_PROMPT"] = "A new Mythic+ season has started. Would you like to reset all dungeon values to their defaults?"
 L["YES"] = "Yes"
 L["NO"] = "No"
+L["WE_STILL_NEED"] = "We still need"

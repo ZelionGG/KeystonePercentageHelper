@@ -292,7 +292,7 @@ function KeystonePercentageHelper:InformGroup(percentage)
     local channel = self.db.profile.general.informChannel
     local percentageStr = string.format("%.2f%%", percentage)
     if percentageStr == "0.00%" then return end
-    SendChatMessage("[KPH]: We still need " .. percentageStr, channel)
+    SendChatMessage("[KPH]: " .. L["WE_STILL_NEED"] .. " " .. percentageStr, channel)
 end
 
 function KeystonePercentageHelper:UpdatePercentageText()
