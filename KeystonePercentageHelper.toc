@@ -7,6 +7,7 @@
 ## AddonCompartmentFunc: KeystonePercentageHelper_OnAddonCompartmentClick
 
 ## Notes: Addon designed to help you keep track of the percentage to make in each M+ dungeon section.
+## Notes-ruRU: Дополнение, которое поможет Вам отслеживать процент, который нужно набрать в каждой части подземелья M+.
 ## SavedVariables: KeystonePercentageHelperDB
 
 ## X-Website: https://github.com/ZelionGG/KeystonePercentageHelper
