@@ -534,6 +534,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
 end
 
 function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
+    local self = KeystonePercentageHelper
     local numBosses = #self.DUNGEONS[self:GetDungeonIdByKey(dungeonKey)]
     local options = {
         name = function()
@@ -593,10 +594,129 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                 confirm = true,
                 confirmText = L["RESET_DUNGEON_CONFIRM"],
             },
+            export = {
+                order = 3,
+                type = "execute",
+                name = L["EXPORT_DUNGEON"],
+                desc = L["EXPORT_DUNGEON_DESC"],
+                func = function()
+                    local addon = KeystonePercentageHelper
+                    local dungeonId = addon:GetDungeonIdByKey(dungeonKey)
+                    if dungeonId and addon.DUNGEONS[dungeonId] and addon.db.profile.advanced[dungeonKey] then
+                        -- Create export string
+                        local exportData = {
+                            dungeon = dungeonKey,
+                            data = addon.db.profile.advanced[dungeonKey]
+                        }
+                        local serialized = LibStub("AceSerializer-3.0"):Serialize(exportData)
+                        local compressed = LibStub("LibDeflate"):CompressDeflate(serialized)
+                        local encoded = LibStub("LibDeflate"):EncodeForPrint(compressed)
+                        
+                        -- Show export dialog
+                        StaticPopupDialogs["KPH_EXPORT_DIALOG"] = {
+                            text = L["EXPORT_DIALOG_TEXT"],
+                            button1 = OKAY,
+                            hasEditBox = true,
+                            editBoxWidth = 350,
+                            maxLetters = 999999,
+                            OnShow = function(dialog)
+                                dialog.editBox:SetText(encoded)
+                                dialog.editBox:HighlightText()
+                                dialog.editBox:SetFocus()
+                            end,
+                            EditBoxOnEscapePressed = function(editBox)
+                                editBox:GetParent():Hide()
+                            end,
+                            timeout = 0,
+                            whileDead = true,
+                            hideOnEscape = true,
+                        }
+                        StaticPopup_Show("KPH_EXPORT_DIALOG")
+                    end
+                end,
+            },
+            import = {
+                order = 4,
+                type = "execute",
+                name = L["IMPORT_DUNGEON"],
+                desc = L["IMPORT_DUNGEON_DESC"],
+                func = function()
+                    local addon = KeystonePercentageHelper
+                    
+                    -- Local function to get dungeon name
+                    local function GetDungeonDisplayName(dungeonKey)
+                        if not dungeonKey then return "Unknown Dungeon" end
+                        
+                        local dungeonId = addon:GetDungeonIdByKey(dungeonKey)
+                        if dungeonId and addon.DUNGEONS[dungeonId] and addon.DUNGEONS[dungeonId].name then
+                            return addon.DUNGEONS[dungeonId].name
+                        end
+                        
+                        -- Try to get localized name
+                        if L[dungeonKey] then
+                            return L[dungeonKey]
+                        end
+                        
+                        -- Fallback: Try to make the key look presentable
+                        local name = dungeonKey:gsub("_", " ")
+                        name = name:gsub("(%l)(%u)", "%1 %2") -- Add space between lower and upper case
+                        name = name:gsub("^%l", string.upper) -- Capitalize first letter
+                        return name
+                    end
+                    
+                    StaticPopupDialogs["KPH_IMPORT_DIALOG"] = {
+                        text = L["IMPORT_DIALOG_TEXT"],
+                        button1 = OKAY,
+                        button2 = CANCEL,
+                        hasEditBox = true,
+                        editBoxWidth = 350,
+                        maxLetters = 999999,
+                        OnAccept = function(dialog)
+                            local importString = dialog.editBox:GetText()
+                            local decoded = LibStub("LibDeflate"):DecodeForPrint(importString)
+                            if decoded then
+                                local decompressed = LibStub("LibDeflate"):DecompressDeflate(decoded)
+                                if decompressed then
+                                    local success, importData = LibStub("AceSerializer-3.0"):Deserialize(decompressed)
+                                    if success and importData.dungeon then
+                                        local importDungeonId = addon:GetDungeonIdByKey(importData.dungeon)
+                                        if importDungeonId and addon.DUNGEONS[importDungeonId] then
+                                            if not addon.db.profile.advanced[importData.dungeon] then
+                                                addon.db.profile.advanced[importData.dungeon] = {}
+                                            end
+                                            for k, v in pairs(importData.data) do
+                                                addon.db.profile.advanced[importData.dungeon][k] = v
+                                            end
+                                            addon:UpdateDungeonData()
+                                            LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePercentageHelper")
+                                            print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_SUCCESS"]:format(GetDungeonDisplayName(importData.dungeon)))
+                                        else
+                                            print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
+                                        end
+                                    else
+                                        print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
+                                    end
+                                else
+                                    print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
+                                end
+                            else
+                                print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
+                            end
+                        end,
+                        EditBoxOnEscapePressed = function(editBox)
+                            editBox:GetParent():Hide()
+                        end,
+                        timeout = 0,
+                        whileDead = true,
+                        hideOnEscape = true,
+                    }
+                    StaticPopup_Show("KPH_IMPORT_DIALOG")
+                end,
+            },
             header = {
                 name = L["TANK_GROUP_HEADER"],
                 type = "header",
-                order = 3,
+                order = 5,
             },
         }
     }
@@ -610,7 +730,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
             type = "group",
             name = bossName,
             inline = true,
-            order = i + 3,  -- Start boss orders at 4 (after header)
+            order = i + 5,  -- Start boss orders at 6 (after header)
             args = {
                 percent = {
                     name = L["PERCENTAGE"],

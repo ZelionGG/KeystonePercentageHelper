@@ -186,3 +186,16 @@ L["NEW_SEASON_RESET_PROMPT"] = "A new Mythic+ season has started. Would you like
 L["YES"] = "Yes"
 L["NO"] = "No"
 L["WE_STILL_NEED"] = "We still need"
+
+-- Export/Import
+L["EXPORT_DUNGEON"] = "Export Dungeon"
+L["EXPORT_DUNGEON_DESC"] = "Export custom percentages for this dungeon"
+L["IMPORT_DUNGEON"] = "Import Dungeon"
+L["IMPORT_DUNGEON_DESC"] = "Import custom percentages for this dungeon"
+L["EXPORT_DIALOG_TITLE"] = "Export Dungeon Percentages"
+L["EXPORT_DIALOG_TEXT"] = "Copy the string below to share your custom percentages:"
+L["IMPORT_DIALOG_TITLE"] = "Import Dungeon Percentages"
+L["IMPORT_DIALOG_TEXT"] = "Paste the exported string below:"
+L["IMPORT_SUCCESS"] = "Imported custom route for %s."
+L["IMPORT_ERROR"] = "Invalid import string"
+L["IMPORT_DIFFERENT_DUNGEON"] = "Imported settings for %s. Opening options for that dungeon."
