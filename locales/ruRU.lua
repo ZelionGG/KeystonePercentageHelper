@@ -50,11 +50,11 @@ L["DFC_BOSS3"] = "Свечной Король"
 L["DFC_BOSS4"] = "Тьма"
 
 -- Operation: Floodgate
-L["OFG"] = "Operation: Floodgate" -- 11.1 patch
-L["OFG_BOSS1"] = "Big M.O.M.M.A." -- 11.1 patch
-L["OFG_BOSS2"] = "Demolition Duo" -- 11.1 patch
-L["OFG_BOSS3"] = "Swampface" -- 11.1 patch
-L["OFG_BOSS4"] = "Geezle Gigazap" -- 11.1 patch
+L["OFG"] = "Операция: Шлюз"
+L["OFG_BOSS1"] = "Большая МАМА"
+L["OFG_BOSS2"] = "Пара подрывников"
+L["OFG_BOSS3"] = "Торфоморд"
+L["OFG_BOSS4"] = "Гизл Гигабжик"
 
 -- Priory of the Sacred Flames
 L["PotSF"] = "Приорат Священного Пламени"
