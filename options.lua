@@ -50,10 +50,23 @@ local expansions = {
     --{id = "Vanilla", name = "EXPANSION_VANILLA", order = 12} -- Vanilla WoW
 }
 
-KeystonePercentageHelper.SEASON_START_DATES = {
-    ["2024-09-10"] = true,  -- TWW Season 1 start date
-    --["2025-03-08"] = true,  -- TWW Season 2 start date
-}
+local portal = C_CVar.GetCVar("portal")
+if portal == "US" then
+    KeystonePercentageHelper.SEASON_START_DATES = {
+        ["2024-09-10"] = true,  -- TWW Season 1 start date
+        ["2025-03-04"] = true,  -- TWW Season 2 start date
+    }
+elseif portal == "EU" then
+    KeystonePercentageHelper.SEASON_START_DATES = {
+        ["2024-09-10"] = true,  -- TWW Season 1 start date
+        ["2025-03-05"] = true,  -- TWW Season 2 start date
+    }
+else
+    KeystonePercentageHelper.SEASON_START_DATES = {
+        ["2024-09-10"] = true,  -- TWW Season 1 start date
+        ["2025-03-05"] = true,  -- TWW Season 2 start date
+    }
+end
 
 -- Load defaults from all expansions
 for _, expansion in ipairs(expansions) do
