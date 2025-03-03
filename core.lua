@@ -29,11 +29,6 @@ KeystonePercentageHelper.currentSection = 1
 function KeystonePercentageHelper:OnInitialize()
     self:LoadExpansionDungeons()
     self.db = LibStub("AceDB-3.0"):New("KeystonePercentageHelperDB", self.defaults, "Default")
-    
-    -- Add lastSeasonCheck to defaults if it doesn't exist
-    if self.db.profile.lastSeasonCheck == nil then
-        self.db.profile.lastSeasonCheck = ""
-    end
 
     -- Generating the changelog
     self:GenerateChangelog()

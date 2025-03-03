@@ -59,7 +59,7 @@ if portal == "US" then
 elseif portal == "EU" then
     KeystonePercentageHelper.SEASON_START_DATES = {
         ["2024-09-10"] = "TWW_1",  -- TWW Season 1 start date
-        ["2025-03-01"] = "TWW_2",  -- TWW Season 2 start date
+        ["2025-03-05"] = "TWW_2",  -- TWW Season 2 start date
     }
 else
     KeystonePercentageHelper.SEASON_START_DATES = {
