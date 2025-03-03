@@ -180,6 +180,7 @@ L["RESET_DUNGEON_CONFIRM"] = "Êtes-vous sûr de vouloir réinitialiser tous les
 L["RESET_ALL_DUNGEONS"] = "Réinitialiser tous les donjons"
 L["RESET_ALL_DUNGEONS_DESC"] = "Réinitialiser tous les donjons à leurs valeurs par défaut"
 L["RESET_ALL_DUNGEONS_CONFIRM"] = "Êtes-vous sûr de vouloir réinitialiser tous les donjons à leurs valeurs par défaut ?"
+L["NEW_SEASON_RESET_PROMPT"] = "Une nouvelle saison Mythique+ a commencé. Voulez-vous réinitialiser toutes les valeurs des donjons de la nouvelle saison à leurs valeurs par défaut ?"
 L["YES"] = "Oui"
 L["NO"] = "Non"
 L["WE_STILL_NEED"] = "Il nous faut encore"

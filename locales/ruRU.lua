@@ -11,9 +11,7 @@ if not L then return end
 -- Dungeons Group
 L["DUNGEONS"] = "Подземелья"
 L["CURRENT_SEASON"] = "Текущий сезон"
-L["CURRENT_SEASON_DUNGEONS"] = "Подземелья текущего сезона"
 L["NEXT_SEASON"] = "Следующий сезон"
-L["NEXT_SEASON_DUNGEONS"] = "Подземелья следующего сезона"
 L["EXPANSION_DF"] = "Драконы"
 L["EXPANSION_CATA"] = "Катаклизм"
 L["EXPANSION_WW"] = "Война Внутри"

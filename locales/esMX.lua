@@ -10,9 +10,7 @@ if not L then return end
 -- Dungeons Group
 L["DUNGEONS"] = "Current Season"
 L["CURRENT_SEASON"] = "Current Season"
-L["CURRENT_SEASON_DUNGEONS"] = "Current Season Dungeons"
 L["NEXT_SEASON"] = "Next Season"
-L["NEXT_SEASON_DUNGEONS"] = "Next Season Dungeons"
 L["EXPANSION_DF"] = "Dragonflight"
 L["EXPANSION_CATA"] = "Cataclysm"
 L["EXPANSION_WW"] = "The War Within"
