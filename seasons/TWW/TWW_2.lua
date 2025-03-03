@@ -1,7 +1,7 @@
 local AddOnName, KeystonePercentageHelper = ...
 
--- Define which dungeons are in the next season
-KeystonePercentageHelper.NEXT_SEASON_DUNGEONS = {
+-- Define which dungeons are in the current season
+KeystonePercentageHelper.TWW_2_DUNGEONS = {
     -- War Within dungeons
     [506] = true, -- CBM (Cinderbrew Meadery)
     [504] = true, -- DFC (Darkflame Cleft)
@@ -14,8 +14,3 @@ KeystonePercentageHelper.NEXT_SEASON_DUNGEONS = {
     [370] = true, -- OMGW (Operation: Mechagon - Workshop)
     [247] = true, -- TML (The MOTHERLODE!!)
 }
-
--- Function to check if a dungeon is in the next season
-function KeystonePercentageHelper:IsNextSeasonDungeon(dungeonId)
-    return self.NEXT_SEASON_DUNGEONS[dungeonId] or false
-end
