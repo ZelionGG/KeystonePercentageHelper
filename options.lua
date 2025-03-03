@@ -1283,7 +1283,7 @@ function KeystonePercentageHelper:CheckForNewSeason()
     local currentDate = date("%Y-%m-%d", time())
     
     -- If this is first load (lastSeasonCheck is empty), just set the date and don't show popup
-    if self.db.profile.lastSeasonCheck == "" then
+    if not self.db.profile.lastSeasonCheck or self.db.profile.lastSeasonCheck == "" then
         self.db.profile.lastSeasonCheck = currentDate
         return
     end
