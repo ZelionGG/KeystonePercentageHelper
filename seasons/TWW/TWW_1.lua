@@ -1,7 +1,7 @@
 local AddOnName, KeystonePercentageHelper = ...
 
 -- Define which dungeons are in the current season
-KeystonePercentageHelper.CURRENT_SEASON_DUNGEONS = {
+KeystonePercentageHelper.TWW_1_DUNGEONS = {
     -- War Within dungeons
     [503] = true, -- AKCE
     [502] = true, -- CoT
@@ -15,8 +15,3 @@ KeystonePercentageHelper.CURRENT_SEASON_DUNGEONS = {
     -- Cataclysm dungeons
     [507] = true, -- GB
 }
-
--- Function to check if a dungeon is in the current season
-function KeystonePercentageHelper:IsCurrentSeasonDungeon(dungeonId)
-    return self.CURRENT_SEASON_DUNGEONS[dungeonId] or false
-end

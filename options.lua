@@ -53,18 +53,18 @@ local expansions = {
 local portal = C_CVar.GetCVar("portal")
 if portal == "US" then
     KeystonePercentageHelper.SEASON_START_DATES = {
-        ["2024-09-10"] = true,  -- TWW Season 1 start date
-        ["2025-03-04"] = true,  -- TWW Season 2 start date
+        ["2024-09-10"] = "TWW_1",  -- TWW Season 1 start date
+        ["2025-03-04"] = "TWW_2",  -- TWW Season 2 start date
     }
 elseif portal == "EU" then
     KeystonePercentageHelper.SEASON_START_DATES = {
-        ["2024-09-10"] = true,  -- TWW Season 1 start date
-        ["2025-03-05"] = true,  -- TWW Season 2 start date
+        ["2024-09-10"] = "TWW_1",  -- TWW Season 1 start date
+        ["2025-03-01"] = "TWW_2",  -- TWW Season 2 start date
     }
 else
     KeystonePercentageHelper.SEASON_START_DATES = {
-        ["2024-09-10"] = true,  -- TWW Season 1 start date
-        ["2025-03-05"] = true,  -- TWW Season 2 start date
+        ["2024-09-10"] = "TWW_1",  -- TWW Season 1 start date
+        ["2025-03-05"] = "TWW_2",  -- TWW Season 2 start date
     }
 end
 
@@ -76,21 +76,6 @@ for _, expansion in ipairs(expansions) do
             KeystonePercentageHelper.defaults.profile.advanced[k] = v
         end
     end
-end
-
-function KeystonePercentageHelper:GetDungeonKeyById(dungeonId)
-    -- Check all expansions for the dungeon ID
-    for _, expansion in ipairs(expansions) do
-        local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
-        if dungeonIds then
-            for key, id in pairs(dungeonIds) do
-                if id == dungeonId then
-                    return key
-                end
-            end
-        end
-    end
-    return nil
 end
 
 function KeystonePercentageHelper:LoadExpansionDungeons()
@@ -114,6 +99,75 @@ function KeystonePercentageHelper:GetDungeonIdByKey(dungeonKey)
         end
     end
     return nil
+end
+
+function KeystonePercentageHelper:GetDungeonKeyById(dungeonId)
+    -- Check each expansion's dungeon IDs table
+    for _, expansion in ipairs(expansions) do
+        local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
+        if dungeonIds then
+            for dungeonKey, id in pairs(dungeonIds) do
+                if id == dungeonId then
+                    return dungeonKey
+                end
+            end
+        end
+    end
+    return nil
+end
+
+function KeystonePercentageHelper:IsCurrentSeasonDungeon(dungeonId)
+    -- Get the current date
+    local currentDate = date("%Y-%m-%d")
+    
+    -- Find the most recent season
+    local mostRecentSeasonDate = nil
+    local currentSeasonId = nil
+    
+    for seasonDate, _ in pairs(self.SEASON_START_DATES) do
+        if seasonDate <= currentDate and (not mostRecentSeasonDate or seasonDate > mostRecentSeasonDate) then
+            currentSeasonId = self.SEASON_START_DATES[seasonDate]
+            mostRecentSeasonDate = seasonDate
+        end
+    end
+    
+    if currentSeasonId then
+        local seasonDungeonsTabName = currentSeasonId .. "_DUNGEONS"
+        local seasonDungeons = self[seasonDungeonsTabName]
+        
+        if seasonDungeons then
+            return seasonDungeons[dungeonId] or false
+        end
+    end
+    
+    return false
+end
+
+function KeystonePercentageHelper:IsNextSeasonDungeon(dungeonId)
+    -- Get the current date
+    local currentDate = date("%Y-%m-%d")
+    
+    -- Find the next season (first season that starts after current date)
+    local nextSeasonDate = nil
+    local nextSeasonId = nil
+    
+    for seasonDate, _ in pairs(self.SEASON_START_DATES) do
+        if seasonDate > currentDate and (not nextSeasonDate or seasonDate < nextSeasonDate) then
+            nextSeasonId = self.SEASON_START_DATES[seasonDate]
+            nextSeasonDate = seasonDate
+        end
+    end
+    
+    if nextSeasonId then
+        local nextSeasonDungeonsTabName = nextSeasonId .. "_DUNGEONS"
+        local nextSeasonDungeons = self[nextSeasonDungeonsTabName]
+        
+        if nextSeasonDungeons then
+            return nextSeasonDungeons[dungeonId] or false
+        end
+    end
+    
+    return false
 end
 
 function KeystonePercentageHelper:GetPositioningOptions()
@@ -370,7 +424,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
     local function CreateExpansionDungeonArgs(dungeonIds, defaults)
         local args = {
             defaultPercentages = {
-                order = 0,
+                order = 3,
                 type = "description",
                 fontSize = "medium",
                 name = function()
@@ -398,13 +452,33 @@ function KeystonePercentageHelper:GetAdvancedOptions()
     -- Create current season options
     local currentSeasonDungeons = {}
     
-    -- Collect all current season dungeons
-    for _, expansion in ipairs(expansions) do
-        local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
-        if dungeonIds then
-            for dungeonKey, dungeonId in pairs(dungeonIds) do
-                if self:IsCurrentSeasonDungeon(dungeonId) then
-                    table.insert(currentSeasonDungeons, {key = dungeonKey, id = dungeonId})
+    -- Get the current date
+    local currentDate = date("%Y-%m-%d")
+    
+    -- Find the most recent season
+    local mostRecentSeasonDate = nil
+    local currentSeasonId = nil
+    
+    for seasonDate, _ in pairs(self.SEASON_START_DATES) do
+        if seasonDate <= currentDate and (not mostRecentSeasonDate or seasonDate > mostRecentSeasonDate) then
+            currentSeasonId = self.SEASON_START_DATES[seasonDate]
+            mostRecentSeasonDate = seasonDate
+        end
+    end
+    
+    if currentSeasonId then
+        local seasonDungeonsTabName = currentSeasonId .. "_DUNGEONS"
+        local seasonDungeons = self[seasonDungeonsTabName]
+        
+        if seasonDungeons then
+            for _, expansion in ipairs(expansions) do
+                local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
+                if dungeonIds then
+                    for dungeonKey, dungeonId in pairs(dungeonIds) do
+                        if seasonDungeons[dungeonId] then
+                            table.insert(currentSeasonDungeons, {key = dungeonKey, id = dungeonId})
+                        end
+                    end
                 end
             end
         end
@@ -417,8 +491,46 @@ function KeystonePercentageHelper:GetAdvancedOptions()
 
     -- Create current season dungeon args
     local dungeonArgs = {
+        export = {
+            order = 1,
+            type = "execute",
+            name = L["EXPORT_SECTION"] or "Export Section",
+            desc = (L["EXPORT_SECTION_DESC"] or "Export all dungeon settings for %s."):format(L["CURRENT_SEASON"]),
+            func = function()
+                local addon = KeystonePercentageHelper
+                local dungeonIds = {}
+                
+                -- Collect current season dungeon data
+                for _, dungeon in ipairs(currentSeasonDungeons) do
+                    local dungeonKey = dungeon.key
+                    if addon.db.profile.advanced[dungeonKey] then
+                        dungeonIds[dungeonKey] = addon.db.profile.advanced[dungeonKey]
+                    end
+                end
+                
+                -- Export current season dungeon data
+                addon:ExportDungeonSettings(dungeonIds, "section", L["CURRENT_SEASON"])
+            end,
+        },
+        import = {
+            order = 2,
+            type = "execute",
+            name = L["IMPORT_SECTION"] or "Import Section",
+            desc = (L["IMPORT_SECTION_DESC"] or "Import dungeon settings for %s."):format(L["CURRENT_SEASON"]),
+            func = function()
+                local addon = KeystonePercentageHelper
+                
+                -- Create filter for current season dungeons
+                local dungeonFilter = {}
+                for _, dungeon in ipairs(currentSeasonDungeons) do
+                    dungeonFilter[dungeon.key] = true
+                end
+                
+                addon:ShowImportDialog(L["CURRENT_SEASON"], dungeonFilter)
+            end,
+        },
         defaultPercentages = {
-            order = 0,
+            order = 3,
             type = "description",
             fontSize = "medium",
             name = function()
@@ -448,13 +560,33 @@ function KeystonePercentageHelper:GetAdvancedOptions()
     -- Create next season dungeon args
     local nextSeasonDungeons = {}
     
-    -- Collect all next season dungeons
-    for _, expansion in ipairs(expansions) do
-        local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
-        if dungeonIds then
-            for dungeonKey, dungeonId in pairs(dungeonIds) do
-                if self:IsNextSeasonDungeon(dungeonId) then
-                    table.insert(nextSeasonDungeons, {key = dungeonKey, id = dungeonId})
+    -- Get the current date
+    local currentDate = date("%Y-%m-%d")
+    
+    -- Find the next season (first season that starts after current date)
+    local nextSeasonDate = nil
+    local nextSeasonId = nil
+    
+    for seasonDate, _ in pairs(self.SEASON_START_DATES) do
+        if seasonDate > currentDate and (not nextSeasonDate or seasonDate < nextSeasonDate) then
+            nextSeasonId = self.SEASON_START_DATES[seasonDate]
+            nextSeasonDate = seasonDate
+        end
+    end
+    
+    if nextSeasonId then
+        local nextSeasonDungeonsTabName = nextSeasonId .. "_DUNGEONS"
+        local nextSeasonDungeonsTable = self[nextSeasonDungeonsTabName]
+        
+        if nextSeasonDungeonsTable then
+            for _, expansion in ipairs(expansions) do
+                local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
+                if dungeonIds then
+                    for dungeonKey, dungeonId in pairs(dungeonIds) do
+                        if nextSeasonDungeonsTable[dungeonId] then
+                            table.insert(nextSeasonDungeons, {key = dungeonKey, id = dungeonId})
+                        end
+                    end
                 end
             end
         end
@@ -467,8 +599,46 @@ function KeystonePercentageHelper:GetAdvancedOptions()
 
     -- Create next season dungeon args
     local nextSeasonDungeonArgs = {
+        export = {
+            order = 1,
+            type = "execute",
+            name = L["EXPORT_SECTION"] or "Export Section",
+            desc = (L["EXPORT_SECTION_DESC"] or "Export all dungeon settings for %s."):format(L["NEXT_SEASON"]),
+            func = function()
+                local addon = KeystonePercentageHelper
+                local dungeonIds = {}
+                
+                -- Collect next season dungeon data
+                for _, dungeon in ipairs(nextSeasonDungeons) do
+                    local dungeonKey = dungeon.key
+                    if addon.db.profile.advanced[dungeonKey] then
+                        dungeonIds[dungeonKey] = addon.db.profile.advanced[dungeonKey]
+                    end
+                end
+                
+                -- Export next season dungeon data
+                addon:ExportDungeonSettings(dungeonIds, "section", L["NEXT_SEASON"])
+            end,
+        },
+        import = {
+            order = 2,
+            type = "execute",
+            name = L["IMPORT_SECTION"] or "Import Section",
+            desc = (L["IMPORT_SECTION_DESC"] or "Import dungeon settings for %s."):format(L["NEXT_SEASON"]),
+            func = function()
+                local addon = KeystonePercentageHelper
+                
+                -- Create filter for next season dungeons
+                local dungeonFilter = {}
+                for _, dungeon in ipairs(nextSeasonDungeons) do
+                    dungeonFilter[dungeon.key] = true
+                end
+                
+                addon:ShowImportDialog(L["NEXT_SEASON"], dungeonFilter)
+            end,
+        },
         defaultPercentages = {
-            order = 0,
+            order = 3,
             type = "description",
             fontSize = "medium",
             name = function()
@@ -509,21 +679,55 @@ function KeystonePercentageHelper:GetAdvancedOptions()
                 self:ResetAllDungeons()
             end
         },
+        exportAllDungeons = {
+            order = 2,
+            type = "execute",
+            name = L["EXPORT_ALL_DUNGEONS"] or "Export All Dungeons",
+            desc = L["EXPORT_ALL_DUNGEONS_DESC"] or "Export settings for all dungeons.",
+            func = function()
+                local addon = KeystonePercentageHelper
+                
+                -- Collect all dungeon data
+                local allDungeonData = {}
+                for dungeonKey, _ in pairs(addon.db.profile.advanced) do
+                    if type(addon.db.profile.advanced[dungeonKey]) == "table" then
+                        allDungeonData[dungeonKey] = addon.db.profile.advanced[dungeonKey]
+                    end
+                end
+                
+                -- Export all dungeon data
+                addon:ExportDungeonSettings(allDungeonData, "all_dungeons")
+            end,
+        },
+        importAllDungeons = {
+            order = 3,
+            type = "execute",
+            name = L["IMPORT_ALL_DUNGEONS"],
+            desc = L["IMPORT_ALL_DUNGEONS_DESC"],
+            func = function()
+                local addon = KeystonePercentageHelper
+                addon:ShowImportDialog()
+            end,
+        },
         dungeons = {
             name = "|cff40E0D0" .. L["CURRENT_SEASON"] .. "|r",
             type = "group",
             childGroups = "tree",
             order = 3,
             args = dungeonArgs
-        },
-        nextseason = {
+        }
+    }
+    
+    -- Only add next season section if there are next season dungeons
+    if nextSeasonId and #nextSeasonDungeons > 0 then
+        args.nextseason = {
             name = "|cffff5733" .. L["NEXT_SEASON"] .. "|r",
             type = "group",
             childGroups = "tree",
             order = 4,
             args = nextSeasonDungeonArgs
         }
-    }
+    end
 
     -- Add expansion sections
     for _, expansion in ipairs(expansions) do
@@ -535,8 +739,53 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             order = expansion.order + 4,  -- Shift expansion orders to after next season
             args = CreateExpansionDungeonArgs(self[expansion.id .. "_DUNGEON_IDS"], self[expansion.id .. "_DEFAULTS"])
         }
+        
+        -- Add export/import buttons for this section
+        args[sectionKey].args.exportSection = {
+            order = 1,  -- Place before defaultPercentages
+            type = "execute",
+            name = L["EXPORT_SECTION"] or "Export Section",
+            desc = (L["EXPORT_SECTION_DESC"] or "Export all dungeon settings for %s."):format(L[expansion.name]),
+            func = function()
+                local addon = KeystonePercentageHelper
+                local dungeonIds = addon[expansion.id .. "_DUNGEON_IDS"]
+                
+                if not dungeonIds then return end
+                
+                -- Collect section dungeon data
+                local sectionData = {}
+                for dungeonKey, _ in pairs(dungeonIds) do
+                    if addon.db.profile.advanced[dungeonKey] then
+                        sectionData[dungeonKey] = addon.db.profile.advanced[dungeonKey]
+                    end
+                end
+                
+                -- Export section dungeon data
+                addon:ExportDungeonSettings(sectionData, "section", L[expansion.name])
+            end,
+        }
+        
+        args[sectionKey].args.importSection = {
+            order = 2,  -- Place before defaultPercentages
+            type = "execute",
+            name = L["IMPORT_SECTION"] or "Import Section",
+            desc = (L["IMPORT_SECTION_DESC"] or "Import dungeon settings for %s."):format(L[expansion.name]),
+            func = function()
+                local addon = KeystonePercentageHelper
+                local dungeonIds = addon[expansion.id .. "_DUNGEON_IDS"]
+                
+                if not dungeonIds then return end
+                
+                -- Create filter for this expansion's dungeons
+                local dungeonFilter = {}
+                for dungeonKey, _ in pairs(dungeonIds) do
+                    dungeonFilter[dungeonKey] = true
+                end
+                
+                addon:ShowImportDialog(L[expansion.name], dungeonFilter)
+            end,
+        }
     end
-
     return {
         name = L["ADVANCED_SETTINGS"],
         type = "group",
@@ -616,7 +865,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                     local addon = KeystonePercentageHelper
                     local dungeonId = addon:GetDungeonIdByKey(dungeonKey)
                     if dungeonId and addon.DUNGEONS[dungeonId] and addon.db.profile.advanced[dungeonKey] then
-                        -- Create export string
+                        -- Create export string for single dungeon
                         local exportData = {
                             dungeon = dungeonKey,
                             data = addon.db.profile.advanced[dungeonKey]
@@ -656,26 +905,9 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                 func = function()
                     local addon = KeystonePercentageHelper
                     
-                    -- Local function to get dungeon name
-                    local function GetDungeonDisplayName(dungeonKey)
-                        if not dungeonKey then return "Unknown Dungeon" end
-                        
-                        local dungeonId = addon:GetDungeonIdByKey(dungeonKey)
-                        if dungeonId and addon.DUNGEONS[dungeonId] and addon.DUNGEONS[dungeonId].name then
-                            return addon.DUNGEONS[dungeonId].name
-                        end
-                        
-                        -- Try to get localized name
-                        if L[dungeonKey] then
-                            return L[dungeonKey]
-                        end
-                        
-                        -- Fallback: Try to make the key look presentable
-                        local name = dungeonKey:gsub("_", " ")
-                        name = name:gsub("(%l)(%u)", "%1 %2") -- Add space between lower and upper case
-                        name = name:gsub("^%l", string.upper) -- Capitalize first letter
-                        return name
-                    end
+                    -- Create filter for this specific dungeon
+                    local dungeonFilter = {}
+                    dungeonFilter[dungeonKey] = true
                     
                     StaticPopupDialogs["KPH_IMPORT_DIALOG"] = {
                         text = L["IMPORT_DIALOG_TEXT"],
@@ -686,35 +918,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                         maxLetters = 999999,
                         OnAccept = function(dialog)
                             local importString = dialog.editBox:GetText()
-                            local decoded = LibStub("LibDeflate"):DecodeForPrint(importString)
-                            if decoded then
-                                local decompressed = LibStub("LibDeflate"):DecompressDeflate(decoded)
-                                if decompressed then
-                                    local success, importData = LibStub("AceSerializer-3.0"):Deserialize(decompressed)
-                                    if success and importData.dungeon then
-                                        local importDungeonId = addon:GetDungeonIdByKey(importData.dungeon)
-                                        if importDungeonId and addon.DUNGEONS[importDungeonId] then
-                                            if not addon.db.profile.advanced[importData.dungeon] then
-                                                addon.db.profile.advanced[importData.dungeon] = {}
-                                            end
-                                            for k, v in pairs(importData.data) do
-                                                addon.db.profile.advanced[importData.dungeon][k] = v
-                                            end
-                                            addon:UpdateDungeonData()
-                                            LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePercentageHelper")
-                                            print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_SUCCESS"]:format(GetDungeonDisplayName(importData.dungeon)))
-                                        else
-                                            print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
-                                        end
-                                    else
-                                        print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
-                                    end
-                                else
-                                    print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
-                                end
-                            else
-                                print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
-                            end
+                            addon:ImportDungeonSettings(importString, nil, dungeonFilter)
                         end,
                         EditBoxOnEscapePressed = function(editBox)
                             editBox:GetParent():Hide()
@@ -727,9 +931,9 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                 end,
             },
             header = {
-                name = L["TANK_GROUP_HEADER"],
-                type = "header",
                 order = 5,
+                type = "header",
+                name = L["TANK_GROUP_HEADER"],
             },
         }
     }
@@ -1021,6 +1225,59 @@ function KeystonePercentageHelper:ResetAllDungeons()
     LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePercentageHelper")
 end
 
+function KeystonePercentageHelper:ResetCurrentSeasonDungeons()
+    local self = KeystonePercentageHelper
+    
+    -- Get the current date
+    local currentDate = date("%Y-%m-%d")
+    
+    -- Find the most recent season
+    local mostRecentSeasonDate = nil
+    local currentSeasonId = nil
+    
+    for seasonDate, _ in pairs(self.SEASON_START_DATES) do
+        if seasonDate <= currentDate and (not mostRecentSeasonDate or seasonDate > mostRecentSeasonDate) then
+            currentSeasonId = self.SEASON_START_DATES[seasonDate]
+            mostRecentSeasonDate = seasonDate
+        end
+    end
+    
+    if currentSeasonId then
+        local seasonDungeonsTabName = currentSeasonId .. "_DUNGEONS"
+        local seasonDungeons = self[seasonDungeonsTabName]
+        
+        if seasonDungeons then
+            -- Reset only the current season dungeons to their defaults
+            for dungeonId, _ in pairs(seasonDungeons) do
+                local dungeonKey = self:GetDungeonKeyById(dungeonId)
+                if dungeonKey then
+                    -- Find the appropriate defaults for this dungeon
+                    local defaults
+                    for _, expansion in ipairs(expansions) do
+                        if self[expansion.id .. "_DUNGEON_IDS"] and self[expansion.id .. "_DUNGEON_IDS"][dungeonKey] then
+                            defaults = self[expansion.id .. "_DEFAULTS"][dungeonKey]
+                            break
+                        end
+                    end
+
+                    if defaults then
+                        if not self.db.profile.advanced[dungeonKey] then
+                            self.db.profile.advanced[dungeonKey] = {}
+                        end
+                        for key, value in pairs(defaults) do
+                            self.db.profile.advanced[dungeonKey][key] = value
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    -- Update the display
+    self:UpdateDungeonData()
+    LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePercentageHelper")
+end
+
 function KeystonePercentageHelper:CheckForNewSeason()
     local self = KeystonePercentageHelper
     local currentDate = date("%Y-%m-%d", time())
@@ -1035,6 +1292,8 @@ function KeystonePercentageHelper:CheckForNewSeason()
     local mostRecentSeasonDate = nil
     for seasonDate, _ in pairs(self.SEASON_START_DATES) do
         if seasonDate <= currentDate and (not mostRecentSeasonDate or seasonDate > mostRecentSeasonDate) then
+            local seasonDungeonsTabName = self.SEASON_START_DATES[seasonDate] .. "_DUNGEONS"
+            currentSeasonDungeons = self[seasonDungeonsTabName]
             mostRecentSeasonDate = seasonDate
         end
     end
@@ -1064,33 +1323,197 @@ function KeystonePercentageHelper:CheckForNewSeason()
     end
 end
 
-function KeystonePercentageHelper:ResetCurrentSeasonDungeons()
-    local self = KeystonePercentageHelper
-    -- Reset only the current season dungeons to their defaults
-    for dungeonId, _ in pairs(self.CURRENT_SEASON_DUNGEONS) do
-        local dungeonKey = self:GetDungeonKeyById(dungeonId)
-        if dungeonKey then
-            -- Find the appropriate defaults for this dungeon
-            local defaults
-            for _, expansion in ipairs(expansions) do
-                if self[expansion.id .. "_DUNGEON_IDS"][dungeonKey] then
-                    defaults = self[expansion.id .. "_DEFAULTS"][dungeonKey]
-                    break
-                end
-            end
+function KeystonePercentageHelper:GetDungeonDisplayName(dungeonKey)
+    if not dungeonKey then return "Unknown Dungeon" end
+    
+    local dungeonId = self:GetDungeonIdByKey(dungeonKey)
+    if dungeonId and self.DUNGEONS[dungeonId] and self.DUNGEONS[dungeonId].name then
+        return self.DUNGEONS[dungeonId].name
+    end
+    
+    -- Try to get localized name
+    if L[dungeonKey] then
+        return L[dungeonKey]
+    end
+    
+    -- Fallback: Try to make the key look presentable
+    local name = dungeonKey:gsub("_", " ")
+    name = name:gsub("(%l)(%u)", "%1 %2") -- Add space between lower and upper case
+    name = name:gsub("^%l", string.upper) -- Capitalize first letter
+    return name
+end
 
-            if defaults then
-                if not self.db.profile.advanced[dungeonKey] then
-                    self.db.profile.advanced[dungeonKey] = {}
-                end
-                for key, value in pairs(defaults) do
-                    self.db.profile.advanced[dungeonKey][key] = value
+-- Global export function for dungeon settings
+function KeystonePercentageHelper:ExportDungeonSettings(dungeonData, exportType, sectionName)
+    -- Create export string
+    local exportData = {
+        type = exportType,
+        section = sectionName,
+        data = dungeonData
+    }
+    local serialized = LibStub("AceSerializer-3.0"):Serialize(exportData)
+    local compressed = LibStub("LibDeflate"):CompressDeflate(serialized)
+    local encoded = LibStub("LibDeflate"):EncodeForPrint(compressed)
+    
+    -- Determine dialog text based on export type
+    local dialogText
+    if exportType == "all_dungeons" then
+        dialogText = L["EXPORT_ALL_DIALOG_TEXT"] or "Copy the string below to share your dungeon settings:"
+    elseif exportType == "section" then
+        dialogText = (L["EXPORT_SECTION_DIALOG_TEXT"] or "Copy the string below to share your %s dungeon settings:"):format(sectionName)
+    else
+        dialogText = L["EXPORT_DIALOG_TEXT"]
+    end
+    
+    -- Show export dialog
+    StaticPopupDialogs["KPH_EXPORT_DIALOG"] = {
+        text = dialogText,
+        button1 = OKAY,
+        hasEditBox = true,
+        editBoxWidth = 350,
+        maxLetters = 999999,
+        OnShow = function(dialog)
+            dialog.editBox:SetText(encoded)
+            dialog.editBox:HighlightText()
+            dialog.editBox:SetFocus()
+        end,
+        EditBoxOnEscapePressed = function(editBox)
+            editBox:GetParent():Hide()
+        end,
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+    }
+    StaticPopup_Show("KPH_EXPORT_DIALOG")
+end
+
+-- Global import function for dungeon settings
+function KeystonePercentageHelper:ImportDungeonSettings(importString, sectionName, dungeonFilter)
+    local addon = self
+    local decoded = LibStub("LibDeflate"):DecodeForPrint(importString)
+    if not decoded then
+        print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
+        return false
+    end
+    
+    local decompressed = LibStub("LibDeflate"):DecompressDeflate(decoded)
+    if not decompressed then
+        print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
+        return false
+    end
+    
+    local success, importData = LibStub("AceSerializer-3.0"):Deserialize(decompressed)
+    if not success then
+        print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
+        return false
+    end
+    
+    local importCount = 0
+    
+    -- Handle different import types
+    if importData.type == "all_dungeons" and importData.data then
+        -- Import all dungeon data (filtered by dungeonFilter if provided)
+        for dungeonKey, dungeonData in pairs(importData.data) do
+            if not dungeonFilter or dungeonFilter[dungeonKey] then
+                local dungeonId = addon:GetDungeonIdByKey(dungeonKey)
+                if dungeonId and addon.DUNGEONS[dungeonId] then
+                    if not addon.db.profile.advanced[dungeonKey] then
+                        addon.db.profile.advanced[dungeonKey] = {}
+                    end
+                    for k, v in pairs(dungeonData) do
+                        addon.db.profile.advanced[dungeonKey][k] = v
+                    end
+                    importCount = importCount + 1
                 end
             end
         end
+    elseif importData.type == "section" and importData.data then
+        -- Import section data (filtered by dungeonFilter if provided)
+        for dungeonKey, dungeonData in pairs(importData.data) do
+            if not dungeonFilter or dungeonFilter[dungeonKey] then
+                local dungeonId = addon:GetDungeonIdByKey(dungeonKey)
+                if dungeonId and addon.DUNGEONS[dungeonId] then
+                    if not addon.db.profile.advanced[dungeonKey] then
+                        addon.db.profile.advanced[dungeonKey] = {}
+                    end
+                    for k, v in pairs(dungeonData) do
+                        addon.db.profile.advanced[dungeonKey][k] = v
+                    end
+                    importCount = importCount + 1
+                end
+            end
+        end
+    elseif importData.dungeon then
+        -- Handle single dungeon import for backward compatibility
+        local dungeonKey = importData.dungeon
+        if not dungeonFilter or dungeonFilter[dungeonKey] then
+            local dungeonId = addon:GetDungeonIdByKey(dungeonKey)
+            if dungeonId and addon.DUNGEONS[dungeonId] then
+                if not addon.db.profile.advanced[dungeonKey] then
+                    addon.db.profile.advanced[dungeonKey] = {}
+                end
+                for k, v in pairs(importData.data) do
+                    addon.db.profile.advanced[dungeonKey][k] = v
+                end
+                addon:UpdateDungeonData()
+                LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePercentageHelper")
+                print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_SUCCESS"]:format(addon:GetDungeonDisplayName(dungeonKey)))
+                return true
+            end
+        end
+        print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
+        return false
+    else
+        print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
+        return false
     end
     
-    -- Update the display
-    self:UpdateDungeonData()
-    LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePercentageHelper")
+    -- Update data and notify of changes
+    if importCount > 0 then
+        addon:UpdateDungeonData()
+        LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePercentageHelper")
+        
+        -- Determine success message based on import type
+        if importData.type == "all_dungeons" then
+            print("|cffdb6233Keystone Percentage Helper:|r " .. (L["IMPORT_ALL_SUCCESS"]))
+        elseif importData.type == "section" then
+            print("|cffdb6233Keystone Percentage Helper:|r " .. (L["IMPORT_SUCCESS"]):format(sectionName))
+        end
+        return true
+    else
+        print("|cffdb6233Keystone Percentage Helper:|r " .. (L["IMPORT_ERROR"]))
+        return false
+    end
+end
+
+-- Global function to create import dialog
+function KeystonePercentageHelper:ShowImportDialog(sectionName, dungeonFilter)
+    local addon = self
+    local dialogText
+    
+    if not sectionName then
+        dialogText = L["IMPORT_ALL_DIALOG_TEXT"] or "Paste the export string to import all dungeon settings:"
+    else
+        dialogText = (L["IMPORT_SECTION_DIALOG_TEXT"] or "Paste the export string to import %s dungeon settings:"):format(sectionName)
+    end
+    
+    StaticPopupDialogs["KPH_IMPORT_DIALOG"] = {
+        text = dialogText,
+        button1 = OKAY,
+        button2 = CANCEL,
+        hasEditBox = true,
+        editBoxWidth = 350,
+        maxLetters = 999999,
+        OnAccept = function(dialog)
+            local importString = dialog.editBox:GetText()
+            addon:ImportDungeonSettings(importString, sectionName, dungeonFilter)
+        end,
+        EditBoxOnEscapePressed = function(editBox)
+            editBox:GetParent():Hide()
+        end,
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+    }
+    StaticPopup_Show("KPH_IMPORT_DIALOG")
 end
