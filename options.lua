@@ -519,8 +519,8 @@ function KeystonePercentageHelper:GetAdvancedOptions()
         export = {
             order = 1,
             type = "execute",
-            name = L["EXPORT_SECTION"] or "Export Section",
-            desc = (L["EXPORT_SECTION_DESC"] or "Export all dungeon settings for %s."):format(L["CURRENT_SEASON"]),
+            name = L["EXPORT_SECTION"],
+            desc = (L["EXPORT_SECTION_DESC"]):format(L["CURRENT_SEASON"]),
             func = function()
                 local addon = KeystonePercentageHelper
                 local dungeonIds = {}
@@ -540,8 +540,8 @@ function KeystonePercentageHelper:GetAdvancedOptions()
         import = {
             order = 2,
             type = "execute",
-            name = L["IMPORT_SECTION"] or "Import Section",
-            desc = (L["IMPORT_SECTION_DESC"] or "Import dungeon settings for %s."):format(L["CURRENT_SEASON"]),
+            name = L["IMPORT_SECTION"],
+            desc = (L["IMPORT_SECTION_DESC"]):format(L["CURRENT_SEASON"]),
             func = function()
                 local addon = KeystonePercentageHelper
                 
@@ -627,8 +627,8 @@ function KeystonePercentageHelper:GetAdvancedOptions()
         export = {
             order = 1,
             type = "execute",
-            name = L["EXPORT_SECTION"] or "Export Section",
-            desc = (L["EXPORT_SECTION_DESC"] or "Export all dungeon settings for %s."):format(L["NEXT_SEASON"]),
+            name = L["EXPORT_SECTION"],
+            desc = (L["EXPORT_SECTION_DESC"]):format(L["NEXT_SEASON"]),
             func = function()
                 local addon = KeystonePercentageHelper
                 local dungeonIds = {}
@@ -648,8 +648,8 @@ function KeystonePercentageHelper:GetAdvancedOptions()
         import = {
             order = 2,
             type = "execute",
-            name = L["IMPORT_SECTION"] or "Import Section",
-            desc = (L["IMPORT_SECTION_DESC"] or "Import dungeon settings for %s."):format(L["NEXT_SEASON"]),
+            name = L["IMPORT_SECTION"],
+            desc = (L["IMPORT_SECTION_DESC"]):format(L["NEXT_SEASON"]),
             func = function()
                 local addon = KeystonePercentageHelper
                 
@@ -702,13 +702,13 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             func = function()
                 -- Reset all dungeons to their defaults
                 self:ResetAllDungeons()
-            end
+            end,
         },
         exportAllDungeons = {
             order = 2,
             type = "execute",
-            name = L["EXPORT_ALL_DUNGEONS"] or "Export All Dungeons",
-            desc = L["EXPORT_ALL_DUNGEONS_DESC"] or "Export settings for all dungeons.",
+            name = L["EXPORT_ALL_DUNGEONS"],
+            desc = L["EXPORT_ALL_DUNGEONS_DESC"],
             func = function()
                 local addon = KeystonePercentageHelper
                 
@@ -1402,9 +1402,9 @@ function KeystonePercentageHelper:ExportDungeonSettings(dungeonData, exportType,
     -- Determine dialog text based on export type
     local dialogText
     if exportType == "all_dungeons" then
-        dialogText = L["EXPORT_ALL_DIALOG_TEXT"] or "Copy the string below to share your dungeon settings:"
+        dialogText = L["EXPORT_ALL_DIALOG_TEXT"]
     elseif exportType == "section" then
-        dialogText = (L["EXPORT_SECTION_DIALOG_TEXT"] or "Copy the string below to share your %s dungeon settings:"):format(sectionName)
+        dialogText = (L["EXPORT_SECTION_DIALOG_TEXT"]):format(sectionName)
     else
         dialogText = L["EXPORT_DIALOG_TEXT"]
     end
@@ -1536,9 +1536,9 @@ function KeystonePercentageHelper:ShowImportDialog(sectionName, dungeonFilter)
     local dialogText
     
     if not sectionName then
-        dialogText = L["IMPORT_ALL_DIALOG_TEXT"] or "Paste the export string to import all dungeon settings:"
+        dialogText = L["IMPORT_ALL_DIALOG_TEXT"]
     else
-        dialogText = (L["IMPORT_SECTION_DIALOG_TEXT"] or "Paste the export string to import %s dungeon settings:"):format(sectionName)
+        dialogText = (L["IMPORT_SECTION_DIALOG_TEXT"]):format(sectionName)
     end
     
     StaticPopupDialogs["KPH_IMPORT_DIALOG"] = {
