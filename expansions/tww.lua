@@ -66,9 +66,9 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
     TR = {
         id = 500,
         bosses = {
-            {1, 31.54, false},
-            {2, 56.60, false},
-            {3, 100, false}
+            {1, 41.13, false},
+            {2, 66.73, false},
+            {3, 100, true}
         }
     },
     TSV = {
