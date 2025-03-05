@@ -23,10 +23,10 @@ KeystonePercentageHelper.SL_DUNGEON_DATA = {
     ToP = {
         id = 382,
         bosses = {
-            {1, 22.59, false},
-            {2, 76.81, true},
-            {3, 100, true},
-            {4, 100, true},
+            {1, 7.01, false},
+            {2, 37.27, false},
+            {3, 71.59, false},
+            {4, 100, false},
             {5, 100, true}
         }
     }
