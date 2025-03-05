@@ -24,9 +24,9 @@ KeystonePercentageHelper.BFA_DUNGEON_DATA = {
     TML = {
         id = 247,
         bosses = {
-            {1, 39.68, false},
-            {2, 45.83, false},
-            {3, 81.26, true},
+            {1, 26.91, false},
+            {2, 59.30, false},
+            {3, 75.93, false},
             {4, 100, true}
         }
     }
