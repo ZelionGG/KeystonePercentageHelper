@@ -6,10 +6,10 @@ KeystonePercentageHelper.BFA_DUNGEON_DATA = {
     OMGW = {
         id = 370,
         bosses = {
-            {1, 39.68, false},
-            {2, 45.83, false},
-            {3, 81.26, true},
-            {4, 100, true}
+            {1, 22.46, false},
+            {2, 47.59, true},
+            {3, 71.66, true},
+            {4, 100,   true}
         }
     },
     SoB = {
