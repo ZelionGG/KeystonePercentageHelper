@@ -188,6 +188,7 @@ L["NEW_SEASON_RESET_PROMPT"] = "Начался новый сезон M+. Хот�
 L["YES"] = "Да"
 L["NO"] = "Нет"
 L["WE_STILL_NEED"] = "Нам всё ещё нужно"
+L["NEW_ROUTES_RESET_PROMPT"] = "The default dungeon routes have been updated in this version. Would you like to reset your current dungeon routes to the new defaults?"
 
 -- Export/Import
 L["EXPORT_DUNGEON"] = "Экспорт подземелья"

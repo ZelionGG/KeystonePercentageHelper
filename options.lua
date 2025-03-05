@@ -23,6 +23,7 @@ KeystonePercentageHelper.defaults = {
             informChannel = "PARTY",
             advancedOptionsEnabled = false,
             lastSeasonCheck = "",
+            lastVersionCheck = "",
         },
         text = {
             font = "Friz Quadrata TT",
@@ -754,7 +755,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
         }
     end
 
-    -- Add expansion sections
+    -- Create expansion sections
     for _, expansion in ipairs(expansions) do
         local sectionKey = expansion.id:lower()
         args[sectionKey] = {
@@ -1324,7 +1325,7 @@ end
 
 function KeystonePercentageHelper:CheckForNewSeason()
     local self = KeystonePercentageHelper
-    local currentDate = date("%Y-%m-%d", time())
+    local currentDate = date("%Y-%m-%d")
     
     -- If this is first load (lastSeasonCheck is empty), just set the date and don't show popup
     if not self.db.profile.lastSeasonCheck or self.db.profile.lastSeasonCheck == "" then
@@ -1364,6 +1365,75 @@ function KeystonePercentageHelper:CheckForNewSeason()
             title = "Keystone Percentage Helper",
         }
         StaticPopup_Show("KPH_NEW_SEASON")
+    end
+end
+
+function KeystonePercentageHelper:CheckForNewRoutes()
+    local currentVersion = C_AddOns.GetAddOnMetadata("KeystonePercentageHelper", "Version")
+    local lastVersionCheck = self.db.profile.general.lastVersionCheck or ""
+    local lastSeasonCheck = self.db.profile.lastSeasonCheck or ""
+    local newRoutesResetPrompt = self.newRoutesResetPrompt or false
+    local lastRoutesUpdate = self.lastRoutesUpdate or ""
+
+    -- Get the current date
+    local currentDate = date("%Y-%m-%d")
+    
+    -- If it's the first version check but the user already had a previous version installed
+    -- (indicated by lastSeasonCheck being populated), and we need to prompt for route reset
+    if lastVersionCheck == "" and newRoutesResetPrompt and self.db.profile.general.advancedOptionsEnabled and not InCombatLockdown() then
+        StaticPopupDialogs["KPH_NEW_ROUTES"] = {
+            text = "|cffffd100Keystone Percentage Helper|r\n\n" .. L["NEW_ROUTES_RESET_PROMPT"] .. "\n\n",
+            button1 = L["YES"],
+            button2 = L["NO"],
+            OnAccept = function()
+                -- Reset only current season dungeon values
+                self:ResetCurrentSeasonDungeons()
+                self.db.profile.general.lastVersionCheck = currentVersion
+            end,
+            OnCancel = function()
+                self.db.profile.general.lastVersionCheck = currentVersion
+            end,
+            timeout = 0,
+            whileDead = true,
+            hideOnEscape = true,
+            preferredIndex = 3,
+            showAlert = true,
+            title = "Keystone Percentage Helper",
+        }
+        StaticPopup_Show("KPH_NEW_ROUTES")
+        return
+    -- If it's the first initialization of the addon (both checks are empty), just store the current version
+    elseif lastVersionCheck == "" and lastSeasonCheck == "" then
+        self.db.profile.general.lastVersionCheck = currentVersion
+        return
+    end
+    
+    -- If the version has changed and we need to prompt for route reset
+    if lastVersionCheck ~= currentVersion and newRoutesResetPrompt and self.db.profile.general.advancedOptionsEnabled and not InCombatLockdown() and 
+       (lastRoutesUpdate > lastVersionCheck or lastVersionCheck == "") and currentVersion >= lastRoutesUpdate then
+        StaticPopupDialogs["KPH_NEW_ROUTES"] = {
+            text = "|cffffd100Keystone Percentage Helper|r\n\n" .. L["NEW_ROUTES_RESET_PROMPT"] .. "\n\n",
+            button1 = L["YES"],
+            button2 = L["NO"],
+            OnAccept = function()
+                -- Reset only current season dungeon values
+                self:ResetCurrentSeasonDungeons()
+                self.db.profile.general.lastVersionCheck = currentVersion
+            end,
+            OnCancel = function()
+                self.db.profile.general.lastVersionCheck = currentVersion
+            end,
+            timeout = 0,
+            whileDead = true,
+            hideOnEscape = true,
+            preferredIndex = 3,
+            showAlert = true,
+            title = "Keystone Percentage Helper",
+        }
+        StaticPopup_Show("KPH_NEW_ROUTES")
+    else
+        -- Update the version check without prompting
+        self.db.profile.general.lastVersionCheck = currentVersion
     end
 end
 

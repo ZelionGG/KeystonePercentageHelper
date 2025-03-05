@@ -184,6 +184,7 @@ L["NEW_SEASON_RESET_PROMPT"] = "Une nouvelle saison Mythique+ a commencé. Voule
 L["YES"] = "Oui"
 L["NO"] = "Non"
 L["WE_STILL_NEED"] = "Il nous faut encore"
+L["NEW_ROUTES_RESET_PROMPT"] = "Les routes par défaut des donjons ont changé dans cette version. Voulez-vous remettre à zero vos routes de donjons avec les nouvelles routes par défaut ?"
 
 -- Export/Import
 L["EXPORT_DUNGEON"] = "Exporter le donjon"
