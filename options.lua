@@ -79,12 +79,37 @@ for _, expansion in ipairs(expansions) do
 end
 
 function KeystonePercentageHelper:LoadExpansionDungeons()
-    -- Load dungeons from all expansions
+    -- Process dungeon data and generate tables for all expansions
     for _, expansion in ipairs(expansions) do
-        local dungeons = KeystonePercentageHelper[expansion.id .. "_DUNGEONS"]
-        if dungeons then
-            for id, data in pairs(dungeons) do
-                KeystonePercentageHelper.DUNGEONS[id] = data
+        local dungeonData = self[expansion.id .. "_DUNGEON_DATA"]
+        if dungeonData then
+            -- Generate the tables for this expansion
+            self:GenerateExpansionTables(expansion.id, dungeonData)
+            
+            -- Initialize advanced settings for each dungeon
+            for shortName, _ in pairs(dungeonData) do
+                -- Ensure the advanced settings table exists for this dungeon
+                if not self.db.profile.advanced[shortName] then
+                    self.db.profile.advanced[shortName] = {}
+                end
+                
+                -- Initialize with defaults if needed
+                local defaults = self[expansion.id .. "_DEFAULTS"][shortName]
+                if defaults then
+                    for key, value in pairs(defaults) do
+                        if self.db.profile.advanced[shortName][key] == nil then
+                            self.db.profile.advanced[shortName][key] = value
+                        end
+                    end
+                end
+            end
+            
+            -- Load dungeons into the main DUNGEONS table
+            local dungeons = self[expansion.id .. "_DUNGEONS"]
+            if dungeons then
+                for id, data in pairs(dungeons) do
+                    self.DUNGEONS[id] = data
+                end
             end
         end
     end
@@ -798,6 +823,25 @@ end
 function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
     local self = KeystonePercentageHelper
     local numBosses = #self.DUNGEONS[self:GetDungeonIdByKey(dungeonKey)]
+    
+    -- Ensure the advanced settings table exists for this dungeon
+    if not self.db.profile.advanced[dungeonKey] then
+        self.db.profile.advanced[dungeonKey] = {}
+        
+        -- Initialize with defaults if needed
+        for _, expansion in ipairs(expansions) do
+            if self[expansion.id .. "_DUNGEON_IDS"] and self[expansion.id .. "_DUNGEON_IDS"][dungeonKey] then
+                local defaults = self[expansion.id .. "_DEFAULTS"][dungeonKey]
+                if defaults then
+                    for key, value in pairs(defaults) do
+                        self.db.profile.advanced[dungeonKey][key] = value
+                    end
+                end
+                break
+            end
+        end
+    end
+    
     local options = {
         name = function()
             local icon = self.dungeonIcons and self.dungeonIcons[dungeonKey] or ""
@@ -939,7 +983,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
     }
     
     for i = 1, numBosses do
-        local bossNumStr = i == 1 and "One" or i == 2 and "Two" or i == 3 and "Three" or "Four"
+        local bossNumStr = self:GetBossNumberString(i)
         local bossName = L[dungeonKey.."_BOSS"..i] or ("Boss "..i)
         
         -- Create a group for each boss line
@@ -1516,4 +1560,38 @@ function KeystonePercentageHelper:ShowImportDialog(sectionName, dungeonFilter)
         hideOnEscape = true,
     }
     StaticPopup_Show("KPH_IMPORT_DIALOG")
+end
+
+function KeystonePercentageHelper:GenerateExpansionTables(expansionId, dungeonData)
+    -- Initialize the tables if they don't exist
+    self[expansionId .. "_DUNGEONS"] = self[expansionId .. "_DUNGEONS"] or {}
+    self[expansionId .. "_DEFAULTS"] = self[expansionId .. "_DEFAULTS"] or {}
+    self[expansionId .. "_DUNGEON_IDS"] = self[expansionId .. "_DUNGEON_IDS"] or {}
+    
+    -- Clear existing data if any
+    wipe(self[expansionId .. "_DUNGEONS"])
+    wipe(self[expansionId .. "_DEFAULTS"])
+    wipe(self[expansionId .. "_DUNGEON_IDS"])
+    
+    for shortName, dungeonData in pairs(dungeonData) do
+        -- Generate DUNGEONS table
+        local dungeonBosses = {}
+        for i, bossData in ipairs(dungeonData.bosses) do
+            -- Add haveInformed = false to each boss entry
+            dungeonBosses[i] = {bossData[1], bossData[2], bossData[3], false}
+        end
+        self[expansionId .. "_DUNGEONS"][dungeonData.id] = dungeonBosses
+        
+        -- Generate DEFAULTS table
+        local defaults = {}
+        for i, bossData in ipairs(dungeonData.bosses) do
+            local bossNumber = "Boss" .. self:GetBossNumberString(i)
+            defaults[bossNumber] = bossData[2]
+            defaults[bossNumber .. "Inform"] = bossData[3]
+        end
+        self[expansionId .. "_DEFAULTS"][shortName] = defaults
+        
+        -- Generate DUNGEON_IDS table
+        self[expansionId .. "_DUNGEON_IDS"][shortName] = dungeonData.id
+    end
 end

@@ -27,8 +27,11 @@ KeystonePercentageHelper.currentDungeonID = 0
 KeystonePercentageHelper.currentSection = 1
 
 function KeystonePercentageHelper:OnInitialize()
-    self:LoadExpansionDungeons()
+    -- Initialize the database first
     self.db = LibStub("AceDB-3.0"):New("KeystonePercentageHelperDB", self.defaults, "Default")
+    
+    -- Then load expansion dungeons
+    self:LoadExpansionDungeons()
 
     -- Generating the changelog
     self:GenerateChangelog()
