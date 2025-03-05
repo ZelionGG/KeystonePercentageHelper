@@ -769,8 +769,8 @@ function KeystonePercentageHelper:GetAdvancedOptions()
         args[sectionKey].args.exportSection = {
             order = 1,  -- Place before defaultPercentages
             type = "execute",
-            name = L["EXPORT_SECTION"] or "Export Section",
-            desc = (L["EXPORT_SECTION_DESC"] or "Export all dungeon settings for %s."):format(L[expansion.name]),
+            name = L["EXPORT_SECTION"],
+            desc = (L["EXPORT_SECTION_DESC"]):format(L[expansion.name]),
             func = function()
                 local addon = KeystonePercentageHelper
                 local dungeonIds = addon[expansion.id .. "_DUNGEON_IDS"]
@@ -793,8 +793,8 @@ function KeystonePercentageHelper:GetAdvancedOptions()
         args[sectionKey].args.importSection = {
             order = 2,  -- Place before defaultPercentages
             type = "execute",
-            name = L["IMPORT_SECTION"] or "Import Section",
-            desc = (L["IMPORT_SECTION_DESC"] or "Import dungeon settings for %s."):format(L[expansion.name]),
+            name = L["IMPORT_SECTION"],
+            desc = (L["IMPORT_SECTION_DESC"]):format(L[expansion.name]),
             func = function()
                 local addon = KeystonePercentageHelper
                 local dungeonIds = addon[expansion.id .. "_DUNGEON_IDS"]
