@@ -50,8 +50,8 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
     PotSF = {
         id = 499,
         bosses = {
-            {1, 32.78, false},
-            {2, 78.76, false},
+            {1, 48.23, false},
+            {2, 70.73, false},
             {3, 100, true}
         }
     },
