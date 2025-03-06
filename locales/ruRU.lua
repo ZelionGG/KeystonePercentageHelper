@@ -5,7 +5,7 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0");
 local L = AceLocale:NewLocale(AddonName, "ruRU", false, false);
 if not L then return end
 
--- Translated January 14th, 2025 year.
+-- Last translated March 7th, 2025 year.
 -- Translation by Hollicsh (https://github.com/Hollicsh)
 
 -- Dungeons Group
@@ -188,7 +188,7 @@ L["NEW_SEASON_RESET_PROMPT"] = "Начался новый сезон M+. Хот�
 L["YES"] = "Да"
 L["NO"] = "Нет"
 L["WE_STILL_NEED"] = "Нам всё ещё нужно"
-L["NEW_ROUTES_RESET_PROMPT"] = "The default dungeon routes have been updated in this version. Would you like to reset your current dungeon routes to the new defaults?"
+L["NEW_ROUTES_RESET_PROMPT"] = "В этой версии были обновлены маршруты подземелий по умолчанию. Хотите сбросить текущие маршруты подземелий на новые значения по умолчанию?"
 
 -- Export/Import
 L["EXPORT_DUNGEON"] = "Экспорт подземелья"
