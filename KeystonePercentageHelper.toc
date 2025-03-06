@@ -17,6 +17,18 @@
 ## X-Curse-Project-ID: 1175416
 ## X-Wago-ID: b6XVj1Gp
 
+## Category-enUS: Dungeons Mythic+
+## Category-deDE: Dungeons Mythic+
+## Category-esES: Dungeons Mythic+
+## Category-esMX: Dungeons Mythic+
+## Category-frFR: Dungeons Mythic+
+## Category-itIT: Dungeons Mythic+
+## Category-koKR: Dungeons Mythic+
+## Category-ptBR: Dungeons Mythic+
+## Category-ruRU: Подземелья М+
+## Category-zhCN: Dungeons Mythic+
+## Category-zhTW: Dungeons Mythic+
+
 embeds.xml
 locales/locales.xml
 expansions/expansions.xml
