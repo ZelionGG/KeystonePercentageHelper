@@ -1372,7 +1372,6 @@ function KeystonePercentageHelper:CheckForNewRoutes()
     local currentVersion = C_AddOns.GetAddOnMetadata("KeystonePercentageHelper", "Version")
     local lastVersionCheck = self.db.profile.general.lastVersionCheck or ""
     local lastSeasonCheck = self.db.profile.lastSeasonCheck or ""
-    local newRoutesResetPrompt = self.newRoutesResetPrompt or false
     local lastRoutesUpdate = self.lastRoutesUpdate or ""
 
     -- Get the current date
@@ -1380,7 +1379,8 @@ function KeystonePercentageHelper:CheckForNewRoutes()
     
     -- If it's the first version check but the user already had a previous version installed
     -- (indicated by lastSeasonCheck being populated), and we need to prompt for route reset
-    if lastVersionCheck == "" and newRoutesResetPrompt and self.db.profile.general.advancedOptionsEnabled and not InCombatLockdown() then
+    if lastVersionCheck == "" and self.db.profile.general.advancedOptionsEnabled 
+        and currentDate > lastSeasonCheck and not InCombatLockdown() then
         StaticPopupDialogs["KPH_NEW_ROUTES"] = {
             text = "|cffffd100Keystone Percentage Helper|r\n\n" .. L["NEW_ROUTES_RESET_PROMPT"] .. "\n\n",
             button1 = L["YES"],
@@ -1409,8 +1409,9 @@ function KeystonePercentageHelper:CheckForNewRoutes()
     end
     
     -- If the version has changed and we need to prompt for route reset
-    if lastVersionCheck ~= currentVersion and newRoutesResetPrompt and self.db.profile.general.advancedOptionsEnabled and not InCombatLockdown() and 
-       (lastRoutesUpdate > lastVersionCheck or lastVersionCheck == "") and currentVersion >= lastRoutesUpdate then
+    if lastVersionCheck ~= currentVersion and self.db.profile.general.advancedOptionsEnabled and not InCombatLockdown() and 
+       (lastRoutesUpdate > lastVersionCheck or lastVersionCheck == "") 
+       and currentDate > lastSeasonCheck and currentVersion >= lastRoutesUpdate then
         StaticPopupDialogs["KPH_NEW_ROUTES"] = {
             text = "|cffffd100Keystone Percentage Helper|r\n\n" .. L["NEW_ROUTES_RESET_PROMPT"] .. "\n\n",
             button1 = L["YES"],

@@ -14,8 +14,7 @@ KeystonePercentageHelper.constants = {
     mediaPath = "Interface\\AddOns\\" .. AddOnName .. "\\media\\"
 }
 
-KeystonePercentageHelper.lastRoutesUpdate = "1.3" -- Set to true when routes have been updated
-KeystonePercentageHelper.newRoutesResetPrompt = true -- Set to true when routes have been updated
+KeystonePercentageHelper.lastRoutesUpdate = "1.4" -- Set to true when routes have been updated
 
 local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
