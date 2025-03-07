@@ -1,12 +1,10 @@
 # Keystone Percentage Helper
 
-## [1.3](https://github.com/ZelionGG/KeystonePercentageHelper/tree/1.3) (2025-03-03)
+## [1.4](https://github.com/ZelionGG/KeystonePercentageHelper/tree/1.4) (2025-03-07)
 
-[Full Changelog](https://github.com/ZelionGG/KeystonePercentageHelper/compare/1.2.1...1.3) [Previous Releases](https://github.com/ZelionGG/KeystonePercentageHelper/releases)
+[Full Changelog](https://github.com/ZelionGG/KeystonePercentageHelper/compare/1.3...1.4) [Previous Releases](https://github.com/ZelionGG/KeystonePercentageHelper/releases)
 
-- Updated for patch **11.1**.
-- Added export/import functionality (global export/import, export/import by section/extension, export/import by dungeon).
-- Improved season management with automatic detection of current and next seasons based on dates.
-- Next season section is now hidden if no next season is set.
-- Russian translation updated, thank you **Hollicsh**.
-- New dungeon **Operation: Floodgate** icon updated.
+- Added a new prompt that will allow you to reset the custom routes you made for all of the dungeons if the default routes have changed.
+- Added missing libraries to fix lua errors.
+- Implemented the first routes of the season.
+- Locales updates.
