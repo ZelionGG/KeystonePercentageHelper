@@ -16,6 +16,7 @@
 
 ## X-Curse-Project-ID: 1175416
 ## X-Wago-ID: b6XVj1Gp
+## X-WoWI-ID: 26913
 
 ## Category-enUS: Mythic+ Dungeons
 ## Category-deDE: Mythic+ Dungeons
