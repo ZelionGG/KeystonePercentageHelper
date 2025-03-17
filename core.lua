@@ -353,7 +353,11 @@ function KeystonePercentageHelper:UpdatePercentageText()
                         self.displayFrame.text:SetText("Finished")
                     else
                         color = self.db.profile.color.inProgress
-                        self.displayFrame.text:SetText(string.format("%.2f%%", nextRequired))
+                        if nextRequired <= 0 then
+                            self.displayFrame.text:SetText("Done")
+                        else
+                            self.displayFrame.text:SetText(string.format("%.2f%%", nextRequired))
+                        end
                     end
                     self.displayFrame.text:SetTextColor(color.r, color.g, color.b, color.a)
                 end)
