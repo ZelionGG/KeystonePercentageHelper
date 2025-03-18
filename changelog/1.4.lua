@@ -1,9 +1,26 @@
 local AddOnName, KeystonePercentageHelper = ...;
 
-KeystonePercentageHelper.Changelog[1400] = {
-    version_string = "1.4",
-    release_date = "2025/03/07",
+KeystonePercentageHelper.Changelog[1410] = {
+    version_string = "1.4.1",
+    release_date = "2025/03/18",
     important = {
+        ["zhCN"] = {},
+        ["zhTW"] = {},
+        ["enUS"] = {
+            "Added locale files for 'Done' and 'Finished' strings.",
+        },
+        ["frFR"] = {
+            "Ajout des langues pour les chaines 'Pourcentage atteint' et 'Terminé'.",
+        },
+        ["koKR"] = {},
+        ["ruRU"] = {},
+        ["deDE"] = {},
+        ["esES"] = {},
+        ["esMX"] = {},
+        ["itIT"] = {},
+        ["ptBR"] = {}
+    },
+    new = {
         ["zhCN"] = {},
         ["zhTW"] = {},
         ["enUS"] = {},
@@ -16,31 +33,14 @@ KeystonePercentageHelper.Changelog[1400] = {
         ["itIT"] = {},
         ["ptBR"] = {}
     },
-    new = {
-        ["zhCN"] = {},
-        ["zhTW"] = {},
-        ["enUS"] = {
-            "Added a new prompt that will allow you to reset the custom routes you made for all of the dungeons if the default routes have changed."
-        },
-        ["frFR"] = {
-            "Ajout d'une nouvelle fenêtre pop-up qui permet de réinitialiser les routes personnalisées que vous avez créés pour tous les donjons si les chemins par défaut de l'addon ont changé."
-        },
-        ["koKR"] = {},
-        ["ruRU"] = {},
-        ["deDE"] = {},
-        ["esES"] = {},
-        ["esMX"] = {},
-        ["itIT"] = {},
-        ["ptBR"] = {}
-    },
     bugfix = {
         ["zhCN"] = {},
         ["zhTW"] = {},
         ["enUS"] = {
-            "Added missing libraries to fix lua errors."
+            "Fixed negative percentages happening in dungeons (for example Operation: Floodgate) where a boss percentage required was lower than the previous boss, it will now show 'Done' as expected."
         },
         ["frFR"] = {
-            "Ajout des bibliothèques manquantes pour corriger les erreurs lua."
+            "Correction des pourcentages négatifs qui apparaissaient dans les donjons (par exemple Operation: Débordement) où un pourcentage requis de boss était inférieur à celui du boss précédent, cela affichera désormais ."
         },
         ["koKR"] = {},
         ["ruRU"] = {},
@@ -53,14 +53,8 @@ KeystonePercentageHelper.Changelog[1400] = {
     improvment = {
         ["zhCN"] = {},
         ["zhTW"] = {},
-        ["enUS"] = {
-            "Implemented the first routes of the season.",
-            "Locales updates."
-        },
-        ["frFR"] = {
-            "Implémentation des premières routes de la saison.",
-            "Mises à jour des traductions."
-        },
+        ["enUS"] = {},
+        ["frFR"] = {},
         ["koKR"] = {},
         ["ruRU"] = {},
         ["deDE"] = {},
