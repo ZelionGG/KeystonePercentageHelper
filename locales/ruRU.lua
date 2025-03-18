@@ -135,6 +135,8 @@ L["GB_BOSS3"] = "Драгх Горячий Мрак"
 L["GB_BOSS4"] = "Властитель недр Эрудакс"
 
 -- UI Strings
+L["Finished"] = "Finished"
+L["Done"] = "Done"
 L["OPTIONS"] = "Настройки"
 L["GENERAL_SETTINGS"] = "Общие настройки"
 L["Changelog"] = "Список изменений"
