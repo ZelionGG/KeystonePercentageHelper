@@ -37,11 +37,11 @@ KeystonePercentageHelper.Changelog[1410] = {
         ["zhCN"] = {},
         ["zhTW"] = {},
         ["enUS"] = {
-            "Fixed negative percentages happening in dungeons (for example Operation: Floodgate) where a boss percentage required was lower than the previous boss, it will now show 'Done' as expected."
+            "Fixed negative percentages happening in dungeons (for example Operation: Floodgate) where a boss percentage required was lower than the previous boss, it will now show 'Done' as expected.",
             "Fixed LibSharedMedia loading order (thanks scizzydo)."
         },
         ["frFR"] = {
-            "Correction des pourcentages négatifs qui apparaissaient dans les donjons (par exemple Operation: Débordement) où un pourcentage requis de boss était inférieur à celui du boss précédent, cela affichera désormais ."
+            "Correction des pourcentages négatifs qui apparaissaient dans les donjons (par exemple Operation: Débordement) où un pourcentage requis de boss était inférieur à celui du boss précédent, cela affichera désormais .",
             "Correction de l'ordre de chargement de LibSharedMedia (merci scizzydo)."
         },
         ["koKR"] = {},
