@@ -6,4 +6,4 @@
 
 - Fixed negative percentages happening in dungeons (for example Operation: Floodgate) where a boss percentage required was lower than the previous boss, it will now show "Done" as expected.
 - Added locale files for "Done" and "Finished" strings.
-- Fixed LibSharedMedia loading order.
+- Fixed LibSharedMedia loading order (thanks scizzydo).
