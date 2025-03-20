@@ -31,7 +31,7 @@ L["CoT"] = "Город Нитей"
 L["CoT_BOSS1"] = "Оратор Крикс'визк"
 L["CoT_BOSS2"] = "Клыки королевы"
 L["CoT_BOSS3"] = "Сгустолиция"
-L["CoT_BOSS4"] = "Изо Великай Сращивательница"
+L["CoT_BOSS4"] = "Изо Великая Сращивательница"
 
 -- Cinderbrew Meadery
 L["CBM"] = "Искроварня"
@@ -135,8 +135,8 @@ L["GB_BOSS3"] = "Драгх Горячий Мрак"
 L["GB_BOSS4"] = "Властитель недр Эрудакс"
 
 -- UI Strings
-L["Finished"] = "Dungeon percentage done"
-L["Done"] = "Section percentage done"
+L["Finished"] = "Процент подземелья выполнен"
+L["Done"] = "Процент части подземелья выполнен"
 L["OPTIONS"] = "Настройки"
 L["GENERAL_SETTINGS"] = "Общие настройки"
 L["Changelog"] = "Список изменений"
