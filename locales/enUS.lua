@@ -131,8 +131,8 @@ L["GB_BOSS3"] = "Drahga Shadowburner"
 L["GB_BOSS4"] = "Erudax, the Duke of Below"
 
 -- UI Strings
-L["Finished"] = "Finished"
-L["Done"] = "Done"
+L["Finished"] = "Dungeon percentage done"
+L["Done"] = "Section percentage done"
 L["OPTIONS"] = "Options"
 L["GENERAL_SETTINGS"] = "General Settings"
 L["Changelog"] = "Changelog"
