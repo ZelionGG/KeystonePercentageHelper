@@ -1,50 +1,60 @@
 local AddOnName, KeystonePercentageHelper = ...;
 local _G = _G;
+-- Cache frequently used global functions for better performance
 local pairs, unpack, select = pairs, unpack, select
 local floor = math.floor
 local format = string.format
 
+-- Initialize Ace3 libraries
 local AceAddon = LibStub("AceAddon-3.0")
 KeystonePercentageHelper = AceAddon:NewAddon(KeystonePercentageHelper, AddOnName, "AceConsole-3.0", "AceEvent-3.0");
 
 -- Initialize changelog
 KeystonePercentageHelper.Changelog = {}
 
+-- Define constants
 KeystonePercentageHelper.constants = {
     mediaPath = "Interface\\AddOns\\" .. AddOnName .. "\\media\\"
 }
 
+-- Track the last routes update version for prompting users
 KeystonePercentageHelper.lastRoutesUpdate = "1.4" -- Set to true when routes have been updated
 
+-- Initialize Ace3 configuration libraries
 local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
+-- Initialize LibSharedMedia for font and texture support
 KeystonePercentageHelper.LSM = LibStub('LibSharedMedia-3.0');
 
+-- Get localization table
 local L = KeystonePercentageHelper.L;
 
+-- Initialize dungeons table to store all dungeon data
 KeystonePercentageHelper.DUNGEONS = {}
 
+-- Track current dungeon and section
 KeystonePercentageHelper.currentDungeonID = 0
 KeystonePercentageHelper.currentSection = 1
 
+-- Called when the addon is first loaded
 function KeystonePercentageHelper:OnInitialize()
-    -- Initialize the database first
+    -- Initialize the database first with AceDB
     self.db = LibStub("AceDB-3.0"):New("KeystonePercentageHelperDB", self.defaults, "Default")
     
-    -- Then load expansion dungeons
+    -- Load dungeon data from expansion modules
     self:LoadExpansionDungeons()
 
-    -- Generating the changelog
+    -- Generate changelog for display in options
     self:GenerateChangelog()
 
-    -- Check for new season
+    -- Check if a new season has started
     self:CheckForNewSeason()
     
-    -- Check for new routes
+    -- Check if routes have been updated in a new version
     self:CheckForNewRoutes()
     
-    -- Create overlay frame
+    -- Create overlay frame for positioning UI
     self.overlayFrame = CreateFrame("Frame", "KeystonePercentageHelperOverlay", UIParent, "BackdropTemplate")
     self.overlayFrame:SetFrameStrata("FULLSCREEN_DIALOG")
     self.overlayFrame:SetAllPoints()
@@ -54,17 +64,17 @@ function KeystonePercentageHelper:OnInitialize()
     })
     self.overlayFrame:SetBackdropColor(0, 0, 0, 0.7)
 
-    -- Create plus sign
+    -- Create plus sign crosshair for positioning
     local lineThickness = 2
 
-    -- Horizontal line
+    -- Horizontal line for crosshair
     local horizontalLine = self.overlayFrame:CreateLine()
     horizontalLine:SetThickness(lineThickness)
     horizontalLine:SetColorTexture(1, 1, 1, 0.1)
     horizontalLine:SetStartPoint("LEFT")
     horizontalLine:SetEndPoint("RIGHT")
 
-    -- Vertical line
+    -- Vertical line for crosshair
     local verticalLine = self.overlayFrame:CreateLine()
     verticalLine:SetThickness(lineThickness)
     verticalLine:SetColorTexture(1, 1, 1, 0.1)
@@ -73,17 +83,17 @@ function KeystonePercentageHelper:OnInitialize()
 
     self.overlayFrame:Hide()
 
-    -- Create main display frame
+    -- Create main display frame that shows percentage
     self.displayFrame = CreateFrame("Frame", "KeystonePercentageHelperFrame", UIParent)
     self.displayFrame:SetSize(200, 20)
     self.displayFrame:SetPoint(self.db.profile.general.position, UIParent, self.db.profile.general.position, self.db.profile.general.xOffset, self.db.profile.general.yOffset)
     
-    -- Create text for display frame
+    -- Create text element for displaying percentage
     self.displayFrame.text = self.displayFrame:CreateFontString(nil, "OVERLAY")
     self.displayFrame.text:SetPoint("CENTER")
     self.displayFrame.text:SetFont(self.LSM:Fetch('font', self.db.profile.text.font), self.db.profile.general.fontSize, "OUTLINE")
     
-    -- Create anchor frame
+    -- Create anchor frame for moving the display
     self.anchorFrame = CreateFrame("Frame", "KeystonePercentageHelperAnchorFrame", self.overlayFrame, "BackdropTemplate")
     self.anchorFrame:SetFrameStrata("TOOLTIP")
     self.anchorFrame:SetSize(200, 30)
@@ -96,12 +106,12 @@ function KeystonePercentageHelper:OnInitialize()
     self.anchorFrame:SetBackdropColor(0, 0, 0, 0.5)
     self.anchorFrame:SetBackdropBorderColor(1, 1, 1, 1)
     
-    -- Create anchor frame text
+    -- Create text for the anchor frame
     local text = self.anchorFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     text:SetPoint("CENTER")
     text:SetText(L["ANCHOR_TEXT"])
     
-    -- Create validate button
+    -- Create validate button to confirm position
     local validateButton = CreateFrame("Button", nil, self.anchorFrame, "UIPanelButtonTemplate")
     validateButton:SetSize(80, 30)
     validateButton:SetPoint("BOTTOMRIGHT", self.anchorFrame, "BOTTOMRIGHT", -10, -40)
@@ -113,12 +123,13 @@ function KeystonePercentageHelper:OnInitialize()
         Settings.OpenToCategory("Keystone Percentage Helper")
     end)
 
-    -- Create cancel button
+    -- Create cancel button to abort positioning
     local cancelButton = CreateFrame("Button", nil, self.anchorFrame, "UIPanelButtonTemplate")
     cancelButton:SetSize(80, 30)
     cancelButton:SetPoint("BOTTOMLEFT", self.anchorFrame, "BOTTOMLEFT", 10, -40)
     cancelButton:SetText(L["CANCEL"])
     
+    -- Function to cancel positioning and return to settings
     local function CancelPositioning()
         self.anchorFrame:Hide()
         self.overlayFrame:Hide()
@@ -128,7 +139,7 @@ function KeystonePercentageHelper:OnInitialize()
     
     cancelButton:SetScript("OnClick", CancelPositioning)
 
-    -- Handle ESC key
+    -- Handle ESC key to cancel positioning
     self.anchorFrame:SetScript("OnKeyDown", function(_, key)
         if key == "ESCAPE" then
             CancelPositioning()
@@ -136,26 +147,28 @@ function KeystonePercentageHelper:OnInitialize()
     end)
     self.anchorFrame:EnableKeyboard(true)
 
-    -- Handle combat
+    -- Handle combat state to hide positioning UI during combat
     local combatFrame = CreateFrame("Frame")
     combatFrame.wasShown = false
     combatFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
     combatFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
     combatFrame:SetScript("OnEvent", function(_, event)
         if event == "PLAYER_REGEN_DISABLED" then
+            -- Hide positioning UI when entering combat
             if self.anchorFrame:IsShown() then
                 combatFrame.wasShown = true
                 self.anchorFrame:Hide()
                 self.overlayFrame:Hide()
             end
         elseif event == "PLAYER_REGEN_ENABLED" and combatFrame.wasShown then
+            -- Restore positioning UI when leaving combat
             combatFrame.wasShown = false
             self.anchorFrame:Show()
             self.overlayFrame:Show()
         end
     end)
 
-    -- Apply ElvUI skin if available
+    -- Apply ElvUI skin if available for better integration
     if ElvUI then
         local E = unpack(ElvUI)
         if E and E.Skins then
@@ -164,13 +177,14 @@ function KeystonePercentageHelper:OnInitialize()
         end
     end
     
+    -- Make anchor frame movable for positioning
     self.anchorFrame:EnableMouse(true)
     self.anchorFrame:SetMovable(true)
     self.anchorFrame:RegisterForDrag("LeftButton")
     self.anchorFrame:SetScript("OnDragStart", function() self.anchorFrame:StartMoving() end)
     self.anchorFrame:SetScript("OnDragStop", function()
         self.anchorFrame:StopMovingOrSizing()
-        -- Update position based on anchor
+        -- Update position based on anchor frame position
         local point, _, relativePoint, xOffset, yOffset = self.anchorFrame:GetPoint()
         self.db.profile.general.position = point
         self.db.profile.general.xOffset = xOffset
@@ -180,7 +194,7 @@ function KeystonePercentageHelper:OnInitialize()
     
     self.anchorFrame:Hide()
     
-    -- Register options
+    -- Register options with Ace3 config system
     AceConfig:RegisterOptionsTable(AddOnName, {
         name = "Keystone Percentage Helper",
         type = "group",
@@ -217,14 +231,17 @@ function KeystonePercentageHelper:OnInitialize()
     self:CreateDisplay()
 end
 
+-- Open configuration panel when command is used
 function KeystonePercentageHelper:ToggleConfig()
     Settings.OpenToCategory("Keystone Percentage Helper")
 end
 
+-- Handler for addon compartment button click
 _G.KeystonePercentageHelper_OnAddonCompartmentClick = function()
     KeystonePercentageHelper:ToggleConfig()
 end
 
+-- Create or recreate the main display frame
 function KeystonePercentageHelper:CreateDisplay()
     if not self.displayFrame then
         self.displayFrame = CreateFrame("Frame", "KeystonePercentageHelperDisplay", UIParent)
@@ -251,14 +268,17 @@ function KeystonePercentageHelper:CreateDisplay()
     self:Refresh()
 end
 
+-- Initialize dungeon tracking when entering a dungeon
 function KeystonePercentageHelper:InitiateDungeon()
     local currentDungeonId = C_ChallengeMode.GetActiveChallengeMapID()
+    -- Return if not in a dungeon or already tracking this dungeon
     if currentDungeonId == nil or currentDungeonId == self.currentDungeonID then return end
     
+    -- Set current dungeon and reset to first section
     self.currentDungeonID = currentDungeonId
     self.currentSection = 1
     
-    -- Sort dungeon data by percentage
+    -- Sort dungeon data by percentage to ensure proper progression
     if self.DUNGEONS[self.currentDungeonID] then
         table.sort(self.DUNGEONS[self.currentDungeonID], function(left, right)
             return left[2] < right[2]
@@ -266,12 +286,14 @@ function KeystonePercentageHelper:InitiateDungeon()
     end
 end
 
+-- Get the current enemy forces percentage from the scenario UI
 function KeystonePercentageHelper:GetCurrentPercentage()
     local steps = select(3, C_Scenario.GetStepInfo())
     local criteriaInfo = C_ScenarioInfo.GetCriteriaInfo(steps) or {}
     local percent, total, current = criteriaInfo.quantity, criteriaInfo.totalQuantity, criteriaInfo.quantityString
     
     if current then
+        -- Extract percentage from the string (remove % symbol)
         current = tonumber(string.sub(current, 1, string.len(current) - 1)) or 0
         local currentPercent = (current / total) * 100 
         return currentPercent or 0
@@ -280,6 +302,7 @@ function KeystonePercentageHelper:GetCurrentPercentage()
     return 0
 end
 
+-- Get data for the current section of the dungeon
 function KeystonePercentageHelper:GetDungeonData()
     if not self.DUNGEONS[self.currentDungeonID] or not self.DUNGEONS[self.currentDungeonID][self.currentSection] then
         return nil
@@ -289,39 +312,51 @@ function KeystonePercentageHelper:GetDungeonData()
     return dungeonData[1], dungeonData[2], dungeonData[3], dungeonData[4]
 end
 
+-- Send a chat message to inform the group about missing percentage
 function KeystonePercentageHelper:InformGroup(percentage)
     if not self.db.profile.general.informGroup then return end
     
     local channel = self.db.profile.general.informChannel
     local percentageStr = string.format("%.2f%%", percentage)
+    -- Don't send message if percentage is 0
     if percentageStr == "0.00%" then return end
     SendChatMessage("[KPH]: " .. L["WE_STILL_NEED"] .. " " .. percentageStr, channel)
 end
 
+-- Update the displayed percentage text based on dungeon progress
 function KeystonePercentageHelper:UpdatePercentageText()
     if not self.displayFrame then return end
     
+    -- Initialize dungeon tracking if needed
     self:InitiateDungeon()
     
+    -- Check if we're in a supported dungeon
     local currentDungeonID = C_ChallengeMode.GetActiveChallengeMapID()
     if currentDungeonID == nil or not self.DUNGEONS[currentDungeonID] then 
         self.displayFrame.text:SetText("")
         return 
     end
     
+    -- Get current enemy forces percentage
     local currentPercentage = self:GetCurrentPercentage()
     
+    -- Skip sections that have 0 or negative percentage requirements
     while self.DUNGEONS[self.currentDungeonID][self.currentSection] and self.DUNGEONS[self.currentDungeonID][self.currentSection][2] <= 0 do
         self.currentSection = self.currentSection + 1
     end
     
+    -- Get data for current section
     local bossID, neededPercent, shouldInfom, haveInformed = self:GetDungeonData()
     if not bossID then return end
     
+    -- Check if criteria info is available for this boss
     if C_ScenarioInfo.GetCriteriaInfo(bossID) then
+        -- Check if boss is killed
         local isBossKilled = C_ScenarioInfo.GetCriteriaInfo(bossID).completed
         
+        -- Calculate remaining percentage needed
         local remainingPercent = neededPercent - currentPercentage
+        -- Round very small values to 0 to avoid showing 0.01%
         if remainingPercent < 0.05 and remainingPercent > 0.00 then 
             remainingPercent = 0.00
         end
@@ -330,6 +365,7 @@ function KeystonePercentageHelper:UpdatePercentageText()
         local color = self.db.profile.color.inProgress
         
         if remainingPercent > 0 and isBossKilled then -- Boss has been killed but percentage is missing
+            -- Inform group about missing percentage if enabled
             if shouldInfom and not haveInformed and self.db.profile.general.informGroup then
                 self:InformGroup(remainingPercent)
                 self.DUNGEONS[self.currentDungeonID][self.currentSection][4] = true
@@ -366,13 +402,16 @@ function KeystonePercentageHelper:UpdatePercentageText()
             end
         end
         
+        -- Apply text color based on status
         self.displayFrame.text:SetTextColor(color.r, color.g, color.b, color.a)
     end
 end
 
+-- Called when the addon is enabled
 function KeystonePercentageHelper:OnEnable()
     -- Ensure display exists and is visible
     self:CreateDisplay()
+    -- Register events for updating the display
     self:RegisterEvent("SCENARIO_CRITERIA_UPDATE")
     self:RegisterEvent("CHALLENGE_MODE_START")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -380,20 +419,24 @@ function KeystonePercentageHelper:OnEnable()
     self:UpdatePercentageText()
 end
 
+-- Event handler for criteria updates (enemy forces percentage changes)
 function KeystonePercentageHelper:SCENARIO_CRITERIA_UPDATE()
     self:UpdatePercentageText()
 end
 
+-- Event handler for starting a Mythic+ dungeon
 function KeystonePercentageHelper:CHALLENGE_MODE_START()
     self:InitiateDungeon()
     self:UpdatePercentageText()
 end
 
+-- Event handler for entering the world or changing zones
 function KeystonePercentageHelper:PLAYER_ENTERING_WORLD()
     self:InitiateDungeon()
     self:UpdatePercentageText()
 end
 
+-- Refresh the display with current settings
 function KeystonePercentageHelper:Refresh()
     if not self.displayFrame then return end
     
@@ -425,6 +468,7 @@ function KeystonePercentageHelper:Refresh()
     self.displayFrame:Show()
 end
 
+-- Update dungeon data with advanced options if enabled
 function KeystonePercentageHelper:UpdateDungeonData()
     if self.db.profile.general.advancedOptionsEnabled then
         for dungeonId, dungeonData in pairs(self.DUNGEONS) do
