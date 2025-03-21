@@ -132,6 +132,7 @@ L["GB_BOSS4"] = "Erudax, le Duc d'en bas"
 
 -- UI Strings
 L["Finished"] = "Pourcentage du donjon atteint"
+L["Section done"] = "Section de donjon terminée"
 L["Done"] = "Pourcentage de la section atteint"
 L["OPTIONS"] = "Options"
 L["GENERAL_SETTINGS"] = "Paramètres généraux"

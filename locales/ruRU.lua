@@ -136,6 +136,7 @@ L["GB_BOSS4"] = "Властитель недр Эрудакс"
 
 -- UI Strings
 L["Finished"] = "Процент подземелья выполнен"
+L["Section done"] = "Section finished"
 L["Done"] = "Процент части подземелья выполнен"
 L["OPTIONS"] = "Настройки"
 L["GENERAL_SETTINGS"] = "Общие настройки"

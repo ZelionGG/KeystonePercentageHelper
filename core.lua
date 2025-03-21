@@ -343,7 +343,7 @@ function KeystonePercentageHelper:UpdatePercentageText()
             self.displayFrame.text:SetText(L["Done"])
         elseif remainingPercent <= 0 and isBossKilled then
             color = self.db.profile.color.finished
-            self.displayFrame.text:SetText(L["Finished"])
+            self.displayFrame.text:SetText(L["Section done"])
             self.currentSection = self.currentSection + 1
             if self.currentSection <= #self.DUNGEONS[self.currentDungeonID] then
                 C_Timer.After(2, function()

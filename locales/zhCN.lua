@@ -135,6 +135,7 @@ L["GB_BOSS4"] = "Erudax, the Duke of Below"
 
 -- UI Strings
 L["Finished"] = "Dungeon percentage done"
+L["Section done"] = "Section finished"
 L["Done"] = "Section percentage done"
 L["OPTIONS"] = "Options"
 L["GENERAL_SETTINGS"] = "General Settings"
