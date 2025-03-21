@@ -135,9 +135,10 @@ L["GB_BOSS3"] = "Драгх Горячий Мрак"
 L["GB_BOSS4"] = "Властитель недр Эрудакс"
 
 -- UI Strings
-L["Finished"] = "Процент подземелья выполнен"
-L["Section done"] = "Section finished"
-L["Done"] = "Процент части подземелья выполнен"
+L["FINISHED"] = "Процент подземелья выполнен"
+L["SECTION_DONE"] = "Section finished"
+L["DONE"] = "Процент части подземелья выполнен"
+L["DUNGEON_DONE"] = "Dungeon finished"
 L["OPTIONS"] = "Настройки"
 L["GENERAL_SETTINGS"] = "Общие настройки"
 L["Changelog"] = "Список изменений"
