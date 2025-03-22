@@ -376,10 +376,18 @@ function KeystonePercentageHelper:UpdatePercentageText()
             self.displayFrame.text:SetText(displayPercent)
         elseif remainingPercent <= 0 and not isBossKilled then -- Boss has not been killed yet but percentage is done
             color = self.db.profile.color.finished
-            self.displayFrame.text:SetText(L["DONE"])
+            if(currentPercentage >= 100) then
+                self.displayFrame.text:SetText(L["FINISHED"])
+            else
+                self.displayFrame.text:SetText(L["DONE"])
+            end
         elseif remainingPercent <= 0 and isBossKilled then -- Boss has been killed and percentage is done
             color = self.db.profile.color.finished
-            self.displayFrame.text:SetText(L["SECTION_DONE"])
+            if(currentPercentage >= 100) then
+                self.displayFrame.text:SetText(L["FINISHED"])
+            else
+                self.displayFrame.text:SetText(L["SECTION_DONE"])
+            end
             self.currentSection = self.currentSection + 1
             if self.currentSection <= #self.DUNGEONS[self.currentDungeonID] then -- Next section exists
                 C_Timer.After(2, function()
@@ -388,10 +396,11 @@ function KeystonePercentageHelper:UpdatePercentageText()
                         color = self.db.profile.color.finished
                         self.displayFrame.text:SetText(L["FINISHED"])
                     else -- Dungeon has not been completed
-                        color = self.db.profile.color.inProgress
-                        if nextRequired <= 0 then
+                        if nextRequired == 0 then
+                            color = self.db.profile.color.finished
                             self.displayFrame.text:SetText(L["DONE"])
                         else
+                            color = self.db.profile.color.inProgress
                             self.displayFrame.text:SetText(string.format("%.2f%%", nextRequired))
                         end
                     end
