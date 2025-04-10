@@ -5,7 +5,7 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0");
 local L = AceLocale:NewLocale(AddonName, "ruRU", false, false);
 if not L then return end
 
--- Last translated March 7th, 2025 year.
+-- Last translated April 10th, 2025 year.
 -- Translation by Hollicsh (https://github.com/Hollicsh)
 
 -- Dungeons Group
@@ -136,9 +136,9 @@ L["GB_BOSS4"] = "Властитель недр Эрудакс"
 
 -- UI Strings
 L["FINISHED"] = "Процент подземелья выполнен"
-L["SECTION_DONE"] = "Section finished"
+L["SECTION_DONE"] = "Часть подземелья завершена"
 L["DONE"] = "Процент части подземелья выполнен"
-L["DUNGEON_DONE"] = "Dungeon finished"
+L["DUNGEON_DONE"] = "Подземелье завершено"
 L["OPTIONS"] = "Настройки"
 L["GENERAL_SETTINGS"] = "Общие настройки"
 L["Changelog"] = "Список изменений"
