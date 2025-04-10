@@ -2,7 +2,7 @@ local AddOnName, KeystonePercentageHelper = ...;
 
 KeystonePercentageHelper.Changelog[1420] = {
     version_string = "1.4.2",
-    release_date = "2025/03/21",
+    release_date = "2025/04/10",
     important = {
         ["zhCN"] = {},
         ["zhTW"] = {},
@@ -46,9 +46,11 @@ KeystonePercentageHelper.Changelog[1420] = {
         ["zhCN"] = {},
         ["zhTW"] = {},
         ["enUS"] = {
-            "Tentative change to the \"Done\" and \"Finished\" strings and addition of a new \"Section done\" string (any feedback is welcome)."
+            "Tentative change to the \"Done\" and \"Finished\" strings and addition of new \"Section finished\" and \"Dungeon finished\" strings (any feedback is welcome)."
         },
-        ["frFR"] = {},
+        ["frFR"] = {
+            "Tentative de changement des phrases \"Pourcentage atteint\" et \"Terminé\" et ajout des nouvelles phrases \"Section de donjon terminée\" et \"Donjon terminé\" (les avis sont les bienvenus)."
+        },
         ["koKR"] = {},
         ["ruRU"] = {},
         ["deDE"] = {},
