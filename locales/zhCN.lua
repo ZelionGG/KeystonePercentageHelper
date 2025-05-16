@@ -192,6 +192,9 @@ L["YES"] = "Yes"
 L["NO"] = "No"
 L["WE_STILL_NEED"] = "We still need"
 L["NEW_ROUTES_RESET_PROMPT"] = "The default dungeon routes have been updated in this version. Would you like to reset your current dungeon routes to the new defaults?"
+L["RESET_ALL"] = "Reset All Dungeons"
+L["RESET_CHANGED_ONLY"] = "Reset Changed Only"
+L["CHANGED_ROUTES_DUNGEONS_LIST"] = "The following dungeons have updated routes:"
 
 -- Export/Import
 L["EXPORT_DUNGEON"] = "Export Dungeon"

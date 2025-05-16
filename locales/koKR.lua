@@ -192,6 +192,9 @@ L["YES"] = "예"
 L["NO"] = "아니요"
 L["WE_STILL_NEED"] = "더 잡아야 됨"
 L["NEW_ROUTES_RESET_PROMPT"] = "이 버전에서는 기본 던전 경로가 업데이트되었습니다. 현재 던전 경로를 새로운 기본값으로 재설정하시겠습니까?"
+L["RESET_ALL"] = "Reset All Dungeons" -- To Translate
+L["RESET_CHANGED_ONLY"] = "Reset Changed Only" -- To Translate
+L["CHANGED_ROUTES_DUNGEONS_LIST"] = "The following dungeons have updated routes:" -- To Translate
 
 -- Export/Import
 L["EXPORT_DUNGEON"] = "던전 내보내기"
