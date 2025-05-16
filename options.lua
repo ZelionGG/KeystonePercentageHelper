@@ -1270,7 +1270,7 @@ function KeystonePercentageHelper:ResetAllDungeons()
     LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePercentageHelper")
 end
 
-function KeystonePercentageHelper:ResetCurrentSeasonDungeons()
+function KeystonePercentageHelper:ResetCurrentSeasonDungeons(specificDungeons)
     local self = KeystonePercentageHelper
     
     -- Get the current date
@@ -1296,21 +1296,26 @@ function KeystonePercentageHelper:ResetCurrentSeasonDungeons()
             for dungeonId, _ in pairs(seasonDungeons) do
                 local dungeonKey = self:GetDungeonKeyById(dungeonId)
                 if dungeonKey then
-                    -- Find the appropriate defaults for this dungeon
-                    local defaults
-                    for _, expansion in ipairs(expansions) do
-                        if self[expansion.id .. "_DUNGEON_IDS"] and self[expansion.id .. "_DUNGEON_IDS"][dungeonKey] then
-                            defaults = self[expansion.id .. "_DEFAULTS"][dungeonKey]
-                            break
+                    -- If specificDungeons is provided, only reset those dungeons
+                    if specificDungeons and not specificDungeons[dungeonKey] then
+                        -- Skip this dungeon as it's not in the list of dungeons to reset
+                    else
+                        -- Find the appropriate defaults for this dungeon
+                        local defaults
+                        for _, expansion in ipairs(expansions) do
+                            if self[expansion.id .. "_DUNGEON_IDS"] and self[expansion.id .. "_DUNGEON_IDS"][dungeonKey] then
+                                defaults = self[expansion.id .. "_DEFAULTS"][dungeonKey]
+                                break
+                            end
                         end
-                    end
 
-                    if defaults then
-                        if not self.db.profile.advanced[dungeonKey] then
-                            self.db.profile.advanced[dungeonKey] = {}
-                        end
-                        for key, value in pairs(defaults) do
-                            self.db.profile.advanced[dungeonKey][key] = value
+                        if defaults then
+                            if not self.db.profile.advanced[dungeonKey] then
+                                self.db.profile.advanced[dungeonKey] = {}
+                            end
+                            for key, value in pairs(defaults) do
+                                self.db.profile.advanced[dungeonKey][key] = value
+                            end
                         end
                     end
                 end
@@ -1381,13 +1386,21 @@ function KeystonePercentageHelper:CheckForNewRoutes()
     -- (indicated by lastSeasonCheck being populated), and we need to prompt for route reset
     if lastVersionCheck == "" and self.db.profile.general.advancedOptionsEnabled 
         and currentDate > lastSeasonCheck and not InCombatLockdown() then
+        local changedDungeonsText = self:GetChangedDungeonsText()
+        
         StaticPopupDialogs["KPH_NEW_ROUTES"] = {
-            text = "|cffffd100Keystone Percentage Helper|r\n\n" .. L["NEW_ROUTES_RESET_PROMPT"] .. "\n\n",
-            button1 = L["YES"],
+            text = "|cffffd100Keystone Percentage Helper|r\n\n" .. L["NEW_ROUTES_RESET_PROMPT"] .. "\n\n" .. changedDungeonsText,
+            button1 = L["RESET_ALL"],
             button2 = L["NO"],
+            button3 = (self.CHANGED_ROUTES_DUNGEONS and next(self.CHANGED_ROUTES_DUNGEONS)) and L["RESET_CHANGED_ONLY"] or nil,
             OnAccept = function()
-                -- Reset only current season dungeon values
+                -- Reset all current season dungeon values
                 self:ResetCurrentSeasonDungeons()
+                self.db.profile.general.lastVersionCheck = currentVersion
+            end,
+            OnAlt = function()
+                -- Reset only dungeons with changed routes
+                self:ResetCurrentSeasonDungeons(self.CHANGED_ROUTES_DUNGEONS)
                 self.db.profile.general.lastVersionCheck = currentVersion
             end,
             OnCancel = function()
@@ -1412,13 +1425,22 @@ function KeystonePercentageHelper:CheckForNewRoutes()
     if lastVersionCheck ~= currentVersion and self.db.profile.general.advancedOptionsEnabled and not InCombatLockdown() and 
        (lastRoutesUpdate > lastVersionCheck or lastVersionCheck == "") 
        and currentDate > lastSeasonCheck and currentVersion >= lastRoutesUpdate then
+        
+        local changedDungeonsText = self:GetChangedDungeonsText()
+        
         StaticPopupDialogs["KPH_NEW_ROUTES"] = {
-            text = "|cffffd100Keystone Percentage Helper|r\n\n" .. L["NEW_ROUTES_RESET_PROMPT"] .. "\n\n",
-            button1 = L["YES"],
+            text = "|cffffd100Keystone Percentage Helper|r\n\n" .. L["NEW_ROUTES_RESET_PROMPT"] .. "\n\n" .. changedDungeonsText,
+            button1 = L["RESET_ALL"],
             button2 = L["NO"],
+            button3 = (self.CHANGED_ROUTES_DUNGEONS and next(self.CHANGED_ROUTES_DUNGEONS)) and L["RESET_CHANGED_ONLY"] or nil,
             OnAccept = function()
-                -- Reset only current season dungeon values
+                -- Reset all current season dungeon values
                 self:ResetCurrentSeasonDungeons()
+                self.db.profile.general.lastVersionCheck = currentVersion
+            end,
+            OnAlt = function()
+                -- Reset only dungeons with changed routes
+                self:ResetCurrentSeasonDungeons(self.CHANGED_ROUTES_DUNGEONS)
                 self.db.profile.general.lastVersionCheck = currentVersion
             end,
             OnCancel = function()
@@ -1436,6 +1458,24 @@ function KeystonePercentageHelper:CheckForNewRoutes()
         -- Update the version check without prompting
         self.db.profile.general.lastVersionCheck = currentVersion
     end
+end
+
+function KeystonePercentageHelper:GetChangedDungeonsText()
+    local self = KeystonePercentageHelper
+    local changedDungeonsText = ""
+    
+    -- Vérifier si la table CHANGED_ROUTES_DUNGEONS existe et n'est pas vide
+    if self.CHANGED_ROUTES_DUNGEONS and next(self.CHANGED_ROUTES_DUNGEONS) then
+        changedDungeonsText = L["CHANGED_ROUTES_DUNGEONS_LIST"] .. "\n"
+        
+        for dungeonKey, _ in pairs(self.CHANGED_ROUTES_DUNGEONS) do
+            local displayName = self:GetDungeonDisplayName(dungeonKey) or dungeonKey
+            changedDungeonsText = changedDungeonsText .. "- " .. displayName .. "\n"
+        end
+        changedDungeonsText = changedDungeonsText .. "\n"
+    end
+    
+    return changedDungeonsText
 end
 
 function KeystonePercentageHelper:GetDungeonDisplayName(dungeonKey)
