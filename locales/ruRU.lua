@@ -5,7 +5,7 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0");
 local L = AceLocale:NewLocale(AddonName, "ruRU", false, false);
 if not L then return end
 
--- Last translated April 10th, 2025 year.
+-- Last translated May 16th, 2025 year.
 -- Translation by Hollicsh (https://github.com/Hollicsh)
 
 -- Dungeons Group
@@ -193,9 +193,9 @@ L["YES"] = "Да"
 L["NO"] = "Нет"
 L["WE_STILL_NEED"] = "Нам всё ещё нужно"
 L["NEW_ROUTES_RESET_PROMPT"] = "В этой версии были обновлены маршруты подземелий по умолчанию. Хотите сбросить текущие маршруты подземелий на новые значения по умолчанию?"
-L["RESET_ALL"] = "Reset All Dungeons" -- To Translate
-L["RESET_CHANGED_ONLY"] = "Reset Changed Only" -- To Translate
-L["CHANGED_ROUTES_DUNGEONS_LIST"] = "The following dungeons have updated routes:" -- To Translate
+L["RESET_ALL"] = "Сбросить все подземелья"
+L["RESET_CHANGED_ONLY"] = "Сбросить только измененные"
+L["CHANGED_ROUTES_DUNGEONS_LIST"] = "Обновлены маршруты следующих подземелий:"
 
 -- Export/Import
 L["EXPORT_DUNGEON"] = "Экспорт подземелья"
