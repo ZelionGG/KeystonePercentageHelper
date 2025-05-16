@@ -41,8 +41,8 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
     OFG = {
         id = 525,
         bosses = {
-            {1, 9.15, false},
-            {2, 64.89, false},
+            {1, 36.81, false},
+            {2, 67.86, false},
             {3, 57.87, true},
             {4, 100, true}
         }
