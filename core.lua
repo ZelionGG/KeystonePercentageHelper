@@ -420,11 +420,45 @@ end
 function KeystonePercentageHelper:OnEnable()
     -- Ensure display exists and is visible
     self:CreateDisplay()
-    -- Register events for updating the display
-    self:RegisterEvent("SCENARIO_CRITERIA_UPDATE")
+
+    -- Mythic+ mode triggers
     self:RegisterEvent("CHALLENGE_MODE_START")
+    self:RegisterEvent("CHALLENGE_MODE_COMPLETED")
+	self:RegisterEvent("WORLD_STATE_TIMER_START")
+
+	-- Scenario triggers
+	self:RegisterEvent("SCENARIO_POI_UPDATE")
+	self:RegisterEvent("SCENARIO_CRITERIA_UPDATE")
+
+	-- Combat triggers
+	self:RegisterEvent("ENCOUNTER_END")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED")
+
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
+
     -- Force an initial update
+    self:UpdatePercentageText()
+end
+
+function KeystonePercentageHelper:WORLD_STATE_TIMER_START()
+    self.currentDungeonID = nil
+
+    self:InitiateDungeon()
+    self:UpdatePercentageText()
+end
+
+-- Event handler for POI updates (boss positions)
+function KeystonePercentageHelper:SCENARIO_POI_UPDATE()
+    self:UpdatePercentageText()
+end
+
+-- Event handler for combat end
+function KeystonePercentageHelper:ENCOUNTER_END()
+    self:UpdatePercentageText()
+end
+
+-- Event handler for combat end
+function KeystonePercentageHelper:PLAYER_REGEN_ENABLED()
     self:UpdatePercentageText()
 end
 
@@ -435,8 +469,14 @@ end
 
 -- Event handler for starting a Mythic+ dungeon
 function KeystonePercentageHelper:CHALLENGE_MODE_START()
+    self.currentDungeonID = nil
+
     self:InitiateDungeon()
     self:UpdatePercentageText()
+end
+
+function KeystonePercentageHelper:CHALLENGE_MODE_COMPLETED()
+    self.currentDungeonID = nil
 end
 
 -- Event handler for entering the world or changing zones
