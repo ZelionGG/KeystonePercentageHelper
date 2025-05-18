@@ -365,54 +365,59 @@ function KeystonePercentageHelper:UpdatePercentageText()
         if remainingPercent < 0.05 and remainingPercent > 0.00 then 
             remainingPercent = 0.00
         end
-        
-        local displayPercent = string.format("%.2f%%", remainingPercent)
-        local color = self.db.profile.color.inProgress
-        
-        if remainingPercent > 0 and isBossKilled then -- Boss has been killed but percentage is missing
-            -- Inform group about missing percentage if enabled
-            if shouldInfom and not haveInformed and self.db.profile.general.informGroup then
-                self:InformGroup(remainingPercent)
-                self.DUNGEONS[self.currentDungeonID][self.currentSection][4] = true
-            end
-            color = self.db.profile.color.missing
-            self.displayFrame.text:SetText(displayPercent)
-        elseif remainingPercent > 0 and not isBossKilled then -- Boss has not been killed yet and percentage is missing
-            self.displayFrame.text:SetText(displayPercent)
-        elseif remainingPercent <= 0 and not isBossKilled then -- Boss has not been killed yet but percentage is done
+
+        if currentPercentage >= 100 then -- Dungeon has been completed, show finished text and skip the rest
             color = self.db.profile.color.finished
-            if(currentPercentage >= 100) then
-                self.displayFrame.text:SetText(L["FINISHED"])
-            else
-                self.displayFrame.text:SetText(L["DONE"])
-            end
-        elseif remainingPercent <= 0 and isBossKilled then -- Boss has been killed and percentage is done
-            color = self.db.profile.color.finished
-            if(currentPercentage >= 100) then
-                self.displayFrame.text:SetText(L["FINISHED"])
-            else
-                self.displayFrame.text:SetText(L["SECTION_DONE"])
-            end
-            self.currentSection = self.currentSection + 1
-            if self.currentSection <= #self.DUNGEONS[self.currentDungeonID] then -- Next section exists
-                C_Timer.After(2, function()
-                    local nextRequired = self.DUNGEONS[self.currentDungeonID][self.currentSection][2] - currentPercentage
-                    if currentPercentage >= 100 then -- Percentage is already done for the dungeon
-                        color = self.db.profile.color.finished
-                        self.displayFrame.text:SetText(L["FINISHED"])
-                    else -- Dungeon has not been completed
-                        if nextRequired == 0 then
+            self.displayFrame.text:SetText(L["DUNGEON_DONE"])
+        else
+            local displayPercent = string.format("%.2f%%", remainingPercent)
+            local color = self.db.profile.color.inProgress
+            
+            if remainingPercent > 0 and isBossKilled then -- Boss has been killed but percentage is missing
+                -- Inform group about missing percentage if enabled
+                if shouldInfom and not haveInformed and self.db.profile.general.informGroup then
+                    self:InformGroup(remainingPercent)
+                    self.DUNGEONS[self.currentDungeonID][self.currentSection][4] = true
+                end
+                color = self.db.profile.color.missing
+                self.displayFrame.text:SetText(displayPercent)
+            elseif remainingPercent > 0 and not isBossKilled then -- Boss has not been killed yet and percentage is missing
+                self.displayFrame.text:SetText(displayPercent)
+            elseif remainingPercent <= 0 and not isBossKilled then -- Boss has not been killed yet but percentage is done
+                color = self.db.profile.color.finished
+                if(currentPercentage >= 100) then
+                    self.displayFrame.text:SetText(L["FINISHED"])
+                else
+                    self.displayFrame.text:SetText(L["DONE"])
+                end
+            elseif remainingPercent <= 0 and isBossKilled then -- Boss has been killed and percentage is done
+                color = self.db.profile.color.finished
+                if(currentPercentage >= 100) then
+                    self.displayFrame.text:SetText(L["FINISHED"])
+                else
+                    self.displayFrame.text:SetText(L["SECTION_DONE"])
+                end
+                self.currentSection = self.currentSection + 1
+                if self.currentSection <= #self.DUNGEONS[self.currentDungeonID] then -- Next section exists
+                    C_Timer.After(2, function()
+                        local nextRequired = self.DUNGEONS[self.currentDungeonID][self.currentSection][2] - currentPercentage
+                        if currentPercentage >= 100 then -- Percentage is already done for the dungeon
                             color = self.db.profile.color.finished
-                            self.displayFrame.text:SetText(L["DONE"])
-                        else
-                            color = self.db.profile.color.inProgress
-                            self.displayFrame.text:SetText(string.format("%.2f%%", nextRequired))
+                            self.displayFrame.text:SetText(L["FINISHED"])
+                        else -- Dungeon has not been completed
+                            if nextRequired == 0 then
+                                color = self.db.profile.color.finished
+                                self.displayFrame.text:SetText(L["DONE"])
+                            else
+                                color = self.db.profile.color.inProgress
+                                self.displayFrame.text:SetText(string.format("%.2f%%", nextRequired))
+                            end
                         end
-                    end
-                    self.displayFrame.text:SetTextColor(color.r, color.g, color.b, color.a)
-                end)
-            else
-                self.displayFrame.text:SetText(L["DUNGEON_DONE"]) -- Dungeon has been completed
+                        self.displayFrame.text:SetTextColor(color.r, color.g, color.b, color.a)
+                    end)
+                else
+                    self.displayFrame.text:SetText(L["DUNGEON_DONE"]) -- Dungeon has been completed
+                end
             end
         end
         
@@ -429,15 +434,10 @@ function KeystonePercentageHelper:OnEnable()
     -- Mythic+ mode triggers
     self:RegisterEvent("CHALLENGE_MODE_START")
     self:RegisterEvent("CHALLENGE_MODE_COMPLETED")
-	self:RegisterEvent("WORLD_STATE_TIMER_START")
 
 	-- Scenario triggers
 	self:RegisterEvent("SCENARIO_POI_UPDATE")
 	self:RegisterEvent("SCENARIO_CRITERIA_UPDATE")
-
-	-- Combat triggers
-	self:RegisterEvent("ENCOUNTER_END")
-	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
 
@@ -445,25 +445,8 @@ function KeystonePercentageHelper:OnEnable()
     self:UpdatePercentageText()
 end
 
-function KeystonePercentageHelper:WORLD_STATE_TIMER_START()
-    self.currentDungeonID = nil
-
-    self:InitiateDungeon()
-    self:UpdatePercentageText()
-end
-
 -- Event handler for POI updates (boss positions)
 function KeystonePercentageHelper:SCENARIO_POI_UPDATE()
-    self:UpdatePercentageText()
-end
-
--- Event handler for combat end
-function KeystonePercentageHelper:ENCOUNTER_END()
-    self:UpdatePercentageText()
-end
-
--- Event handler for combat end
-function KeystonePercentageHelper:PLAYER_REGEN_ENABLED()
     self:UpdatePercentageText()
 end
 
