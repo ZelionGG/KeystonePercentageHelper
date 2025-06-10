@@ -24,6 +24,12 @@ KeystonePercentageHelper.defaults = {
             advancedOptionsEnabled = false,
             lastSeasonCheck = "",
             lastVersionCheck = "",
+            rolesEnabled = {
+                LEADER = true,
+                TANK = true,
+                HEALER = true,
+                DAMAGER = true
+            }
         },
         text = {
             font = "Friz Quadrata TT",
@@ -365,6 +371,29 @@ function KeystonePercentageHelper:GetOtherOptions()
         inline = true,
         order = 10,
         args = {
+            rolesEnabled = {
+                name = L["ROLES_ENABLED"],
+                desc = L["ROLES_ENABLED_DESC"],
+                type = "multiselect",
+                order = 2,
+                values = {
+                    LEADER = L["LEADER"],
+                    TANK = L["TANK"],
+                    HEALER = L["HEALER"],
+                    DAMAGER = L["DPS"]
+                },
+                get = function(_, key)
+                    return self.db.profile.general.rolesEnabled[key] or false
+                end,
+                set = function(_, key, state)
+                    if state then
+                        self.db.profile.general.rolesEnabled[key] = true
+                    else
+                        self.db.profile.general.rolesEnabled[key] = false
+                    end
+                    self:Refresh()
+                end
+            },
             informGroup = {
                 name = L["INFORM_GROUP"],
                 desc = L["INFORM_GROUP_DESC"],
