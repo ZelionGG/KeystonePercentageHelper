@@ -332,18 +332,6 @@ end
 function KeystonePercentageHelper:UpdatePercentageText()
     if not self.displayFrame then return end
 
-    -- Check if the player has the right role to see the percentages and inform the group
-    local leaderEnabled   = self.db.profile.general.rolesEnabled.LEADER
-    local isLeader        = UnitIsGroupLeader("player")
-    local role            = UnitGroupRolesAssigned("player")   -- "TANK", "HEALER", "DAMAGER", ou "NONE"
-    local roleEnabled     = self.db.profile.general.rolesEnabled[role]
-
-    local shouldShow = (leaderEnabled and isLeader) or roleEnabled
-    
-    if not shouldShow then
-        return
-    end
-
     -- Initialize dungeon tracking if needed
     self:InitiateDungeon()
 
@@ -514,7 +502,7 @@ function KeystonePercentageHelper:Refresh()
     local role            = UnitGroupRolesAssigned("player")   -- "TANK", "HEALER", "DAMAGER", ou "NONE"
     local roleEnabled     = self.db.profile.general.rolesEnabled[role]
 
-    local shouldShow = (leaderEnabled and isLeader) or roleEnabled
+    local shouldShow = (leaderEnabled and isLeader) or roleEnabled or role == "NONE"
 
     if not shouldShow then
         self.displayFrame:Hide()
