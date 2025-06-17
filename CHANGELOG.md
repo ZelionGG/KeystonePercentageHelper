@@ -1,7 +1,10 @@
 # Keystone Percentage Helper
 
-## [1.5](https://github.com/ZelionGG/KeystonePercentageHelper/tree/1.5) (2025-06-10)
+## [1.5.1](https://github.com/ZelionGG/KeystonePercentageHelper/tree/1.5.1) (2025-06-18)
 
-[Full Changelog](https://github.com/ZelionGG/KeystonePercentageHelper/compare/1.4.6...1.5) [Previous Releases](https://github.com/ZelionGG/KeystonePercentageHelper/releases)
+[Full Changelog](https://github.com/ZelionGG/KeystonePercentageHelper/compare/1.5...1.5.1) [Previous Releases](https://github.com/ZelionGG/KeystonePercentageHelper/releases)
 
-- Added the option to show the percentage and the option to inform group only for specific roles.
+- Fixed percentages not showing anymore since version 1.5.
+- **Keystone Percentage Helper** is now translated in Chinese (PRC), thank you **nanjuekaien1**.
+- Updated Russian translation, thank you again **Hollicsh**.
+- Updated Korean translation, thank you again **BlueSea-jun**.
