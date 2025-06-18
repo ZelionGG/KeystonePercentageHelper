@@ -5,7 +5,7 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0");
 local L = AceLocale:NewLocale(AddonName, "ruRU", false, false);
 if not L then return end
 
--- Last translated May 16th, 2025 year.
+-- Last translated June 19th, 2025.
 -- Translation by Hollicsh (https://github.com/Hollicsh)
 
 -- Dungeons Group
@@ -89,26 +89,23 @@ L["NW_BOSS2"] = "Амарт Жнец"
 L["NW_BOSS3"] = "Хирург Трупошов"
 L["NW_BOSS4"] = "Налтор Криомант"
 
--- TO TRANSLATE
 -- Halls of Atonement
-L["HoA_BOSS1"] = "Halkias, the Sin-Stained Goliath"
-L["HoA_BOSS2"] = "Echelon"
-L["HoA_BOSS3"] = "High Adjudicator Aleez"
-L["HoA_BOSS4"] = "Lord Chamberlain"
+L["HoA_BOSS1"] = "Халкиас"
+L["HoA_BOSS2"] = "Эшелон"
+L["HoA_BOSS3"] = "Верховный адъюдикатор Ализа"
+L["HoA_BOSS4"] = "Лорд-камергер"
 
 -- Tazavesh: Streets of Wonder
-L["TSoW_BOSS1"] = "Zo'phex the Sentinel"
-L["TSoW_BOSS2"] = "The Grand Menagerie"
-L["TSoW_BOSS3"] = "Mailroom Mayhem"
-L["TSoW_BOSS4"] = "Myza's Oasis"
-L["TSoW_BOSS5"] = "So'azmi"
+L["TSoW_BOSS1"] = "Зо'фекс Часовой"
+L["TSoW_BOSS2"] = "Алькруукс"
+L["TSoW_BOSS3"] = "ПОЧТ-мейстер"
+L["TSoW_BOSS4"] = "Зо'грон"
+L["TSoW_BOSS5"] = "Со'азми"
 
 -- Tazavesh: So'leah's Gambit
-L["TSLG_BOSS1"] = "Hylbrande"
-L["TSLG_BOSS2"] = "Timecap'n Hooktail"
-L["TSLG_BOSS3"] = "So'leah"
--- END TO TRANSLATE
-
+L["TSLG_BOSS1"] = "Хильбранд"
+L["TSLG_BOSS2"] = "Хронокэп Крюкохвост"
+L["TSLG_BOSS3"] = "Со'лея"
 
 -- Battle for Azeroth
 -- Operation: Mechagon - Workshop
