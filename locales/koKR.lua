@@ -20,59 +20,50 @@ L["EXPANSION_LEGION"] = "군단"
 
 -- The War Within
 -- Ara-Kara, City of Echoes
-L["AKCE"] = "메아리의 도시 아라카라"
 L["AKCE_BOSS1"] = "아바녹스"
 L["AKCE_BOSS2"] = "아눕젝트"
 L["AKCE_BOSS3"] = "수확자 키카탈"
 
 -- City of Threads
-L["CoT"] = "실타래의 도시"
 L["CoT_BOSS1"] = "웅변가 크릭스비즈크"
 L["CoT_BOSS2"] = "여왕의 송곳니"
 L["CoT_BOSS3"] = "응집체"
 L["CoT_BOSS4"] = "대접합사 이조"
 
 -- Cinderbrew Meadery
-L["CBM"] = "잿불맥주 양조장"
 L["CBM_BOSS1"] = "양조장인 알드리르"
 L["CBM_BOSS2"] = "이파"
 L["CBM_BOSS3"] = "벤크 버즈비"
 L["CBM_BOSS4"] = "골디 바론바텀"
 
 -- Darkflame Cleft
-L["DFC"] = "어둠불꽃 동굴"
 L["DFC_BOSS1"] = "밀랍수염 영감"
 L["DFC_BOSS2"] = "블레지콘"
 L["DFC_BOSS3"] = "양초왕"
 L["DFC_BOSS4"] = "어둠의 존재"
 
 -- Operation: Floodgate
-L["OFG"] = "작전명: 수문"
 L["OFG_BOSS1"] = "큰.대.모"
 L["OFG_BOSS2"] = "박살 2인조"
 L["OFG_BOSS3"] = "늪지면상"
 L["OFG_BOSS4"] = "기즐 기가잽"
 
 -- Priory of the Sacred Flames
-L["PotSF"] = "신성한 불꽃의 수도원"
 L["PotSF_BOSS1"] = "대장 데일크라이"
 L["PotSF_BOSS2"] = "남작 브라운파이크"
 L["PotSF_BOSS3"] = "수도원장 머프레이"
 
 -- The Dawnbreaker
-L["TDB"] = "새벽인도자호"
 L["TDB_BOSS1"] = "대변자 섀도크라운"
 L["TDB_BOSS2"] = "아눕이카즈"
 L["TDB_BOSS3"] = "라샤난 "
 
 -- The Rookery
-L["TR"] = "부화장"
 L["TR_BOSS1"] = "키리오스"
 L["TR_BOSS2"] = "폭풍수호병 고렌"
 L["TR_BOSS3"] = "공허석 괴수"
 
 -- The Stonevault
-L["TSV"] = "바위금고"
 L["TSV_BOSS1"] = "토.보.무.전."
 L["TSV_BOSS2"] = "스카모락"
 L["TSV_BOSS3"] = "상급 기계공"
@@ -80,13 +71,11 @@ L["TSV_BOSS4"] = "공허 대변자 에리히"
 
 -- Shadowlands
 -- Mists of Tirna Scithe
-L["MoTS"] = "티르너 사이드의 안개"
 L["MoTS_BOSS1"] = "잉그라 말로크"
 L["MoTS_BOSS2"] = "미스트콜러"
 L["MoTS_BOSS3"] = "트레도바"
 
 --Theater of Pain
-L["ToP"] = "고통의 투기장"
 L["ToP_BOSS1"] = "오만불손한 도전자"
 L["ToP_BOSS2"] = "선혈토막"
 L["ToP_BOSS3"] = "몰락하지 않은 자 자브"
@@ -94,7 +83,6 @@ L["ToP_BOSS4"] = "쿨타로크"
 L["ToP_BOSS5"] = "무한의 여제 모르드레타"
 
 -- The Necrotic Wake
-L["NW"] = "죽음의 상흔"
 L["NW_BOSS1"] = "역병뼈닥이"
 L["NW_BOSS2"] = "수확자 아마스"
 L["NW_BOSS3"] = "의사 스티치플레"
@@ -122,21 +110,18 @@ L["TSLG_BOSS3"] = "So'leah"
 
 -- Battle for Azeroth
 -- Operation: Mechagon - Workshop
-L["OMGW"] = " 작전명: 메카곤"
 L["OMGW_BOSS1"] = "통통 격투"
 L["OMGW_BOSS2"] = "쿠.조."
 L["OMGW_BOSS3"] = "기계공의 정원"
 L["OMGW_BOSS4"] = "왕 메카곤"
 
 -- Siege of Boralus
-L["SoB"] = "보랄러스 공성전"
 L["SoB_BOSS1"] = "난도질꾼 레드후크"
 L["SoB_BOSS2"] = "공포의 선장 록우드"
 L["SoB_BOSS3"] = "하달 다크패덤"
 L["SoB_BOSS4"] = "비크고스"
 
 -- The MOTHERLODE!!
-L["TML"] = "왕노다지 광산!!"
 L["TML_BOSS1"] = "동전 투입식 군중 난타기"
 L["TML_BOSS2"] = "아제로크"
 L["TML_BOSS3"] = "릭사 플럭스플레임"
@@ -146,7 +131,6 @@ L["TML_BOSS4"] = "모굴 라즈덩크"
 
 -- Cataclysm
 -- Grim Batol
-L["GB"] = "그림 바톨"
 L["GB_BOSS1"] = "장군 움브리스"
 L["GB_BOSS2"] = "제련장인 트롱구스"
 L["GB_BOSS3"] = "드라가 섀도버너"

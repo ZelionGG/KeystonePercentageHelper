@@ -20,59 +20,50 @@ L["EXPANSION_LEGION"] = "军团再临"
 
 -- The War Within
 -- Ara-Kara, City of Echoes
-L["AKCE"] = "艾拉-卡拉，回响之城"
 L["AKCE_BOSS1"] = "阿瓦诺克斯"
 L["AKCE_BOSS2"] = "阿努布泽克特"
 L["AKCE_BOSS3"] = "收割者吉卡塔尔"
 
 -- City of Threads
-L["CoT"] = "千丝之城"
 L["CoT_BOSS1"] = "演说者基克斯威兹克"
 L["CoT_BOSS2"] = "女王之牙"
 L["CoT_BOSS3"] = "凝结聚合体"
 L["CoT_BOSS4"] = "大捻接师艾佐"
 
 -- Cinderbrew Meadery
-L["CBM"] = "燧酿酒庄"
 L["CBM_BOSS1"] = "酿造大师阿德里尔"
 L["CBM_BOSS2"] = "艾帕"
 L["CBM_BOSS3"] = "本克·鸣蜂"
 L["CBM_BOSS4"] = "戈尔迪·底爵"
 
 -- Darkflame Cleft
-L["DFC"] = "暗焰裂口"
 L["DFC_BOSS1"] = "老蜡须"
 L["DFC_BOSS2"] = "布雷炙孔"
 L["DFC_BOSS3"] = "蜡烛之王"
 L["DFC_BOSS4"] = "黑暗之主"
 
 -- Operation: Floodgate
-L["OFG"] = "水闸行动"
 L["OFG_BOSS1"] = "老大娘"
 L["OFG_BOSS2"] = "破拆双人组"
 L["OFG_BOSS3"] = "沼面"
 L["OFG_BOSS4"] = "吉泽尔·超震"
 
 -- Priory of the Sacred Flames
-L["PotSF"] = "圣焰隐修院"
 L["PotSF_BOSS1"] = "戴尔克莱上尉"
 L["PotSF_BOSS2"] = "布朗派克男爵"
 L["PotSF_BOSS3"] = "隐修院长穆普雷"
 
 -- The Dawnbreaker
-L["TDB"] = "破晨号"
 L["TDB_BOSS1"] = "夏多克朗"
 L["TDB_BOSS2"] = "阿努布伊卡基"
 L["TDB_BOSS3"] = "拉夏南"
 
 -- The Rookery
-L["TR"] = "驭雷栖巢"
 L["TR_BOSS1"] = "凯里欧斯"
 L["TR_BOSS2"] = "雷卫戈伦"
 L["TR_BOSS3"] = "虚空石畸体"
 
 -- The Stonevault
-L["TSV"] = "矶石宝库"
 L["TSV_BOSS1"] = "E.D.N.A."
 L["TSV_BOSS2"] = "斯卡莫拉克"
 L["TSV_BOSS3"] = "机械大师"
@@ -80,13 +71,11 @@ L["TSV_BOSS4"] = "虚空代言人艾里克"
 
 -- Shadowlands
 -- Mists of Tirna Scithe
-L["MoTS"] = "塞兹仙林的迷雾"
 L["MoTS_BOSS1"] = "英格拉·马洛克"
 L["MoTS_BOSS2"] = "唤雾者"
 L["MoTS_BOSS3"] = "特雷德奥瓦"
 
 --Theater of Pain
-L["ToP"] = "伤逝剧场"
 L["ToP_BOSS1"] = "狭路相逢"
 L["ToP_BOSS2"] = "斩血"
 L["ToP_BOSS3"] = "无堕者哈夫"
@@ -94,7 +83,6 @@ L["ToP_BOSS4"] = "库尔萨洛克"
 L["ToP_BOSS5"] = "无尽女皇莫德蕾莎"
 
 -- The Necrotic Wake
-L["NW"] = "通灵战潮"
 L["NW_BOSS1"] = "凋骨"
 L["NW_BOSS2"] = "收割者阿玛厄斯"
 L["NW_BOSS3"] = "外科医生缝肉"
@@ -123,21 +111,18 @@ L["TSLG_BOSS3"] = "So'leah"
 
 -- Battle for Azeroth
 -- Operation: Mechagon - Workshop
-L["OMGW"] = "麦卡贡行动 - 车间"
 L["OMGW_BOSS1"] = "坦克大战"
 L["OMGW_BOSS2"] = "狂犬K.U.-J.0."
 L["OMGW_BOSS3"] = "机械师的花园"
 L["OMGW_BOSS4"] = "麦卡贡国王"
 
 -- Siege of Boralus
-L["SoB"] = "围攻伯拉勒斯"
 L["SoB_BOSS1"] = "“屠夫”血钩"
 L["SoB_BOSS2"] = "恐怖船长洛克伍德"
 L["SoB_BOSS3"] = "哈达尔·黑渊"
 L["SoB_BOSS4"] = "维克戈斯"
 
 -- The MOTHERLODE!!
-L["TML"] = "暴富矿区！！"
 L["TML_BOSS1"] = "投币式群体打击者"
 L["TML_BOSS2"] = "艾泽洛克"
 L["TML_BOSS3"] = "瑞克莎·流火"
@@ -147,7 +132,6 @@ L["TML_BOSS4"] = "商业大亨拉兹敦克"
 
 -- Cataclysm
 -- Grim Batol
-L["GB"] = "格瑞姆巴托"
 L["GB_BOSS1"] = "乌比斯将军"
 L["GB_BOSS2"] = "铸炉之主索朗格斯"
 L["GB_BOSS3"] = "达加·燃影者"
