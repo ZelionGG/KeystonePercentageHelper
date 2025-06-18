@@ -9,6 +9,45 @@ local strsplit = strsplit
 local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
+-- ---------------------------------------------------------------------------
+-- Helper utilities
+-- ---------------------------------------------------------------------------
+-- Shallow-clone a table. If the WoW utility `CopyTable` exists we use it,
+-- otherwise fall back to manual copy. This is needed so that changing the
+-- `order` field for one AceConfig option group does not overwrite the value
+-- used in another section.
+local function CloneTable(tbl)
+    if type(CopyTable) == "function" then return CopyTable(tbl) end
+    local t = {}
+    for k, v in pairs(tbl) do t[k] = v end
+    return t
+end
+
+-- Insert dungeon option groups into an AceConfig args table in alphabetical
+-- order. Every option is cloned from `sharedOptions[key]`, placed after the
+-- section headers (offset with `baseOrder`), and assigned its own `order` so
+-- AceConfig displays them deterministically.
+--   addon        : reference to KeystonePercentageHelper for helper calls
+--   dungeonKeys  : array of dungeon string keys (short names)
+--   sharedOptions: table containing pre-built option groups for each dungeon
+--   targetArgs   : the args table we are populating (e.g., dungeonArgs)
+--   baseOrder    : numeric order to start from (usually 3)
+local function InsertSortedDungeonOptions(addon, dungeonKeys, sharedOptions, targetArgs, baseOrder)
+    local sortable = {}
+    for _, key in ipairs(dungeonKeys) do
+        local mapId = addon:GetDungeonIdByKey(key)
+        local name = (mapId and select(1, C_ChallengeMode.GetMapUIInfo(mapId))) or key
+        table.insert(sortable, { key = key, name = name })
+    end
+    table.sort(sortable, function(a, b) return a.name < b.name end)
+
+    for idx, entry in ipairs(sortable) do
+        local opt = CloneTable(sharedOptions[entry.key])
+        opt.order = baseOrder + idx
+        targetArgs[entry.key] = opt
+    end
+end
+
 local L = LibStub("AceLocale-3.0"):GetLocale(AddOnName, true);
 KeystonePercentageHelper.L = L
 
@@ -523,30 +562,11 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             }
         }
 
-        -- Add dungeon options in alphabetical order with explicit order indices
+        -- Add dungeon options (alphabetical)
         if dungeonIds then
-            -- Build sortable list with localized names
-            local sortable = {}
-            for dungeonKey, _ in pairs(dungeonIds) do
-                local mapId = self:GetDungeonIdByKey(dungeonKey)
-                local name = (mapId and select(1, C_ChallengeMode.GetMapUIInfo(mapId))) or dungeonKey
-                table.insert(sortable, {key = dungeonKey, name = name})
-            end
-
-            table.sort(sortable, function(a, b)
-                return a.name < b.name
-            end)
-
-            for idx, entry in ipairs(sortable) do
-                local original = sharedDungeonOptions[entry.key]
-                local opt = (type(CopyTable) == "function") and CopyTable(original) or {}
-                if opt ~= original then
-                    for k, v in pairs(original) do opt[k] = v end
-                end
-
-                opt.order = idx + 3 -- after export/import/defaultPercentages
-                args[entry.key] = opt
-            end
+            local keys = {}
+            for key, _ in pairs(dungeonIds) do table.insert(keys, key) end
+            InsertSortedDungeonOptions(self, keys, sharedDungeonOptions, args, 3)
         end
         return args
     end
@@ -670,17 +690,11 @@ function KeystonePercentageHelper:GetAdvancedOptions()
         }
     }
 
-    -- Add current season dungeon options with explicit order so AceConfig respects the alphabetical sequence
-    for idx, dungeon in ipairs(currentSeasonDungeons) do
-        local original = sharedDungeonOptions[dungeon.key]
-        local opt = (type(CopyTable) == "function") and CopyTable(original) or {}
-        if opt ~= original then
-            for k, v in pairs(original) do opt[k] = v end
-        end
-
-        -- Place after export/import/defaultPercentages (orders 1-3)
-        opt.order = idx + 3
-        dungeonArgs[dungeon.key] = opt
+    -- Add current season dungeon options (alphabetical)
+    do
+        local keys = {}
+        for _, d in ipairs(currentSeasonDungeons) do table.insert(keys, d.key) end
+        InsertSortedDungeonOptions(self, keys, sharedDungeonOptions, dungeonArgs, 3)
     end
 
     -- Create next season dungeon args
@@ -802,16 +816,11 @@ function KeystonePercentageHelper:GetAdvancedOptions()
         }
     }
 
-    -- Add next season dungeon options with explicit order as well
-    for idx, dungeon in ipairs(nextSeasonDungeons) do
-        local original = sharedDungeonOptions[dungeon.key]
-        local opt = (type(CopyTable) == "function") and CopyTable(original) or {}
-        if opt ~= original then
-            for k, v in pairs(original) do opt[k] = v end
-        end
-
-        opt.order = idx + 3
-        nextSeasonDungeonArgs[dungeon.key] = opt
+    -- Add next season dungeon options (alphabetical)
+    do
+        local keys = {}
+        for _, d in ipairs(nextSeasonDungeons) do table.insert(keys, d.key) end
+        InsertSortedDungeonOptions(self, keys, sharedDungeonOptions, nextSeasonDungeonArgs, 3)
     end
 
     -- Create expansion sections
