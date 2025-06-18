@@ -538,7 +538,12 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             end)
 
             for idx, entry in ipairs(sortable) do
-                local opt = sharedDungeonOptions[entry.key]
+                local original = sharedDungeonOptions[entry.key]
+                local opt = (type(CopyTable) == "function") and CopyTable(original) or {}
+                if opt ~= original then
+                    for k, v in pairs(original) do opt[k] = v end
+                end
+
                 opt.order = idx + 3 -- after export/import/defaultPercentages
                 args[entry.key] = opt
             end
@@ -667,7 +672,12 @@ function KeystonePercentageHelper:GetAdvancedOptions()
 
     -- Add current season dungeon options with explicit order so AceConfig respects the alphabetical sequence
     for idx, dungeon in ipairs(currentSeasonDungeons) do
-        local opt = sharedDungeonOptions[dungeon.key]
+        local original = sharedDungeonOptions[dungeon.key]
+        local opt = (type(CopyTable) == "function") and CopyTable(original) or {}
+        if opt ~= original then
+            for k, v in pairs(original) do opt[k] = v end
+        end
+
         -- Place after export/import/defaultPercentages (orders 1-3)
         opt.order = idx + 3
         dungeonArgs[dungeon.key] = opt
@@ -794,7 +804,12 @@ function KeystonePercentageHelper:GetAdvancedOptions()
 
     -- Add next season dungeon options with explicit order as well
     for idx, dungeon in ipairs(nextSeasonDungeons) do
-        local opt = sharedDungeonOptions[dungeon.key]
+        local original = sharedDungeonOptions[dungeon.key]
+        local opt = (type(CopyTable) == "function") and CopyTable(original) or {}
+        if opt ~= original then
+            for k, v in pairs(original) do opt[k] = v end
+        end
+
         opt.order = idx + 3
         nextSeasonDungeonArgs[dungeon.key] = opt
     end
