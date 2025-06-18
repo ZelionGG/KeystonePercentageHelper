@@ -101,6 +101,26 @@ L["NW_BOSS2"] = "Амарт Жнец"
 L["NW_BOSS3"] = "Хирург Трупошов"
 L["NW_BOSS4"] = "Налтор Криомант"
 
+-- TO TRANSLATE
+-- Halls of Atonement
+L["HoA_BOSS1"] = "Halkias, the Sin-Stained Goliath"
+L["HoA_BOSS2"] = "Echelon"
+L["HoA_BOSS3"] = "High Adjudicator Aleez"
+L["HoA_BOSS4"] = "Lord Chamberlain"
+
+-- Tazavesh: Streets of Wonder
+L["TSoW_BOSS1"] = "Zo'phex the Sentinel"
+L["TSoW_BOSS2"] = "The Grand Menagerie"
+L["TSoW_BOSS3"] = "Mailroom Mayhem"
+L["TSoW_BOSS4"] = "Myza's Oasis"
+L["TSoW_BOSS5"] = "So'azmi"
+
+-- Tazavesh: So'leah's Gambit
+L["TSLG_BOSS1"] = "Hylbrande"
+L["TSLG_BOSS2"] = "Timecap'n Hooktail"
+L["TSLG_BOSS3"] = "So'leah"
+-- END TO TRANSLATE
+
 
 -- Battle for Azeroth
 -- Operation: Mechagon - Workshop

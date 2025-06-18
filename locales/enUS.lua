@@ -98,7 +98,7 @@ L["NW_BOSS3"] = "Surgeon Stitchflesh"
 L["NW_BOSS4"] = "Nalthor the Rimebinder"
 
 -- Halls of Atonement
-L["HoA_BOSS1"] = "Halkias"
+L["HoA_BOSS1"] = "Halkias, the Sin-Stained Goliath"
 L["HoA_BOSS2"] = "Echelon"
 L["HoA_BOSS3"] = "High Adjudicator Aleez"
 L["HoA_BOSS4"] = "Lord Chamberlain"

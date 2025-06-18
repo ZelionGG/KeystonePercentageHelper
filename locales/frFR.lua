@@ -100,6 +100,25 @@ L["NW_BOSS2"] = "Amarth"
 L["NW_BOSS3"] = "Docteur Sutur"
 L["NW_BOSS4"] = "Nalthor le Lieur-de-Givre"
 
+-- Halls of Atonement
+L["HoA_BOSS1"] = "Halkias, le goliath vicié"
+L["HoA_BOSS2"] = "Échelon"
+L["HoA_BOSS3"] = "Grande adjudicatrice Alize"
+L["HoA_BOSS4"] = "Grand chambellan"
+
+-- Tazavesh: Streets of Wonder
+L["TSoW_BOSS1"] = "Zo'phex la sentinelle"
+L["TSoW_BOSS2"] = "Grandiose Ménagerie"
+L["TSoW_BOSS3"] = "Courrier chaotique"
+L["TSoW_BOSS4"] = "Oasis d’Au'myza"
+L["TSoW_BOSS5"] = "So'azmi"
+
+-- Tazavesh: So'leah's Gambit
+L["TSLG_BOSS1"] = "Hylbrande"
+L["TSLG_BOSS2"] = "Chronocapitaine Harpagone"
+L["TSLG_BOSS3"] = "So'leah"
+
+
 -- Battle for Azeroth
 -- Operation: Mechagon - Workshop
 L["OMGW"] = "Operation: Mécagone - l'Atelier"
