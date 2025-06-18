@@ -1,4 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
+  <!-- TWW -->
   <Script file="TWW/TWW_1.lua"/>
   <Script file="TWW/TWW_2.lua"/>
+  <Script file="TWW/TWW_3.lua"/>
 </Ui>

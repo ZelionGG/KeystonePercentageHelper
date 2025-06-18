@@ -29,5 +29,32 @@ KeystonePercentageHelper.SL_DUNGEON_DATA = {
             {4, 100, false},
             {5, 100, true}
         }
+    },
+    TSoW = {
+        id = 391,
+        bosses = {
+            {1, 7.01, false},
+            {2, 37.27, false},
+            {3, 71.59, false},
+            {4, 100, false},
+            {5, 100, true}
+        }
+    },
+    TSLG = {
+        id = 392,
+        bosses = {
+            {1, 7.01, false},
+            {2, 37.27, false},
+            {3, 71.59, false},
+        }
+    },
+    HoA = {
+        id = 378,
+        bosses = {
+            {1, 7.01, false},
+            {2, 37.27, false},
+            {3, 71.59, false},
+            {4, 100, false},
+        }
     }
 }

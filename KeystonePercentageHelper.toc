@@ -32,11 +32,12 @@
 
 embeds.xml
 locales/locales.xml
-expansions/expansions.xml
-seasons/seasons.xml
+
+utils/expansions/expansions.xml
+utils/seasons/seasons.xml
 
 options.lua
 core.lua
 dungeonIcons.lua
 
-changelog/Load_Changelog.xml
+utils/changelog/Load_Changelog.xml
