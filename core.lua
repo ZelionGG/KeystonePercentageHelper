@@ -5,6 +5,29 @@ local pairs, unpack, select = pairs, unpack, select
 local floor = math.floor
 local format = string.format
 
+-- Register custom link handler for changelog
+local kphLinkType = "kphchangelog"
+local kphLinkFormat = "|H" .. kphLinkType .. ":%s|h%s|h"
+
+-- Original SetItemRef function
+local originalSetItemRef = SetItemRef
+
+-- Hook the SetItemRef function to handle our custom links
+SetItemRef = function(link, text, button, chatFrame)
+    local linkType = link:match("^([^:]+)")
+    
+    if linkType == kphLinkType then
+        -- Open the changelog tab directly
+        -- Use AceConfigDialog to open the correct panel
+        local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+        AceConfigDialog:Open(AddOnName .. "_Changelog")
+        return
+    end
+    
+    -- Call the original function for all other links
+    return originalSetItemRef(link, text, button, chatFrame)
+end
+
 -- Initialize Ace3 libraries
 local AceAddon = LibStub("AceAddon-3.0")
 KeystonePercentageHelper = AceAddon:NewAddon(KeystonePercentageHelper, AddOnName, "AceConsole-3.0", "AceEvent-3.0");
@@ -58,6 +81,11 @@ function KeystonePercentageHelper:OnInitialize()
 
     -- Check if routes have been updated in a new version
     self:CheckForNewRoutes()
+    
+    -- Show update notification with clickable changelog link
+    local openChangelogText = L["Open changelog"] or "Open changelog"
+    local changelogLink = format(kphLinkFormat, "", "[" .. openChangelogText .. "]")
+    print("|cffdb6233Keystone Percentage Helper:|r A new update has been installed, you can check the changelog by clicking " .. changelogLink)
 
     -- Create overlay frame for positioning UI
     self.overlayFrame = CreateFrame("Frame", "KeystonePercentageHelperOverlay", UIParent, "BackdropTemplate")
