@@ -7,7 +7,7 @@ KeystonePercentageHelper.TWW_3_DUNGEONS = {
     [499] = true, -- PotSF
     [505] = true, -- TDB
     [525] = true, -- OFG (Operation: Floodgate)
-    --[526] = true, -- Eco-dome Al'dani (TBD)
+    --[542] = true, -- EDAD (Eco-dome Al'dani) (Coming in 11.1.2)
     -- Shadowlands dungeons
     [391] = true, -- Tazavesh: Streets of Wonder
     [392] = true, -- Tazavesh: So'leah's Gambit

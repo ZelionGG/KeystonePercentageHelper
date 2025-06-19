@@ -79,5 +79,13 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
             {3, 75.66, false},
             {4, 100, true}
         }
+    },
+    --[[ EDAD = { -- Eco-Dome Al'dani
+        id = 542,
+        bosses = {
+            {1, 26.79, false},
+            {2, 54.40, false},
+            {3, 100, true}
     }
+    } ]]
 }
