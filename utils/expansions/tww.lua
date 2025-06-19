@@ -3,7 +3,7 @@ local AddOnName, KeystonePercentageHelper = ...
 -- Define a single source of truth for dungeon data
 KeystonePercentageHelper.TWW_DUNGEON_DATA = {
     -- Format: [shortName] = {id = dungeonID, bosses = {{bossID, percent, shouldInform}, ...}}
-    AKCE = {
+    AKCE = { -- Ara-Kara, City of Echoes
         id = 503,
         bosses = {
             {1, 32.78, false},
@@ -11,7 +11,7 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
             {3, 100, true}
         }
     },
-    CoT = {
+    CoT = { -- City of Threads
         id = 502,
         bosses = {
             {1, 31.54, false},
@@ -20,7 +20,7 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
             {4, 100, true}
         }
     },
-    CBM = {
+    CBM = { -- Cinderbrew Meadery
         id = 506,
         bosses = {
             {1, 24.87, false},
@@ -29,7 +29,7 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
             {4, 100, true}
         }
     },
-    DFC = {
+    DFC = { -- Darkflame Cleft
         id = 504,
         bosses = {
             {1, 28.24, false},
@@ -38,7 +38,7 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
             {4, 100, true}
         }
     },
-    OFG = {
+    OFG = { -- Operation: Floodgate
         id = 525,
         bosses = {
             {1, 36.81, false},
@@ -47,7 +47,7 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
             {4, 100, true}
         }
     },
-    PotSF = {
+    PotSF = { -- Priory of the Sacred Flame
         id = 499,
         bosses = {
             {1, 48.23, false},
@@ -55,7 +55,7 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
             {3, 100, true}
         }
     },
-    TDB = {
+    TDB = { -- The Dawnbreaker
         id = 505,
         bosses = {
             {1, 29.78, false},
@@ -63,7 +63,7 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
             {3, 100, true}
         }
     },
-    TR = {
+    TR = { -- The Rookery
         id = 500,
         bosses = {
             {1, 41.13, false},
@@ -71,7 +71,7 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
             {3, 100, true}
         }
     },
-    TSV = {
+    TSV = { -- The Stonevault
         id = 501,
         bosses = {
             {1, 26.79, false},
@@ -86,6 +86,6 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
             {1, 26.79, false},
             {2, 54.40, false},
             {3, 100, true}
-    }
+        }
     } ]]
 }
