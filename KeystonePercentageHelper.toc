@@ -38,6 +38,5 @@ utils/seasons/seasons.xml
 
 options.lua
 core.lua
-dungeonIcons.lua
 
 utils/changelog/Load_Changelog.xml
