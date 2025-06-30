@@ -361,6 +361,10 @@ function KeystonePercentageHelper:UpdatePercentageText()
 
         -- Calculate remaining percentage needed
         local remainingPercent = neededPercent - currentPercentage
+        -- Ensure remainingPercent never goes below zero
+        if remainingPercent < 0 then
+            remainingPercent = 0.00
+        end
         -- Round very small values to 0 to avoid showing 0.01%
         if remainingPercent < 0.05 and remainingPercent > 0.00 then
             remainingPercent = 0.00
@@ -397,6 +401,10 @@ function KeystonePercentageHelper:UpdatePercentageText()
             if self.currentSection <= #self.DUNGEONS[self.currentDungeonID] then -- Next section exists
                 C_Timer.After(2, function()
                     local nextRequired = self.DUNGEONS[self.currentDungeonID][self.currentSection][2] - currentPercentage
+                        -- Ensure nextRequired never goes below zero
+                        if nextRequired < 0 then
+                            nextRequired = 0.00
+                        end
                     if currentPercentage >= 100 then -- Percentage is already done for the dungeon
                         color = self.db.profile.color.finished
                         self.displayFrame.text:SetText(L["FINISHED"])
