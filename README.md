@@ -47,6 +47,7 @@
 [![CurseForge](https://cf.way2muchnoise.eu/title/1175416.svg?badge_style=for_the_badge)](https://www.curseforge.com/wow/addons/keystone-percentage-helper) [![Wago](https://tinyurl.com/33tpuru9)](https://addons.wago.io/addons/keystonepercentagehelper)
 [![WowInterface](https://tinyurl.com/k57p9ebb)](https://www.wowinterface.com/downloads/info26913-KeystonePercentageHelper.html) [![Github Releases](https://img.shields.io/badge/GitHub%20Releases-121013?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ZelionGG/KeystonePercentageHelper/releases)
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
