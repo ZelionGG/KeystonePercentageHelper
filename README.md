@@ -31,12 +31,8 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
-    <li>
-        <a href="#about-the-project">About The Project</a>
-        <ul>
-            <li><a href="#built-with">Built With</a></li>
-        </ul>
-    </li>
+    <li><a href="#download">Download</a></li>
+    <li><a href="#about-the-project">About The Project</a></li>
     <li><a href="#slash-commands">Slash Commands</a></li>
     <li><a href="#features">Features</a></li>
     <li><a href="#credits">Credits</a></li>
@@ -45,6 +41,12 @@
     <li><a href="#license">License</a></li>
   </ol>
 </details>
+
+## Download
+
+[![CurseForge](https://cf.way2muchnoise.eu/title/1175416.svg?badge_style=for_the_badge)](https://www.curseforge.com/wow/addons/keystone-percentage-helper) [![Wago](https://tinyurl.com/33tpuru9)](https://addons.wago.io/addons/keystonepercentagehelper)
+[![WowInterface](https://tinyurl.com/k57p9ebb)](https://www.wowinterface.com/downloads/info26913-KeystonePercentageHelper.html) [![Github Releases](https://img.shields.io/badge/GitHub%20Releases-121013?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ZelionGG/KeystonePercentageHelper/releases)
+
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -136,6 +138,9 @@ If you have a suggestion that would make this better, please fork the repo and c
 Distributed under the All Rights Reserved License. See `LICENSE` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Stars
+[![Stargazers over time](https://starchart.cc/ZelionGG/KeystonePercentageHelper.svg?variant=adaptive)](https://starchart.cc/ZelionGG/KeystonePercentageHelper)
 
 
 [contributors-shield]: https://img.shields.io/github/contributors/ZelionGG/KeystonePercentageHelper.svg?style=for-the-badge
