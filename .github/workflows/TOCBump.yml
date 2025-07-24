@@ -3,10 +3,7 @@ name: Update TOC Interface version(s)
 on:
   schedule:
     - cron: 0 3 * * *
-#  push:
-#    branches:
-#      - master
-
+    
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -17,8 +14,9 @@ jobs:
       - name: Update TOC Interface version retail
         uses: p3lim/toc-interface-updater@v4
         with:
-          flavor: retail # this is the default
-          beta: false   # this is optional
+          flavor: retail
+          beta: false
+          ptr: true
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v6
