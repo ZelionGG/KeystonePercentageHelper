@@ -1,10 +1,8 @@
 # Keystone Percentage Helper
 
-## [1.6](https://github.com/ZelionGG/KeystonePercentageHelper/tree/1.6) (2025-06-19)
+## [1.7](https://github.com/ZelionGG/KeystonePercentageHelper/releases/tag/1.7) (2025-07-26)
 
-[Full Changelog](https://github.com/ZelionGG/KeystonePercentageHelper/compare/1.5.1...1.6) [Previous Releases](https://github.com/ZelionGG/KeystonePercentageHelper/releases)
+[Full Changelog](https://github.com/ZelionGG/KeystonePercentageHelper/compare/1.6...1.7) [Previous Releases](https://github.com/ZelionGG/KeystonePercentageHelper/releases)
 
-- TOC updated for patch **11.1.7**.
-- Added support for The War Within **season 3**.
-- Reworked the way dungeons names are handled to use the WoW native API (no more language files).
-- Reworked the dungeon ordering to be more robust (alphabetically ordered).
+- TOC prepared for patch **11.2**.
+- **Season 3** is now fully supported with the addition of **Eco-Dome Al'dani**, please note that the dungeon name is not yet showing the translated name and the icon will show a placeholder until patch **11.2** is released. Enjoy Season 3 preparation!
