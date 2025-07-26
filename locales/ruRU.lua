@@ -43,6 +43,11 @@ L["DFC_BOSS2"] = "Пламекон"
 L["DFC_BOSS3"] = "Свечной Король"
 L["DFC_BOSS4"] = "Тьма"
 
+-- Eco-Dome Al'Dani
+L["EDAD_BOSS1"] = "Azhiccar"
+L["EDAD_BOSS2"] = "Taah'bat and A'wazj"
+L["EDAD_BOSS3"] = "Soul-Scribe"
+
 -- Operation: Floodgate
 L["OFG_BOSS1"] = "Большая МАМА"
 L["OFG_BOSS2"] = "Пара подрывников"

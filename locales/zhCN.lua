@@ -42,6 +42,11 @@ L["DFC_BOSS2"] = "布雷炙孔"
 L["DFC_BOSS3"] = "蜡烛之王"
 L["DFC_BOSS4"] = "黑暗之主"
 
+-- Eco-Dome Al'Dani
+L["EDAD_BOSS1"] = "Azhiccar"
+L["EDAD_BOSS2"] = "Taah'bat and A'wazj"
+L["EDAD_BOSS3"] = "Soul-Scribe"
+
 -- Operation: Floodgate
 L["OFG_BOSS1"] = "老大娘"
 L["OFG_BOSS2"] = "破拆双人组"

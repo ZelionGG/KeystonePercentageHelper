@@ -42,6 +42,11 @@ L["DFC_BOSS2"] = "블레지콘"
 L["DFC_BOSS3"] = "양초왕"
 L["DFC_BOSS4"] = "어둠의 존재"
 
+-- Eco-Dome Al'Dani
+L["EDAD_BOSS1"] = "Azhiccar"
+L["EDAD_BOSS2"] = "Taah'bat and A'wazj"
+L["EDAD_BOSS3"] = "Soul-Scribe"
+
 -- Operation: Floodgate
 L["OFG_BOSS1"] = "큰.대.모"
 L["OFG_BOSS2"] = "박살 2인조"

@@ -40,6 +40,11 @@ L["DFC_BOSS2"] = "Blazikon"
 L["DFC_BOSS3"] = "Le roi-bougie"
 L["DFC_BOSS4"] = "Les Ténèbres"
 
+-- Eco-Dome Al'Dani
+L["EDAD_BOSS1"] = "Azhiccar"
+L["EDAD_BOSS2"] = "Taah'bat and A'wazj"
+L["EDAD_BOSS3"] = "Soul-Scribe"
+
 -- Operation: Floodgate
 L["OFG_BOSS1"] = "Grand-M.A.M.A."
 L["OFG_BOSS2"] = "Duo de démolition"
