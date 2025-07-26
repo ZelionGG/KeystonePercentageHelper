@@ -51,10 +51,10 @@ KeystonePercentageHelper.SL_DUNGEON_DATA = {
     HoA = {
         id = 378,
         bosses = {
-            {1, 7.01, false},
-            {2, 37.27, false},
-            {3, 71.59, false},
-            {4, 100, false},
+            {1, 64.50, false},
+            {2, 79.50, true},
+            {3, 92.70, true},
+            {4, 100, true},
         }
     }
 }
