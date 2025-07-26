@@ -497,6 +497,12 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             name, _, _, texture = C_ChallengeMode.GetMapUIInfo(mapId)
         end
 
+        -- TODO : Remove after patch 11.2 release
+        if mapId == 542 and name == nil then
+            texture = "134400"
+            name = "Eco-Dome Al'dani"
+        end
+
         -- Fallbacks
         local icon = texture
         local displayName = name
@@ -990,6 +996,12 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                 name, _, _, texture, _ = C_ChallengeMode.GetMapUIInfo(mapId)
             end
 
+            -- TODO : Remove after patch 11.2 release
+            if mapId == 542 and name == nil then
+                texture = "134400"
+                name = "Eco-Dome Al'dani"
+            end
+
             return '|T' .. texture .. ":16:16:0:0|t " .. (name)
         end,
         type = "group",
@@ -1007,6 +1019,15 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                         name, _, _, texture, _ =
                             C_ChallengeMode.GetMapUIInfo(mapId)
                     end
+
+                    -- TODO : Remove after patch 11.2 release
+                    if mapId == 542 and name == nil then
+                        texture = "134400"
+                        name = "Eco-Dome Al'dani"
+                        return "|T" .. texture .. ":20:20:0:0|t |cff40E0D0" ..
+                                   (name) .. "|r\n" .. "The dungeon name is a placeholder and will be automatically translated when patch 11.2 is released, icon will also be updated accordingly."
+                    end
+
                     return "|T" .. texture .. ":20:20:0:0|t |cff40E0D0" ..
                                (name) .. "|r"
                 end

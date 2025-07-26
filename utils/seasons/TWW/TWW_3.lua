@@ -7,7 +7,7 @@ KeystonePercentageHelper.TWW_3_DUNGEONS = {
     [499] = true, -- PotSF (Priory of the Sacred Flame)
     [505] = true, -- TDB (The Dawnbreaker)
     [525] = true, -- OFG (Operation: Floodgate)
-    --[542] = true, -- EDAD (Eco-dome Al'dani) (Coming in 11.1.2)
+    [542] = true, -- EDAD (Eco-dome Al'dani) (Coming in 11.2)
     -- Shadowlands dungeons
     [391] = true, -- TSoW (Tazavesh: Streets of Wonder)
     [392] = true, -- TSLG (Tazavesh: So'leah's Gambit)
