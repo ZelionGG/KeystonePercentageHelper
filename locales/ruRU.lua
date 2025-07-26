@@ -5,7 +5,7 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0");
 local L = AceLocale:NewLocale(AddonName, "ruRU", false, false);
 if not L then return end
 
--- Last translated June 19th, 2025.
+-- Last translated July 26th, 2025.
 -- Translation by Hollicsh (https://github.com/Hollicsh)
 
 -- Dungeons Group
@@ -44,9 +44,9 @@ L["DFC_BOSS3"] = "Свечной Король"
 L["DFC_BOSS4"] = "Тьма"
 
 -- Eco-Dome Al'Dani
-L["EDAD_BOSS1"] = "Azhiccar"
-L["EDAD_BOSS2"] = "Taah'bat and A'wazj"
-L["EDAD_BOSS3"] = "Soul-Scribe"
+L["EDAD_BOSS1"] = "Ажиккар"
+L["EDAD_BOSS2"] = "Таа'бат и А'вазж"
+L["EDAD_BOSS3"] = "Переписчица душ"
 
 -- Operation: Floodgate
 L["OFG_BOSS1"] = "Большая МАМА"
