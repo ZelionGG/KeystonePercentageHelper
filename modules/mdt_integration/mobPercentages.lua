@@ -446,14 +446,14 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                 end
             },
             displayOptions = {
-                name = L["DISPLAY_OPTIONS"] or "Display Options",
+                name = L["DISPLAY_OPTIONS"],
                 type = "group",
                 inline = true,
                 order = 2,
                 args = {
                     showPercent = {
-                        name = L["SHOW_PERCENTAGE"] or "Show Percentage",
-                        desc = L["SHOW_PERCENTAGE_DESC"] or "Show the percentage value for each mob",
+                        name = L["SHOW_PERCENTAGE"],
+                        desc = L["SHOW_PERCENTAGE_DESC"],
                         type = "toggle",
                         order = 1,
                         width = "full",
@@ -468,8 +468,8 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         disabled = function() return not self.db.profile.mobPercentages.enabled end
                     },
                     showCount = {
-                        name = L["SHOW_COUNT"] or "Show Count",
-                        desc = L["SHOW_COUNT_DESC"] or "Show the count value for each mob",
+                        name = L["SHOW_COUNT"],
+                        desc = L["SHOW_COUNT_DESC"],
                         type = "toggle",
                         order = 2,
                         width = "full",
@@ -484,8 +484,8 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         disabled = function() return not self.db.profile.mobPercentages.enabled end
                     },
                     showTotal = {
-                        name = L["SHOW_TOTAL"] or "Show Total",
-                        desc = L["SHOW_TOTAL_DESC"] or "Show the total count needed for 100%",
+                        name = L["SHOW_TOTAL"],
+                        desc = L["SHOW_TOTAL_DESC"],
                         type = "toggle",
                         order = 3,
                         width = "full",
@@ -500,8 +500,8 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         disabled = function() return not self.db.profile.mobPercentages.enabled or not self.db.profile.mobPercentages.showCount end
                     },
                     customFormat = {
-                        name = L["CUSTOM_FORMAT"] or "Text Format",
-                        desc = L["CUSTOM_FORMAT_DESC"] or "Enter a custom format for the text. Use %s to represent the percentage.",
+                        name = L["CUSTOM_FORMAT"],
+                        desc = L["CUSTOM_FORMAT_DESC"],
                         type = "input",
                         order = 4,
                         width = 1.5, -- Réduit la largeur pour faire de la place au bouton
@@ -516,8 +516,8 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         disabled = function() return not self.db.profile.mobPercentages.enabled end
                     },
                     resetCustomFormat = {
-                        name = L["RESET_TO_DEFAULT"] or "Reset",
-                        desc = L["RESET_FORMAT_DESC"] or "Reset the text format to the default value",
+                        name = L["RESET_TO_DEFAULT"],
+                        desc = L["RESET_FORMAT_DESC"],
                         type = "execute",
                         order = 5,
                         width = 0.5, -- Bouton plus petit
@@ -533,14 +533,14 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                 }
             },
             appearanceOptions = {
-                name = L["APPEARANCE_OPTIONS"] or "Appearance Options",
+                name = L["APPEARANCE_OPTIONS"],
                 type = "group",
                 inline = true,
                 order = 3,
                 args = {
                     fontSize = {
-                        name = L["MOB_PERCENTAGE_FONT_SIZE"] or "Font Size",
-                        desc = L["MOB_PERCENTAGE_FONT_SIZE_DESC"] or "Set the font size for mob percentage text",
+                        name = L["MOB_PERCENTAGE_FONT_SIZE"],
+                        desc = L["MOB_PERCENTAGE_FONT_SIZE_DESC"],
                         type = "range",
                         order = 1,
                         min = 6,
@@ -557,8 +557,8 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         disabled = function() return not self.db.profile.mobPercentages.enabled end
                     },
                     textColor = {
-                        name = L["TEXT_COLOR"] or "Text Color",
-                        desc = L["TEXT_COLOR_DESC"] or "Set the color of the mob percentage text",
+                        name = L["TEXT_COLOR"],
+                        desc = L["TEXT_COLOR_DESC"],
                         type = "color",
                         order = 2,
                         hasAlpha = true,
@@ -573,18 +573,18 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         disabled = function() return not self.db.profile.mobPercentages.enabled end
                     },
                     frameStrata = {
-                        name = L["FRAME_STRATA"] or "Frame Strata",
-                        desc = L["FRAME_STRATA_DESC"] or "Set the frame strata for the mob percentage text",
+                        name = L["FRAME_STRATA"],
+                        desc = L["FRAME_STRATA_DESC"],
                         type = "select",
                         order = 3,
                         values = {
-                            LOW = L["LOW"] or "Low",
-                            MEDIUM = L["MEDIUM"] or "Medium",
-                            HIGH = L["HIGH"] or "High",
-                            DIALOG = L["DIALOG"] or "Dialog",
-                            FULLSCREEN = L["FULLSCREEN"] or "Fullscreen",
-                            FULLSCREEN_DIALOG = L["FULLSCREEN_DIALOG"] or "Fullscreen Dialog",
-                            TOOLTIP = L["TOOLTIP"] or "Tooltip"
+                            LOW = L["LOW"],
+                            MEDIUM = L["MEDIUM"],
+                            HIGH = L["HIGH"],
+                            DIALOG = L["DIALOG"],
+                            FULLSCREEN = L["FULLSCREEN"],
+                            FULLSCREEN_DIALOG = L["FULLSCREEN_DIALOG"],
+                            TOOLTIP = L["TOOLTIP"]
                         },
                         get = function() return self.db.profile.mobPercentages.frameStrata end,
                         set = function(_, value) 
@@ -597,15 +597,15 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         disabled = function() return not self.db.profile.mobPercentages.enabled end
                     },
                     position = {
-                        name = L["MOB_PERCENTAGE_POSITION"] or "Position",
-                        desc = L["MOB_PERCENTAGE_POSITION_DESC"] or "Set the position of the percentage text relative to the nameplate",
+                        name = L["MOB_PERCENTAGE_POSITION"],
+                        desc = L["MOB_PERCENTAGE_POSITION_DESC"],
                         type = "select",
                         order = 4,
                         values = {
-                            RIGHT = L["RIGHT"] or "Right",
-                            LEFT = L["LEFT"] or "Left",
-                            TOP = L["TOP"] or "Top",
-                            BOTTOM = L["BOTTOM"] or "Bottom"
+                            RIGHT = L["RIGHT"],
+                            LEFT = L["LEFT"],
+                            TOP = L["TOP"],
+                            BOTTOM = L["BOTTOM"]
                         },
                         get = function() return self.db.profile.mobPercentages.position end,
                         set = function(_, value) 
@@ -618,8 +618,8 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         disabled = function() return not self.db.profile.mobPercentages.enabled end
                     },
                     xOffset = {
-                        name = L["X_OFFSET"] or "X Offset",
-                        desc = L["X_OFFSET_DESC"] or "Adjust the horizontal position of the text",
+                        name = L["X_OFFSET"],
+                        desc = L["X_OFFSET_DESC"],
                         type = "range",
                         order = 5,
                         min = -100,
@@ -636,8 +636,8 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         disabled = function() return not self.db.profile.mobPercentages.enabled end
                     },
                     yOffset = {
-                        name = L["Y_OFFSET"] or "Y Offset",
-                        desc = L["Y_OFFSET_DESC"] or "Adjust the vertical position of the text",
+                        name = L["Y_OFFSET"],
+                        desc = L["Y_OFFSET_DESC"],
                         type = "range",
                         order = 6,
                         min = -100,
