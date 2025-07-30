@@ -715,19 +715,13 @@ function KeystonePercentageHelper:CheckForMDT()
     
     -- Check if MDT is loaded
     self.mdtLoaded = false
-    
-    -- Check for both possible MDT global names
-    if MDT or MethodDungeonTools then
+
+    local loaded = C_AddOns.IsAddOnLoaded("MythicDungeonTools")
+    if loaded then
         self.mdtLoaded = true
+        self:Print(L["MDT_LOADED"])
     else
-        -- If MDT is not found, try to load it
-        local loaded = C_AddOns.IsAddOnLoaded("MythicDungeonTools")
-        if loaded then
-            self.mdtLoaded = true
-            self:Print(L["MDT_LOADED"] or "Mythic Dungeon Tools loaded successfully.")
-        else
-            self:Print(L["MDT_NOT_FOUND"] or "Mythic Dungeon Tools not found. Mob percentages will not be shown. Please install MDT for this feature to work.")
-        end
+        self:Print(L["MDT_NOT_FOUND"])
     end
 end
 
