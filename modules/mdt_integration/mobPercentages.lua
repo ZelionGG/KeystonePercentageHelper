@@ -177,8 +177,11 @@ function KeystonePercentageHelper:UpdateTargetPercentage()
             end
         end
         
+        -- Format text according to user preference
+        local formattedText = format(self.db.profile.mobPercentages.customFormat, percentText)
+        
         -- Update and show the text
-        self.targetPercentFrame.text:SetText("(" .. percentText .. ")")
+        self.targetPercentFrame.text:SetText(formattedText)
         self.targetPercentFrame:Show()
     else
         self.targetPercentFrame:Hide()
@@ -269,8 +272,11 @@ function KeystonePercentageHelper:UpdateMouseoverPercentage()
         self.mouseoverPercentFrame:ClearAllPoints()
         self.mouseoverPercentFrame:SetPoint("BOTTOMLEFT", GameTooltip, "TOPLEFT", 0, 5)
         
+        -- Format text according to user preference
+        local formattedText = format(self.db.profile.mobPercentages.customFormat, percentText)
+        
         -- Update and show the text
-        self.mouseoverPercentFrame.text:SetText("(" .. percentText .. ")")
+        self.mouseoverPercentFrame.text:SetText(formattedText)
         self.mouseoverPercentFrame:Show()
     else
         self.mouseoverPercentFrame:Hide()
@@ -315,12 +321,13 @@ function KeystonePercentageHelper:UpdateNameplate(unit)
         -- Create the frame with a parent to ensure visibility
         textFrame = CreateFrame("Frame", "KPH_PercentFrame_"..unit, nameplate)
         textFrame:SetSize(80, 30) -- Larger size to ensure visibility
-        textFrame:SetFrameStrata("HIGH") -- Set higher strata to ensure it's above other elements
+        textFrame:SetFrameStrata(self.db.profile.mobPercentages.frameStrata or "HIGH") -- Set higher strata to ensure it's above other elements
         
         textFrame.text = textFrame:CreateFontString(nil, "OVERLAY")
         textFrame.text:SetPoint("CENTER")
         textFrame.text:SetFont(self.LSM:Fetch('font', self.db.profile.text.font), 
             self.db.profile.mobPercentages.fontSize or 8, "OUTLINE")
+        textFrame.text:SetTextColor(self.db.profile.mobPercentages.textColor.r or 1, self.db.profile.mobPercentages.textColor.g or 1, self.db.profile.mobPercentages.textColor.b or 1, self.db.profile.mobPercentages.textColor.a or 1)
         
         self.nameplateTextFrames[unit] = textFrame
     end
@@ -381,8 +388,11 @@ function KeystonePercentageHelper:UpdateNameplate(unit)
             end
         end
         
+        -- Format text according to user preference
+        local formattedText = format(self.db.profile.mobPercentages.customFormat, percentText)
+        
         -- Update and show the text
-        textFrame.text:SetText("(" .. percentText .. ")")
+        textFrame.text:SetText(formattedText)
         textFrame:Show()
     else
         textFrame:Hide()
@@ -489,6 +499,37 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         end,
                         disabled = function() return not self.db.profile.mobPercentages.enabled or not self.db.profile.mobPercentages.showCount end
                     },
+                    customFormat = {
+                        name = L["CUSTOM_FORMAT"] or "Text Format",
+                        desc = L["CUSTOM_FORMAT_DESC"] or "Enter a custom format for the text. Use %s to represent the percentage.",
+                        type = "input",
+                        order = 4,
+                        width = 1.5, -- Réduit la largeur pour faire de la place au bouton
+                        get = function() return self.db.profile.mobPercentages.customFormat end,
+                        set = function(_, value) 
+                            self.db.profile.mobPercentages.customFormat = value
+                            -- Update all nameplates
+                            for unit, _ in pairs(self.nameplateTextFrames) do
+                                self:UpdateNameplate(unit)
+                            end
+                        end,
+                        disabled = function() return not self.db.profile.mobPercentages.enabled end
+                    },
+                    resetCustomFormat = {
+                        name = L["RESET_TO_DEFAULT"] or "Reset",
+                        desc = L["RESET_FORMAT_DESC"] or "Reset the text format to the default value",
+                        type = "execute",
+                        order = 5,
+                        width = 0.5, -- Bouton plus petit
+                        func = function()
+                            self.db.profile.mobPercentages.customFormat = "(%s)" -- Valeur par défaut
+                            -- Update all nameplates
+                            for unit, _ in pairs(self.nameplateTextFrames) do
+                                self:UpdateNameplate(unit)
+                            end
+                        end,
+                        disabled = function() return not self.db.profile.mobPercentages.enabled end
+                    },
                 }
             },
             appearanceOptions = {
@@ -515,11 +556,52 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         end,
                         disabled = function() return not self.db.profile.mobPercentages.enabled end
                     },
+                    textColor = {
+                        name = L["TEXT_COLOR"] or "Text Color",
+                        desc = L["TEXT_COLOR_DESC"] or "Set the color of the mob percentage text",
+                        type = "color",
+                        order = 2,
+                        hasAlpha = true,
+                        get = function() return self.db.profile.mobPercentages.textColor.r, self.db.profile.mobPercentages.textColor.g, self.db.profile.mobPercentages.textColor.b, self.db.profile.mobPercentages.textColor.a end,
+                        set = function(_, r, g, b, a) 
+                            self.db.profile.mobPercentages.textColor = {r = r, g = g, b = b, a = a}
+                            -- Update all existing nameplate texts
+                            for unit, frame in pairs(self.nameplateTextFrames) do
+                                frame.text:SetTextColor(r, g, b, a)
+                            end
+                        end,
+                        disabled = function() return not self.db.profile.mobPercentages.enabled end
+                    },
+                    frameStrata = {
+                        name = L["FRAME_STRATA"] or "Frame Strata",
+                        desc = L["FRAME_STRATA_DESC"] or "Set the frame strata for the mob percentage text",
+                        type = "select",
+                        order = 3,
+                        values = {
+                            BACKGROUND = L["BACKGROUND"] or "Background",
+                            LOW = L["LOW"] or "Low",
+                            MEDIUM = L["MEDIUM"] or "Medium",
+                            HIGH = L["HIGH"] or "High",
+                            DIALOG = L["DIALOG"] or "Dialog",
+                            FULLSCREEN = L["FULLSCREEN"] or "Fullscreen",
+                            FULLSCREEN_DIALOG = L["FULLSCREEN_DIALOG"] or "Fullscreen Dialog",
+                            TOOLTIP = L["TOOLTIP"] or "Tooltip"
+                        },
+                        get = function() return self.db.profile.mobPercentages.frameStrata end,
+                        set = function(_, value) 
+                            self.db.profile.mobPercentages.frameStrata = value
+                            -- Update all existing nameplate texts
+                            for unit, frame in pairs(self.nameplateTextFrames) do
+                                frame:SetFrameStrata(value)
+                            end
+                        end,
+                        disabled = function() return not self.db.profile.mobPercentages.enabled end
+                    },
                     position = {
                         name = L["MOB_PERCENTAGE_POSITION"] or "Position",
                         desc = L["MOB_PERCENTAGE_POSITION_DESC"] or "Set the position of the percentage text relative to the nameplate",
                         type = "select",
-                        order = 2,
+                        order = 4,
                         values = {
                             RIGHT = L["RIGHT"] or "Right",
                             LEFT = L["LEFT"] or "Left",
@@ -540,7 +622,7 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         name = L["X_OFFSET"] or "X Offset",
                         desc = L["X_OFFSET_DESC"] or "Adjust the horizontal position of the text",
                         type = "range",
-                        order = 3,
+                        order = 5,
                         min = -100,
                         max = 100,
                         step = 1,
@@ -558,7 +640,7 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         name = L["Y_OFFSET"] or "Y Offset",
                         desc = L["Y_OFFSET_DESC"] or "Adjust the vertical position of the text",
                         type = "range",
-                        order = 4,
+                        order = 6,
                         min = -100,
                         max = 100,
                         step = 1,
@@ -655,10 +737,13 @@ end
 KeystonePercentageHelper.defaults.profile.mobPercentages = {
     enabled = false,
     fontSize = 8,
+    frameStrata = "HIGH",
+    textColor = { r = 1, g = 1, b = 1, a = 1 },
     position = "RIGHT",
     showPercent = true,
     showCount = false,
     showTotal = false,
     xOffset = 0,
-    yOffset = 0
+    yOffset = 0,
+    customFormat = "(%s)" -- %s sera remplacé par le pourcentage
 }
