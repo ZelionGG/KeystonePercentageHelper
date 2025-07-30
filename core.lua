@@ -220,6 +220,7 @@ function KeystonePercentageHelper:OnInitialize()
                     otherOptions = self:GetOtherOptions(),
                 }
             },
+            mobPercentages = self:GetMobPercentagesOptions(),
             advanced = self:GetAdvancedOptions()
         }
     })
@@ -234,6 +235,11 @@ function KeystonePercentageHelper:OnInitialize()
 
     -- Create display after DB is initialized
     self:CreateDisplay()
+    
+    -- Initialize mob percentages module if enabled
+    if self.db.profile.mobPercentages and self.db.profile.mobPercentages.enabled then
+        self:InitializeMobPercentages()
+    end
 end
 
 -- Open configuration panel when command is used

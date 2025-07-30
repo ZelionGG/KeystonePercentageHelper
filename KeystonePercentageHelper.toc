@@ -38,5 +38,6 @@ utils/seasons/seasons.xml
 
 options.lua
 core.lua
+modules/mdt_integration/mobPercentages.lua
 
 utils/changelog/Load_Changelog.xml

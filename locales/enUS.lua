@@ -137,6 +137,33 @@ L["GB_BOSS2"] = "Forgemaster Throngus"
 L["GB_BOSS3"] = "Drahga Shadowburner"
 L["GB_BOSS4"] = "Erudax, the Duke of Below"
 
+-- Mob Percentages
+L["MOB_PERCENTAGES"] = "Mob Percentages"
+L["ENABLE_MOB_PERCENTAGES"] = "Enable Mob Percentages"
+L["ENABLE_MOB_PERCENTAGES_DESC"] = "Show percentage contribution of each mob in Mythic+ dungeons"
+L["MOB_PERCENTAGE_FONT_SIZE"] = "Font Size"
+L["MOB_PERCENTAGE_FONT_SIZE_DESC"] = "Set the font size for mob percentage text"
+L["MOB_PERCENTAGE_POSITION"] = "Position"
+L["MOB_PERCENTAGE_POSITION_DESC"] = "Set the position of the percentage text relative to the nameplate"
+L["RIGHT"] = "Right"
+L["LEFT"] = "Left"
+L["TOP"] = "Top"
+L["BOTTOM"] = "Bottom"
+
+-- MDT Integration
+L["MDT_WARNING"] = "This feature requires Mythic Dungeon Tools (MDT) addon to be installed."
+L["MDT_FOUND"] = "Mythic Dungeon Tools found. Mob percentages will use MDT data."
+L["MDT_LOADED"] = "Mythic Dungeon Tools loaded successfully."
+L["MDT_NOT_FOUND"] = "Mythic Dungeon Tools not found. Mob percentages will not be shown. Please install MDT for this feature to work."
+L["DISPLAY_OPTIONS"] = "Display Options"
+L["APPEARANCE_OPTIONS"] = "Appearance Options"
+L["SHOW_PERCENTAGE"] = "Show Percentage"
+L["SHOW_PERCENTAGE_DESC"] = "Show the percentage value for each mob"
+L["SHOW_COUNT"] = "Show Count"
+L["SHOW_COUNT_DESC"] = "Show the count value for each mob"
+L["SHOW_TOTAL"] = "Show Total"
+L["SHOW_TOTAL_DESC"] = "Show the total count needed for 100%"
+
 -- UI Strings
 L["FINISHED"] = "Dungeon percentage done"
 L["SECTION_DONE"] = "Section finished"
