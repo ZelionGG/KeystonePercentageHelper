@@ -671,26 +671,38 @@ function KeystonePercentageHelper:UpdateNameplatePosition(unit)
     local xOffset = self.db.profile.mobPercentages.xOffset or 0
     local yOffset = self.db.profile.mobPercentages.yOffset or 0
     
-    -- Base offsets based on position
-    local baseXOffset = 0
-    local baseYOffset = 0
-    
-    if position == "LEFT" then
-        baseXOffset = 5
-    elseif position == "RIGHT" then
-        baseXOffset = -5
-    elseif position == "TOP" then
-        baseYOffset = 5
-    elseif position == "BOTTOM" then
-        baseYOffset = -5
+    -- Adjust text alignment based on position
+    frame.text:ClearAllPoints()
+    if position == "RIGHT" then
+        -- If position is RIGHT, align text to LEFT (closer to nameplate)
+        frame.text:SetPoint("LEFT", frame, "LEFT")
+    elseif position == "LEFT" then
+        -- If position is LEFT, align text to RIGHT (closer to nameplate)
+        frame.text:SetPoint("RIGHT", frame, "RIGHT")
+    else
+        -- For other positions (TOP, BOTTOM, etc.), center the text
+        frame.text:SetPoint("CENTER", frame, "CENTER")
     end
     
-    -- Apply user offsets
-    baseXOffset = baseXOffset + xOffset
-    baseYOffset = baseYOffset + yOffset
-    
     frame:ClearAllPoints()
-    frame:SetPoint(position, nameplate, position, baseXOffset, baseYOffset)
+    
+    -- Use more precise anchor points to avoid overlap with nameplate text
+    if position == "RIGHT" then
+        -- Anchor to the right edge of the nameplate
+        frame:SetPoint("LEFT", nameplate, "RIGHT", xOffset, yOffset)
+    elseif position == "LEFT" then
+        -- Anchor to the left edge of the nameplate
+        frame:SetPoint("RIGHT", nameplate, "LEFT", xOffset, yOffset)
+    elseif position == "TOP" then
+        -- Anchor to the top edge of the nameplate
+        frame:SetPoint("BOTTOM", nameplate, "TOP", xOffset, yOffset)
+    elseif position == "BOTTOM" then
+        -- Anchor to the bottom edge of the nameplate
+        frame:SetPoint("TOP", nameplate, "BOTTOM", xOffset, yOffset)
+    else
+        -- For other positions, use the original method
+        frame:SetPoint(position, nameplate, position, xOffset, yOffset)
+    end
 end
 
 -- Check if Mythic Dungeon Tools is loaded and available
