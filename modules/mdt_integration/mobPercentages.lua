@@ -411,19 +411,19 @@ end
 -- Get options for mob percentages display
 function KeystonePercentageHelper:GetMobPercentagesOptions()
     return {
-        name = L["MOB_PERCENTAGES"] or "Mob Percentages",
+        name = L["MOB_PERCENTAGES"],
         type = "group",
         order = 4,
         args = {
             mdtWarning = {
-                name = L["MDT_WARNING"] or "This feature requires Mythic Dungeon Tools (MDT) addon to be installed.",
+                name = L["MDT_WARNING"],
                 type = "description",
                 order = 0,
                 fontSize = "medium",
             },
             enable = {
-                name = L["ENABLE_MOB_PERCENTAGES"] or "Enable Mob Percentages",
-                desc = L["ENABLE_MOB_PERCENTAGES_DESC"] or "Show percentage contribution of each mob in Mythic+ dungeons",
+                name = L["ENABLE_MOB_PERCENTAGES"],
+                desc = L["ENABLE_MOB_PERCENTAGES_DESC"],
                 type = "toggle",
                 width = "full",
                 order = 1,
