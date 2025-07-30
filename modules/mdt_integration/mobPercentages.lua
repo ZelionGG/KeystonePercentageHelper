@@ -578,7 +578,6 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         type = "select",
                         order = 3,
                         values = {
-                            BACKGROUND = L["BACKGROUND"] or "Background",
                             LOW = L["LOW"] or "Low",
                             MEDIUM = L["MEDIUM"] or "Medium",
                             HIGH = L["HIGH"] or "High",
