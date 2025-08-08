@@ -43,9 +43,9 @@ L["DFC_BOSS3"] = "양초왕"
 L["DFC_BOSS4"] = "어둠의 존재"
 
 -- Eco-Dome Al'Dani
-L["EDAD_BOSS1"] = "Azhiccar"
-L["EDAD_BOSS2"] = "Taah'bat and A'wazj"
-L["EDAD_BOSS3"] = "Soul-Scribe"
+L["EDAD_BOSS1"] = "아즈히카르"
+L["EDAD_BOSS2"] = "타바트와 아와즈지"
+L["EDAD_BOSS3"] = "영혼필경사사"
 
 -- Operation: Floodgate
 L["OFG_BOSS1"] = "큰.대.모"
@@ -94,23 +94,23 @@ L["NW_BOSS3"] = "의사 스티치플레"
 L["NW_BOSS4"] = "냉기결속사 날토르"
 
 -- TO TRANSLATE
--- Halls of Atonement
-L["HoA_BOSS1"] = "Halkias, the Sin-Stained Goliath"
-L["HoA_BOSS2"] = "Echelon"
-L["HoA_BOSS3"] = "High Adjudicator Aleez"
-L["HoA_BOSS4"] = "Lord Chamberlain"
+-- Halls of Atonement 속죄의 전당
+L["HoA_BOSS1"] = "죄악에 물든 거수 할키아스"
+L["HoA_BOSS2"] = "에첼론"
+L["HoA_BOSS3"] = "대신판관 알리즈"
+L["HoA_BOSS4"] = "시종장"
 
 -- Tazavesh: Streets of Wonder
-L["TSoW_BOSS1"] = "Zo'phex the Sentinel"
-L["TSoW_BOSS2"] = "The Grand Menagerie"
-L["TSoW_BOSS3"] = "Mailroom Mayhem"
-L["TSoW_BOSS4"] = "Myza's Oasis"
-L["TSoW_BOSS5"] = "So'azmi"
+L["TSoW_BOSS1"] = "파수꾼 조펙스"
+L["TSoW_BOSS2"] = "대사육장"
+L["TSoW_BOSS3"] = "우편물실 대소동"
+L["TSoW_BOSS4"] = "마이자의 오아시스"
+L["TSoW_BOSS5"] = "소아즈미"
 
 -- Tazavesh: So'leah's Gambit
-L["TSLG_BOSS1"] = "Hylbrande"
-L["TSLG_BOSS2"] = "Timecap'n Hooktail"
-L["TSLG_BOSS3"] = "So'leah"
+L["TSLG_BOSS1"] = "힐브란데"
+L["TSLG_BOSS2"] = "시간선장 후크테일"
+L["TSLG_BOSS3"] = "소레아"
 -- END TO TRANSLATE
 
 -- Battle for Azeroth
@@ -236,3 +236,4 @@ L["IMPORT_ALL_SUCCESS"] = "모든 던전을 위한 사용자 지정 진행도 �
 L["IMPORT_ALL_ERROR"] = "문자열이 잘못되었습니다."
 L["IMPORT_ERROR"] = "문자열이 잘못되었습니다."
 L["IMPORT_DIFFERENT_DUNGEON"] = "%s에 대한 설정을 가져왔습니다. 해당 던전에 대한 옵션을 엽니다."
+
