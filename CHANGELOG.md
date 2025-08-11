@@ -1,6 +1,6 @@
 # Keystone Percentage Helper
 
-## [1.7.1](https://github.com/ZelionGG/KeystonePercentageHelper/releases/tag/1.7.1) (2025-07-26)
+## [1.7.1](https://github.com/ZelionGG/KeystonePercentageHelper/releases/tag/1.7.1) (2025-08-11)
 
 [Full Changelog](https://github.com/ZelionGG/KeystonePercentageHelper/compare/1.7...1.7.1) [Previous Releases](https://github.com/ZelionGG/KeystonePercentageHelper/releases)
 
