@@ -49,8 +49,14 @@ KeystonePercentageHelper.Changelog[1710] = {
     improvment = {
         ["zhCN"] = {},
         ["zhTW"] = {},
-        ["enUS"] = {},
-        ["frFR"] = {},
+        ["enUS"] = {
+            "Korean translation updated, thank you again [BlueSea-jun].",
+            "Russian translation updated, thank you [Hollicsh]."
+        },
+        ["frFR"] = {
+            "Traduction coréenne mise à jour, merci à nouveau [BlueSea-jun].",
+            "Traduction russe mise à jour, merci à [Hollicsh]."
+        },
         ["koKR"] = {},
         ["ruRU"] = {},
         ["deDE"] = {},
