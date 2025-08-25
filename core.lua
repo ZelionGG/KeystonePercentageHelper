@@ -2,8 +2,6 @@ local AddOnName, KeystonePercentageHelper = ...;
 local _G = _G;
 -- Cache frequently used global functions for better performance
 local pairs, unpack, select = pairs, unpack, select
-local floor = math.floor
-local format = string.format
 
 -- Initialize Ace3 libraries
 local AceAddon = LibStub("AceAddon-3.0")
@@ -220,7 +218,25 @@ function KeystonePercentageHelper:OnInitialize()
                     otherOptions = self:GetOtherOptions(),
                 }
             },
-            mobPercentages = self:GetMobPercentagesOptions(),
+            mdtIntegration = {
+                name = L["MDT_INTEGRATION"],
+                type = "group",
+                order = 2,
+                args = {
+                    mdtIntegrationHeader = {
+                        order = 0,
+                        type = "header",
+                        name = L["MDT_INTEGRATION"],
+                    },
+                    mdtWarning = {
+                        name = L["MDT_SECTION_WARNING"] or "This section requires Mythic Dungeon Tools (MDT) addon to be installed.",
+                        type = "description",
+                        order = 0,
+                        fontSize = "medium",
+                    },
+                    mobPercentages = self:GetMobPercentagesOptions(),
+                }
+            },
             advanced = self:GetAdvancedOptions()
         }
     })
