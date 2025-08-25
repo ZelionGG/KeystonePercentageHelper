@@ -497,12 +497,6 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             name, _, _, texture = C_ChallengeMode.GetMapUIInfo(mapId)
         end
 
-        -- TODO : Remove after patch 11.2 release
-        if mapId == 542 and name == nil then
-            texture = "134400"
-            name = "Eco-Dome Al'dani"
-        end
-
         -- Fallbacks
         local icon = texture
         local displayName = name
@@ -996,12 +990,6 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                 name, _, _, texture, _ = C_ChallengeMode.GetMapUIInfo(mapId)
             end
 
-            -- TODO : Remove after patch 11.2 release
-            if mapId == 542 and name == nil then
-                texture = "134400"
-                name = "Eco-Dome Al'dani"
-            end
-
             return '|T' .. texture .. ":16:16:0:0|t " .. (name)
         end,
         type = "group",
@@ -1018,14 +1006,6 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                     if mapId then
                         name, _, _, texture, _ =
                             C_ChallengeMode.GetMapUIInfo(mapId)
-                    end
-
-                    -- TODO : Remove after patch 11.2 release
-                    if mapId == 542 and name == nil then
-                        texture = "134400"
-                        name = "Eco-Dome Al'dani"
-                        return "|T" .. texture .. ":20:20:0:0|t |cff40E0D0" ..
-                                   (name) .. "|r\n" .. "The dungeon name is a placeholder and will be automatically translated when patch 11.2 is released, icon will also be updated accordingly."
                     end
 
                     return "|T" .. texture .. ":20:20:0:0|t |cff40E0D0" ..
@@ -1102,9 +1082,9 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                             editBoxWidth = 350,
                             maxLetters = 999999,
                             OnShow = function(dialog)
-                                dialog.editBox:SetText(encoded)
-                                dialog.editBox:HighlightText()
-                                dialog.editBox:SetFocus()
+                                dialog.EditBox:SetText(encoded)
+                                dialog.EditBox:HighlightText()
+                                dialog.EditBox:SetFocus()
                             end,
                             EditBoxOnEscapePressed = function(editBox)
                                 editBox:GetParent():Hide()
@@ -1137,7 +1117,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                         editBoxWidth = 350,
                         maxLetters = 999999,
                         OnAccept = function(dialog)
-                            local importString = dialog.editBox:GetText()
+                            local importString = dialog.EditBox:GetText()
                             addon:ImportDungeonSettings(importString, nil,
                                                         dungeonFilter)
                         end,
@@ -1730,9 +1710,9 @@ function KeystonePercentageHelper:ExportDungeonSettings(dungeonData, exportType,
         editBoxWidth = 350,
         maxLetters = 999999,
         OnShow = function(dialog)
-            dialog.editBox:SetText(encoded)
-            dialog.editBox:HighlightText()
-            dialog.editBox:SetFocus()
+            dialog.EditBox:SetText(encoded)
+            dialog.EditBox:HighlightText()
+            dialog.EditBox:SetFocus()
         end,
         EditBoxOnEscapePressed = function(editBox)
             editBox:GetParent():Hide()
@@ -1870,7 +1850,7 @@ function KeystonePercentageHelper:ShowImportDialog(sectionName, dungeonFilter)
         editBoxWidth = 350,
         maxLetters = 999999,
         OnAccept = function(dialog)
-            local importString = dialog.editBox:GetText()
+            local importString = dialog.EditBox:GetText()
             addon:ImportDungeonSettings(importString, sectionName, dungeonFilter)
         end,
         EditBoxOnEscapePressed = function(editBox)
