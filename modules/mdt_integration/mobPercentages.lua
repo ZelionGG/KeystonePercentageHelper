@@ -9,15 +9,13 @@ local L = KeystonePercentageHelper.L
 function KeystonePercentageHelper:InitializeMobPercentages()
     -- Create a frame for nameplate hooks
     self.mobPercentFrame = CreateFrame("Frame")
-    
+
     -- Register events
     self.mobPercentFrame:RegisterEvent("NAME_PLATE_UNIT_ADDED")
     self.mobPercentFrame:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
     self.mobPercentFrame:RegisterEvent("CHALLENGE_MODE_START")
     self.mobPercentFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-    self.mobPercentFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
-    self.mobPercentFrame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
-    
+
     -- Set up event handler
     self.mobPercentFrame:SetScript("OnEvent", function(_, event, ...)
         if event == "NAME_PLATE_UNIT_ADDED" then
@@ -30,23 +28,15 @@ function KeystonePercentageHelper:InitializeMobPercentages()
             self:CheckForMDT()
             -- Update all existing nameplates
             self:UpdateAllNameplates()
-        elseif event == "PLAYER_TARGET_CHANGED" then
-            self:UpdateTargetPercentage()
-        elseif event == "UPDATE_MOUSEOVER_UNIT" then
-            self:UpdateMouseoverPercentage()
         end
     end)
-    
+
     -- Create a cache for nameplate text frames
     self.nameplateTextFrames = {}
-    
-    -- Create frames for target and mouseover
-    self:CreateTargetFrame()
-    self:CreateMouseoverFrame()
-    
+
     -- Check if MDT is available
     self:CheckForMDT()
-    
+
     -- Update all existing nameplates
     self:UpdateAllNameplates()
 end
@@ -55,7 +45,7 @@ end
 function KeystonePercentageHelper:UpdateAllNameplates()
     -- Only proceed if the feature is enabled
     if not self.db.profile.mobPercentages.enabled then return end
-    
+
     -- Get all visible nameplates
     for i = 1, 40 do
         local unit = "nameplate" .. i
@@ -71,12 +61,12 @@ function KeystonePercentageHelper:CreateTargetFrame()
         self.targetPercentFrame = CreateFrame("Frame", nil, UIParent)
         self.targetPercentFrame:SetSize(100, 20)
         self.targetPercentFrame:SetPoint("BOTTOM", TargetFrame, "TOP", 0, 5)
-        
+
         self.targetPercentFrame.text = self.targetPercentFrame:CreateFontString(nil, "OVERLAY")
         self.targetPercentFrame.text:SetPoint("CENTER")
-        self.targetPercentFrame.text:SetFont(self.LSM:Fetch('font', self.db.profile.text.font), 
+        self.targetPercentFrame.text:SetFont(self.LSM:Fetch('font', self.db.profile.text.font),
             self.db.profile.mobPercentages.fontSize or 8, "OUTLINE")
-        
+
         self.targetPercentFrame:Hide()
     end
 end
@@ -87,12 +77,12 @@ function KeystonePercentageHelper:CreateMouseoverFrame()
         self.mouseoverPercentFrame = CreateFrame("Frame", nil, UIParent)
         self.mouseoverPercentFrame:SetSize(100, 20)
         self.mouseoverPercentFrame:SetPoint("BOTTOMLEFT", GameTooltip, "TOPLEFT", 0, 5)
-        
+
         self.mouseoverPercentFrame.text = self.mouseoverPercentFrame:CreateFontString(nil, "OVERLAY")
         self.mouseoverPercentFrame.text:SetPoint("LEFT")
-        self.mouseoverPercentFrame.text:SetFont(self.LSM:Fetch('font', self.db.profile.text.font), 
+        self.mouseoverPercentFrame.text:SetFont(self.LSM:Fetch('font', self.db.profile.text.font),
             self.db.profile.mobPercentages.fontSize or 8, "OUTLINE")
-        
+
         self.mouseoverPercentFrame:Hide()
     end
 end
@@ -100,46 +90,46 @@ end
 -- Update percentage display for current target
 function KeystonePercentageHelper:UpdateTargetPercentage()
     if not self.mdtLoaded or not self.targetPercentFrame then return end
-    if not C_ChallengeMode.IsChallengeModeActive() then 
+    if not C_ChallengeMode.IsChallengeModeActive() then
         self.targetPercentFrame:Hide()
-        return 
+        return
     end
-    
+
     -- Only show for hostile targets
     if not UnitExists("target") or (UnitReaction("target", "player") and UnitReaction("target", "player") > 4) then
         self.targetPercentFrame:Hide()
         return
     end
-    
+
     -- Get the NPC ID from the GUID
     local guid = UnitGUID("target")
-    if not guid then 
+    if not guid then
         self.targetPercentFrame:Hide()
-        return 
+        return
     end
-    
+
     local _, _, _, _, _, npcID = strsplit("-", guid)
-    if not npcID then 
+    if not npcID then
         self.targetPercentFrame:Hide()
-        return 
+        return
     end
-    
+
     -- Get MDT data
     local DungeonTools = MDT or MethodDungeonTools
     if not DungeonTools or not DungeonTools.GetEnemyForces then
         self.targetPercentFrame:Hide()
         return
     end
-    
+
     -- Get enemy forces data from MDT
     local isTeeming = self:IsTeeming()
     local count, max, maxTeeming, teemingCount = DungeonTools:GetEnemyForces(tonumber(npcID))
-    
+
     -- Use teeming count if applicable
     if (teemingCount and isTeeming) or not count then
         count = teemingCount
     end
-    
+
     -- Calculate percentage
     local weight
     if count and ((isTeeming and maxTeeming) or (not isTeeming and max)) then
@@ -150,23 +140,23 @@ function KeystonePercentageHelper:UpdateTargetPercentage()
         end
         weight = weight * 100
     end
-    
+
     -- Update text based on user preferences
     if weight and weight > 0 then
         local percentText = ""
-        
+
         -- Show percentage
         if self.db.profile.mobPercentages.showPercent then
             percentText = format("%.2f%%", weight)
         end
-        
+
         -- Show count if enabled
         if self.db.profile.mobPercentages.showCount then
             if percentText ~= "" then
                 percentText = percentText .. " | "
             end
             percentText = percentText .. count
-            
+
             -- Show total if enabled
             if self.db.profile.mobPercentages.showTotal then
                 if isTeeming then
@@ -176,10 +166,10 @@ function KeystonePercentageHelper:UpdateTargetPercentage()
                 end
             end
         end
-        
+
         -- Format text according to user preference
         local formattedText = format(self.db.profile.mobPercentages.customFormat, percentText)
-        
+
         -- Update and show the text
         self.targetPercentFrame.text:SetText(formattedText)
         self.targetPercentFrame:Show()
@@ -190,167 +180,79 @@ end
 
 -- Update percentage display for mouseover unit
 function KeystonePercentageHelper:UpdateMouseoverPercentage()
-    if not self.mdtLoaded or not self.mouseoverPercentFrame then return end
-    if not C_ChallengeMode.IsChallengeModeActive() then 
-        self.mouseoverPercentFrame:Hide()
-        return 
-    end
-    
-    -- Only show for hostile units
-    if not UnitExists("mouseover") or (UnitReaction("mouseover", "player") and UnitReaction("mouseover", "player") > 4) then
-        self.mouseoverPercentFrame:Hide()
-        return
-    end
-    
-    -- Get the NPC ID from the GUID
-    local guid = UnitGUID("mouseover")
-    if not guid then 
-        self.mouseoverPercentFrame:Hide()
-        return 
-    end
-    
-    local _, _, _, _, _, npcID = strsplit("-", guid)
-    if not npcID then 
-        self.mouseoverPercentFrame:Hide()
-        return 
-    end
-    
-    -- Get MDT data
-    local DungeonTools = MDT or MethodDungeonTools
-    if not DungeonTools or not DungeonTools.GetEnemyForces then
-        self.mouseoverPercentFrame:Hide()
-        return
-    end
-    
-    -- Get enemy forces data from MDT
-    local isTeeming = self:IsTeeming()
-    local count, max, maxTeeming, teemingCount = DungeonTools:GetEnemyForces(tonumber(npcID))
-    
-    -- Use teeming count if applicable
-    if (teemingCount and isTeeming) or not count then
-        count = teemingCount
-    end
-    
-    -- Calculate percentage
-    local weight
-    if count and ((isTeeming and maxTeeming) or (not isTeeming and max)) then
-        if isTeeming then
-            weight = count / maxTeeming
-        else
-            weight = count / max
-        end
-        weight = weight * 100
-    end
-    
-    -- Update text based on user preferences
-    if weight and weight > 0 then
-        local percentText = ""
-        
-        -- Show percentage
-        if self.db.profile.mobPercentages.showPercent then
-            percentText = format("%.2f%%", weight)
-        end
-        
-        -- Show count if enabled
-        if self.db.profile.mobPercentages.showCount then
-            if percentText ~= "" then
-                percentText = percentText .. " | "
-            end
-            percentText = percentText .. count
-            
-            -- Show total if enabled
-            if self.db.profile.mobPercentages.showTotal then
-                if isTeeming then
-                    percentText = percentText .. "/" .. maxTeeming
-                else
-                    percentText = percentText .. "/" .. max
-                end
-            end
-        end
-        
-        -- Update position relative to tooltip
-        self.mouseoverPercentFrame:ClearAllPoints()
-        self.mouseoverPercentFrame:SetPoint("BOTTOMLEFT", GameTooltip, "TOPLEFT", 0, 5)
-        
-        -- Format text according to user preference
-        local formattedText = format(self.db.profile.mobPercentages.customFormat, percentText)
-        
-        -- Update and show the text
-        self.mouseoverPercentFrame.text:SetText(formattedText)
-        self.mouseoverPercentFrame:Show()
-    else
-        self.mouseoverPercentFrame:Hide()
-    end
+    if self.mouseoverPercentFrame then self.mouseoverPercentFrame:Hide() end
+    return
 end
 
 -- Update a nameplate with percentage text
 function KeystonePercentageHelper:UpdateNameplate(unit)
     -- Only process hostile nameplates in Mythic+ dungeons
-    if not C_ChallengeMode.IsChallengeModeActive() then 
-        return 
+    if not C_ChallengeMode.IsChallengeModeActive() then
+        return
     end
-    
-    if UnitReaction(unit, "player") and UnitReaction(unit, "player") > 4 then 
-        return 
+
+    if UnitReaction(unit, "player") and UnitReaction(unit, "player") > 4 then
+        return
     end
-    
+
     -- Get the NPC ID from the GUID
     local guid = UnitGUID(unit)
-    if not guid then 
-        return 
+    if not guid then
+        return
     end
-    
+
     local _, _, _, _, _, npcID = strsplit("-", guid)
-    if not npcID then 
-        return 
+    if not npcID then
+        return
     end
-    
+
     -- Check if MDT is loaded
-    if not self.mdtLoaded then 
-        return 
+    if not self.mdtLoaded then
+        return
     end
-    
+
     -- Create or get the text frame for this nameplate
     local textFrame = self.nameplateTextFrames[unit]
     if not textFrame then
         local nameplate = C_NamePlate.GetNamePlateForUnit(unit)
-        if not nameplate then 
-            return 
+        if not nameplate then
+            return
         end
-        
-        -- Create the frame with a parent to ensure visibility
-        textFrame = CreateFrame("Frame", "KPH_PercentFrame_"..unit, nameplate)
+
+        -- Create the frame parented to UIParent (not the nameplate) to avoid clipping/occlusion when plates stack
+        textFrame = CreateFrame("Frame", "KPH_PercentFrame_"..unit, UIParent)
         textFrame:SetSize(80, 30) -- Larger size to ensure visibility
-        textFrame:SetFrameStrata(self.db.profile.mobPercentages.frameStrata or "HIGH") -- Set higher strata to ensure it's above other elements
-        
+        textFrame:SetFrameStrata("TOOLTIP") -- Use high strata to be above stacked nameplates
+        textFrame:SetIgnoreParentAlpha(true) -- Prevent parent alpha fading from hiding the text
+
         textFrame.text = textFrame:CreateFontString(nil, "OVERLAY")
         textFrame.text:SetPoint("CENTER")
-        textFrame.text:SetFont(self.LSM:Fetch('font', self.db.profile.text.font), 
+        textFrame.text:SetFont(self.LSM:Fetch('font', self.db.profile.text.font),
             self.db.profile.mobPercentages.fontSize or 8, "OUTLINE")
         textFrame.text:SetTextColor(self.db.profile.mobPercentages.textColor.r or 1, self.db.profile.mobPercentages.textColor.g or 1, self.db.profile.mobPercentages.textColor.b or 1, self.db.profile.mobPercentages.textColor.a or 1)
-        
+
         self.nameplateTextFrames[unit] = textFrame
     end
-    
+
     -- Always update position to ensure visibility
     self:UpdateNameplatePosition(unit)
-    
+
     -- Get MDT data
     local DungeonTools = MDT or MethodDungeonTools
     if not DungeonTools or not DungeonTools.GetEnemyForces then
         textFrame:Hide()
         return
     end
-    
+
     -- Get enemy forces data from MDT
     local isTeeming = self:IsTeeming()
     local count, max, maxTeeming, teemingCount = DungeonTools:GetEnemyForces(tonumber(npcID))
-    
+
     -- Use teeming count if applicable
     if (teemingCount and isTeeming) or not count then
         count = teemingCount
     end
-    
+
     -- Calculate percentage
     local weight
     if count and ((isTeeming and maxTeeming) or (not isTeeming and max)) then
@@ -361,23 +263,23 @@ function KeystonePercentageHelper:UpdateNameplate(unit)
         end
         weight = weight * 100
     end
-    
+
     -- Update text based on user preferences
     if weight and weight > 0 then
         local percentText = ""
-        
+
         -- Show percentage
         if self.db.profile.mobPercentages.showPercent then
             percentText = format("%.2f%%", weight)
         end
-        
+
         -- Show count if enabled
         if self.db.profile.mobPercentages.showCount then
             if percentText ~= "" then
                 percentText = percentText .. " | "
             end
             percentText = percentText .. count
-            
+
             -- Show total if enabled
             if self.db.profile.mobPercentages.showTotal then
                 if isTeeming then
@@ -387,10 +289,10 @@ function KeystonePercentageHelper:UpdateNameplate(unit)
                 end
             end
         end
-        
+
         -- Format text according to user preference
         local formattedText = format(self.db.profile.mobPercentages.customFormat, percentText)
-        
+
         -- Update and show the text
         textFrame.text:SetText(formattedText)
         textFrame:Show()
@@ -428,7 +330,7 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                 width = "full",
                 order = 1,
                 get = function() return self.db.profile.mobPercentages.enabled end,
-                set = function(_, value) 
+                set = function(_, value)
                     self.db.profile.mobPercentages.enabled = value
                     if value then
                         self:InitializeMobPercentages()
@@ -458,7 +360,7 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         order = 1,
                         width = "full",
                         get = function() return self.db.profile.mobPercentages.showPercent end,
-                        set = function(_, value) 
+                        set = function(_, value)
                             self.db.profile.mobPercentages.showPercent = value
                             -- Update all nameplates
                             for unit, _ in pairs(self.nameplateTextFrames) do
@@ -474,7 +376,7 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         order = 2,
                         width = "full",
                         get = function() return self.db.profile.mobPercentages.showCount end,
-                        set = function(_, value) 
+                        set = function(_, value)
                             self.db.profile.mobPercentages.showCount = value
                             -- Update all nameplates
                             for unit, _ in pairs(self.nameplateTextFrames) do
@@ -490,7 +392,7 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         order = 3,
                         width = "full",
                         get = function() return self.db.profile.mobPercentages.showTotal end,
-                        set = function(_, value) 
+                        set = function(_, value)
                             self.db.profile.mobPercentages.showTotal = value
                             -- Update all nameplates
                             for unit, _ in pairs(self.nameplateTextFrames) do
@@ -506,7 +408,7 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         order = 4,
                         width = 1.5, -- Réduit la largeur pour faire de la place au bouton
                         get = function() return self.db.profile.mobPercentages.customFormat end,
-                        set = function(_, value) 
+                        set = function(_, value)
                             self.db.profile.mobPercentages.customFormat = value
                             -- Update all nameplates
                             for unit, _ in pairs(self.nameplateTextFrames) do
@@ -547,7 +449,7 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         max = 16,
                         step = 1,
                         get = function() return self.db.profile.mobPercentages.fontSize end,
-                        set = function(_, value) 
+                        set = function(_, value)
                             self.db.profile.mobPercentages.fontSize = value
                             -- Update all existing nameplate texts
                             for unit, frame in pairs(self.nameplateTextFrames) do
@@ -563,35 +465,11 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         order = 2,
                         hasAlpha = true,
                         get = function() return self.db.profile.mobPercentages.textColor.r, self.db.profile.mobPercentages.textColor.g, self.db.profile.mobPercentages.textColor.b, self.db.profile.mobPercentages.textColor.a end,
-                        set = function(_, r, g, b, a) 
+                        set = function(_, r, g, b, a)
                             self.db.profile.mobPercentages.textColor = {r = r, g = g, b = b, a = a}
                             -- Update all existing nameplate texts
                             for unit, frame in pairs(self.nameplateTextFrames) do
                                 frame.text:SetTextColor(r, g, b, a)
-                            end
-                        end,
-                        disabled = function() return not self.db.profile.mobPercentages.enabled end
-                    },
-                    frameStrata = {
-                        name = L["FRAME_STRATA"],
-                        desc = L["FRAME_STRATA_DESC"],
-                        type = "select",
-                        order = 3,
-                        values = {
-                            LOW = L["LOW"],
-                            MEDIUM = L["MEDIUM"],
-                            HIGH = L["HIGH"],
-                            DIALOG = L["DIALOG"],
-                            FULLSCREEN = L["FULLSCREEN"],
-                            FULLSCREEN_DIALOG = L["FULLSCREEN_DIALOG"],
-                            TOOLTIP = L["TOOLTIP"]
-                        },
-                        get = function() return self.db.profile.mobPercentages.frameStrata end,
-                        set = function(_, value) 
-                            self.db.profile.mobPercentages.frameStrata = value
-                            -- Update all existing nameplate texts
-                            for unit, frame in pairs(self.nameplateTextFrames) do
-                                frame:SetFrameStrata(value)
                             end
                         end,
                         disabled = function() return not self.db.profile.mobPercentages.enabled end
@@ -608,7 +486,7 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                             BOTTOM = L["BOTTOM"]
                         },
                         get = function() return self.db.profile.mobPercentages.position end,
-                        set = function(_, value) 
+                        set = function(_, value)
                             self.db.profile.mobPercentages.position = value
                             -- Update all existing nameplate texts
                             for unit, frame in pairs(self.nameplateTextFrames) do
@@ -626,7 +504,7 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         max = 100,
                         step = 1,
                         get = function() return self.db.profile.mobPercentages.xOffset end,
-                        set = function(_, value) 
+                        set = function(_, value)
                             self.db.profile.mobPercentages.xOffset = value
                             -- Update all existing nameplate texts
                             for unit, frame in pairs(self.nameplateTextFrames) do
@@ -644,7 +522,7 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         max = 100,
                         step = 1,
                         get = function() return self.db.profile.mobPercentages.yOffset end,
-                        set = function(_, value) 
+                        set = function(_, value)
                             self.db.profile.mobPercentages.yOffset = value
                             -- Update all existing nameplate texts
                             for unit, frame in pairs(self.nameplateTextFrames) do
@@ -663,14 +541,14 @@ end
 function KeystonePercentageHelper:UpdateNameplatePosition(unit)
     local frame = self.nameplateTextFrames[unit]
     if not frame then return end
-    
+
     local nameplate = C_NamePlate.GetNamePlateForUnit(unit)
     if not nameplate then return end
-    
+
     local position = self.db.profile.mobPercentages.position or "RIGHT"
     local xOffset = self.db.profile.mobPercentages.xOffset or 0
     local yOffset = self.db.profile.mobPercentages.yOffset or 0
-    
+
     -- Adjust text alignment based on position
     frame.text:ClearAllPoints()
     if position == "RIGHT" then
@@ -683,9 +561,9 @@ function KeystonePercentageHelper:UpdateNameplatePosition(unit)
         -- For other positions (TOP, BOTTOM, etc.), center the text
         frame.text:SetPoint("CENTER", frame, "CENTER")
     end
-    
+
     frame:ClearAllPoints()
-    
+
     -- Use more precise anchor points to avoid overlap with nameplate text
     if position == "RIGHT" then
         -- Anchor to the right edge of the nameplate
@@ -712,7 +590,7 @@ function KeystonePercentageHelper:CheckForMDT()
         frame:Hide()
         self.nameplateTextFrames[unit] = nil
     end
-    
+
     -- Check if MDT is loaded
     self.mdtLoaded = false
 
@@ -729,7 +607,7 @@ end
 function KeystonePercentageHelper:IsTeeming()
     local _, affixes = C_ChallengeMode.GetActiveKeystoneInfo()
     if not affixes then return false end
-    
+
     for _, affixID in ipairs(affixes) do
         if affixID == 5 then -- 5 is the Teeming affix ID
             return true
@@ -742,7 +620,6 @@ end
 KeystonePercentageHelper.defaults.profile.mobPercentages = {
     enabled = false,
     fontSize = 8,
-    frameStrata = "HIGH",
     textColor = { r = 1, g = 1, b = 1, a = 1 },
     position = "RIGHT",
     showPercent = true,
