@@ -222,7 +222,7 @@ function KeystonePercentageHelper:UpdateNameplate(unit)
         -- Create the frame parented to UIParent (not the nameplate) to avoid clipping/occlusion when plates stack
         textFrame = CreateFrame("Frame", "KPH_PercentFrame_"..unit, UIParent)
         textFrame:SetSize(80, 30) -- Larger size to ensure visibility
-        textFrame:SetFrameStrata("TOOLTIP") -- Use high strata to be above stacked nameplates
+        textFrame:SetFrameStrata("MEDIUM") -- Use high strata to be above stacked nameplates
         textFrame:SetIgnoreParentAlpha(true) -- Prevent parent alpha fading from hiding the text
 
         textFrame.text = textFrame:CreateFontString(nil, "OVERLAY")
