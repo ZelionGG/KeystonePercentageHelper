@@ -1082,9 +1082,9 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                             editBoxWidth = 350,
                             maxLetters = 999999,
                             OnShow = function(dialog)
-                                dialog.editBox:SetText(encoded)
-                                dialog.editBox:HighlightText()
-                                dialog.editBox:SetFocus()
+                                dialog.EditBox:SetText(encoded)
+                                dialog.EditBox:HighlightText()
+                                dialog.EditBox:SetFocus()
                             end,
                             EditBoxOnEscapePressed = function(editBox)
                                 editBox:GetParent():Hide()
@@ -1117,7 +1117,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                         editBoxWidth = 350,
                         maxLetters = 999999,
                         OnAccept = function(dialog)
-                            local importString = dialog.editBox:GetText()
+                            local importString = dialog.EditBox:GetText()
                             addon:ImportDungeonSettings(importString, nil,
                                                         dungeonFilter)
                         end,
@@ -1710,9 +1710,9 @@ function KeystonePercentageHelper:ExportDungeonSettings(dungeonData, exportType,
         editBoxWidth = 350,
         maxLetters = 999999,
         OnShow = function(dialog)
-            dialog.editBox:SetText(encoded)
-            dialog.editBox:HighlightText()
-            dialog.editBox:SetFocus()
+            dialog.EditBox:SetText(encoded)
+            dialog.EditBox:HighlightText()
+            dialog.EditBox:SetFocus()
         end,
         EditBoxOnEscapePressed = function(editBox)
             editBox:GetParent():Hide()
@@ -1850,7 +1850,7 @@ function KeystonePercentageHelper:ShowImportDialog(sectionName, dungeonFilter)
         editBoxWidth = 350,
         maxLetters = 999999,
         OnAccept = function(dialog)
-            local importString = dialog.editBox:GetText()
+            local importString = dialog.EditBox:GetText()
             addon:ImportDungeonSettings(importString, sectionName, dungeonFilter)
         end,
         EditBoxOnEscapePressed = function(editBox)
