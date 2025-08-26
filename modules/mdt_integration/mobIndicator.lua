@@ -640,9 +640,9 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                         order = 5,
                         values = {
                             RIGHT = L["RIGHT"],
-                            LEFT  = L["LEFT"]  or "LEFT",
-                            TOP   = L["TOP"]   or "TOP",
-                            BOTTOM= L["BOTTOM"]or "BOTTOM",
+                            LEFT  = L["LEFT"],
+                            TOP   = L["TOP"],
+                            BOTTOM= L["BOTTOM"]
                         },
                         get = function() return self.db.profile.mobIndicator.position end,
                         set = function(_, v)
