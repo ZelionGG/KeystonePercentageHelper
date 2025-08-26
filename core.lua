@@ -235,6 +235,7 @@ function KeystonePercentageHelper:OnInitialize()
                         fontSize = "medium",
                     },
                     mobPercentages = self:GetMobPercentagesOptions(),
+                    mobIndicator = self:GetMobIndicatorOptions(),
                 }
             },
             advanced = self:GetAdvancedOptions()
@@ -255,6 +256,11 @@ function KeystonePercentageHelper:OnInitialize()
     -- Initialize mob percentages module if enabled
     if self.db.profile.mobPercentages and self.db.profile.mobPercentages.enabled then
         self:InitializeMobPercentages()
+    end
+
+    -- After InitializeMobPercentages check
+    if self.db.profile.mobIndicator and self.db.profile.mobIndicator.enabled then
+        self:InitializeMobIndicator()
     end
 end
 
