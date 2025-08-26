@@ -518,9 +518,6 @@ function KeystonePercentageHelper:CheckForMDT()
     local loaded = C_AddOns.IsAddOnLoaded("MythicDungeonTools")
     if loaded then
         self.mdtLoaded = true
-        self:Print(L["MDT_LOADED"])
-    else
-        self:Print(L["MDT_NOT_FOUND"])
     end
 end
 
