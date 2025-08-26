@@ -339,7 +339,7 @@ function KeystonePercentageHelper:GetFontOptions()
                 type = "range",
                 order = 2,
                 min = 8,
-                max = 24,
+                max = 64,
                 step = 1,
                 get = function()
                     return self.db.profile.general.fontSize
