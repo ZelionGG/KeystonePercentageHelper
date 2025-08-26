@@ -1,4 +1,4 @@
-## Interface: 110200
+## Interface: 110200, 110205
 ## Title: Keystone Percentage Helper
 ## Author: ZelionGG
 ## Version: @project-version@
