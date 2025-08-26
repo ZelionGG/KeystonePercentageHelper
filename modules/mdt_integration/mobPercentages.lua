@@ -318,7 +318,7 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         type = "range",
                         order = 1,
                         min = 6,
-                        max = 16,
+                        max = 32,
                         step = 1,
                         get = function() return self.db.profile.mobPercentages.fontSize end,
                         set = function(_, value)
