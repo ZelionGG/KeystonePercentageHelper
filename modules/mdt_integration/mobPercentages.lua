@@ -5,6 +5,20 @@ local pairs, select, strsplit, format = pairs, select, strsplit, string.format
 -- Get localization table
 local L = KeystonePercentageHelper.L
 
+-- Quiet MDT presence check for UI gating (no prints, no side-effects)
+local function IsMDTAvailable()
+    local loaded = false
+    if C_AddOns and C_AddOns.IsAddOnLoaded then
+        loaded = C_AddOns.IsAddOnLoaded("MythicDungeonTools")
+    elseif IsAddOnLoaded then
+        loaded = IsAddOnLoaded("MythicDungeonTools")
+    end
+    if not loaded then
+        loaded = (_G.MDT ~= nil)
+    end
+    return not not loaded
+end
+
 -- Initialize the mob percentages module
 function KeystonePercentageHelper:InitializeMobPercentages()
     -- Create a frame for nameplate hooks
@@ -54,7 +68,6 @@ function KeystonePercentageHelper:UpdateAllNameplates()
         end
     end
 end
-
 
 -- Update a nameplate with percentage text
 function KeystonePercentageHelper:UpdateNameplate(unit)
@@ -190,7 +203,9 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
         order = 4,
         args = {
             mdtWarning = {
-                name = L["MDT_WARNING"],
+                name = function()
+                    return IsMDTAvailable() and L["MDT_FOUND"] or L["MDT_WARNING"]
+                end,
                 type = "description",
                 order = 0,
                 fontSize = "medium",
@@ -222,6 +237,9 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         end
                         wipe(self.nameplateTextFrames)
                     end
+                end,
+                disabled = function()
+                    return not IsMDTAvailable()
                 end
             },
             displayOptions = {
@@ -229,6 +247,9 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                 type = "group",
                 inline = true,
                 order = 3,
+                disabled = function()
+                    return not IsMDTAvailable()
+                end,
                 args = {
                     showPercent = {
                         name = L["SHOW_PERCENTAGE"],
@@ -244,7 +265,9 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                                 self:UpdateNameplate(unit)
                             end
                         end,
-                        disabled = function() return not self.db.profile.mobPercentages.enabled end
+                        disabled = function()
+                            return (not self.db.profile.mobPercentages.enabled) or (not IsMDTAvailable())
+                        end
                     },
                     showCount = {
                         name = L["SHOW_COUNT"],
@@ -260,7 +283,9 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                                 self:UpdateNameplate(unit)
                             end
                         end,
-                        disabled = function() return not self.db.profile.mobPercentages.enabled end
+                        disabled = function()
+                            return (not self.db.profile.mobPercentages.enabled) or (not IsMDTAvailable())
+                        end
                     },
                     showTotal = {
                         name = L["SHOW_TOTAL"],
@@ -276,7 +301,9 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                                 self:UpdateNameplate(unit)
                             end
                         end,
-                        disabled = function() return not self.db.profile.mobPercentages.enabled or not self.db.profile.mobPercentages.showCount end
+                        disabled = function()
+                            return (not self.db.profile.mobPercentages.enabled) or (not self.db.profile.mobPercentages.showCount) or (not IsMDTAvailable())
+                        end
                     },
                     customFormat = {
                         name = L["CUSTOM_FORMAT"],
@@ -292,7 +319,9 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                                 self:UpdateNameplate(unit)
                             end
                         end,
-                        disabled = function() return not self.db.profile.mobPercentages.enabled end
+                        disabled = function()
+                            return (not self.db.profile.mobPercentages.enabled) or (not IsMDTAvailable())
+                        end
                     },
                     resetCustomFormat = {
                         name = L["RESET_TO_DEFAULT"],
@@ -307,7 +336,9 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                                 self:UpdateNameplate(unit)
                             end
                         end,
-                        disabled = function() return not self.db.profile.mobPercentages.enabled end
+                        disabled = function()
+                            return (not self.db.profile.mobPercentages.enabled) or (not IsMDTAvailable())
+                        end
                     },
                 }
             },
@@ -316,6 +347,9 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                 type = "group",
                 inline = true,
                 order = 4,
+                disabled = function()
+                    return not IsMDTAvailable()
+                end,
                 args = {
                     fontSize = {
                         name = L["MOB_PERCENTAGE_FONT_SIZE"],
@@ -333,7 +367,9 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                                 frame.text:SetFont(self.LSM:Fetch('font', self.db.profile.text.font), value, "OUTLINE")
                             end
                         end,
-                        disabled = function() return not self.db.profile.mobPercentages.enabled end
+                        disabled = function()
+                            return (not self.db.profile.mobPercentages.enabled) or (not IsMDTAvailable())
+                        end
                     },
                     textColor = {
                         name = L["TEXT_COLOR"],
@@ -349,7 +385,9 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                                 frame.text:SetTextColor(r, g, b, a)
                             end
                         end,
-                        disabled = function() return not self.db.profile.mobPercentages.enabled end
+                        disabled = function()
+                            return (not self.db.profile.mobPercentages.enabled) or (not IsMDTAvailable())
+                        end
                     },
                     position = {
                         name = L["MOB_PERCENTAGE_POSITION"],
@@ -370,7 +408,9 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                                 self:UpdateNameplatePosition(unit)
                             end
                         end,
-                        disabled = function() return not self.db.profile.mobPercentages.enabled end
+                        disabled = function()
+                            return (not self.db.profile.mobPercentages.enabled) or (not IsMDTAvailable())
+                        end
                     },
                     xOffset = {
                         name = L["X_OFFSET"],
@@ -388,7 +428,9 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                                 self:UpdateNameplatePosition(unit)
                             end
                         end,
-                        disabled = function() return not self.db.profile.mobPercentages.enabled end
+                        disabled = function()
+                            return (not self.db.profile.mobPercentages.enabled) or (not IsMDTAvailable())
+                        end
                     },
                     yOffset = {
                         name = L["Y_OFFSET"],
@@ -406,7 +448,9 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                                 self:UpdateNameplatePosition(unit)
                             end
                         end,
-                        disabled = function() return not self.db.profile.mobPercentages.enabled end
+                        disabled = function()
+                            return (not self.db.profile.mobPercentages.enabled) or (not IsMDTAvailable())
+                        end
                     },
                 }
             }

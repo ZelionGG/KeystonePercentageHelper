@@ -524,7 +524,10 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
         order = 5,
         args = {
             intro = {
-                name = L["MDT_WARNING"],
+                name = function()
+                    self:CheckForMDTForIndicators()
+                    return self.mdtIndicator.loaded and L["MDT_FOUND"] or L["MDT_WARNING"]
+                end,
                 type = "description",
                 order = 0,
                 fontSize = "medium",
@@ -555,6 +558,10 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                         end
                         wipe(self.nameplateMarkerFrames)
                     end
+                end,
+                disabled = function()
+                    self:CheckForMDTForIndicators()
+                    return not self.mdtIndicator.loaded
                 end
             },
             appearance = {
@@ -562,6 +569,10 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                 type = "group",
                 inline = true,
                 order = 3,
+                disabled = function()
+                    self:CheckForMDTForIndicators()
+                    return not self.mdtIndicator.loaded
+                end,
                 args = {
                     texture = {
                         name = L["MOB_INDICATOR_TEXTURE"],
@@ -636,7 +647,10 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                                 end
                             end
                         end,
-                        disabled = function() return not self.db.profile.mobIndicator.tintEnabled end
+                        disabled = function()
+                            self:CheckForMDTForIndicators()
+                            return (not self.mdtIndicator.loaded) or (not self.db.profile.mobIndicator.tintEnabled)
+                        end
                     },
                     position = {
                         name = L["POSITION"],
@@ -692,6 +706,10 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                 type = "group",
                 inline = true,
                 order = 4,
+                disabled = function()
+                    self:CheckForMDTForIndicators()
+                    return not self.mdtIndicator.loaded
+                end,
                 args = {
                     autoAdvance = {
                         name = L["MOB_INDICATOR_AUTO_ADVANCE"],
