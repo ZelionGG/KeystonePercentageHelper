@@ -195,12 +195,17 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                 order = 0,
                 fontSize = "medium",
             },
+            mobIndicatorHeader = {
+                name = L["MOB_PERCENTAGES"],
+                type = "header",
+                order = 1,
+            },
             enable = {
-                name = L["ENABLE_MOB_PERCENTAGES"],
+                name = L["ENABLE"],
                 desc = L["ENABLE_MOB_PERCENTAGES_DESC"],
                 type = "toggle",
                 width = "full",
-                order = 1,
+                order = 2,
                 get = function() return self.db.profile.mobPercentages.enabled end,
                 set = function(_, value)
                     self.db.profile.mobPercentages.enabled = value
@@ -223,7 +228,7 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                 name = L["DISPLAY_OPTIONS"],
                 type = "group",
                 inline = true,
-                order = 2,
+                order = 3,
                 args = {
                     showPercent = {
                         name = L["SHOW_PERCENTAGE"],
@@ -310,7 +315,7 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                 name = L["APPEARANCE_OPTIONS"],
                 type = "group",
                 inline = true,
-                order = 3,
+                order = 4,
                 args = {
                     fontSize = {
                         name = L["MOB_PERCENTAGE_FONT_SIZE"],

@@ -529,12 +529,17 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                 order = 0,
                 fontSize = "medium",
             },
+            mobIndicatorHeader = {
+                name = L["MOB_INDICATOR"],
+                type = "header",
+                order = 1,
+            },
             enable = {
-                name = L["ENABLE_MOB_INDICATORS"],
+                name = L["ENABLE"],
                 desc = L["ENABLE_MOB_INDICATORS_DESC"],
                 type = "toggle",
                 width = "full",
-                order = 1,
+                order = 2,
                 get = function() return self.db.profile.mobIndicator.enabled end,
                 set = function(_, value)
                     self.db.profile.mobIndicator.enabled = value
@@ -556,7 +561,7 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                 name = L["APPEARANCE_OPTIONS"],
                 type = "group",
                 inline = true,
-                order = 2,
+                order = 3,
                 args = {
                     texture = {
                         name = L["MOB_INDICATOR_TEXTURE"],
@@ -686,7 +691,7 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                 name = L["MOB_INDICATOR_BEHAVIOR"],
                 type = "group",
                 inline = true,
-                order = 3,
+                order = 4,
                 args = {
                     autoAdvance = {
                         name = L["MOB_INDICATOR_AUTO_ADVANCE"],
