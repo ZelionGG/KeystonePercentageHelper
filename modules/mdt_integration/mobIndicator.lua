@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, undefined-field
 local AddOnName, KeystonePercentageHelper = ...
 local _G = _G
 local pairs, ipairs, select, strsplit = pairs, ipairs, select, strsplit
@@ -19,7 +20,6 @@ KeystonePercentageHelper.defaults.profile.mobIndicator = {
     tintEnabled  = false,
     tint         = { r = 1, g = 1, b = 1, a = 1 },
     autoAdvance  = true,
-    debug        = false,
 }
 
 -- ===============================
@@ -43,66 +43,9 @@ KeystonePercentageHelper.mdtIndicator = KeystonePercentageHelper.mdtIndicator or
     dungeonEnemies = nil,        -- cached enemies table for current dungeon
 }
 
--- Simple debug helpers
-local function tableCountKeys(t)
-    local c = 0
-    if t then for _ in pairs(t) do c = c + 1 end end
-    return c
-end
+--
 
-local function findEnemyIndicesByNpcId(dungeonEnemies, npcId)
-    local indices = {}
-    if type(dungeonEnemies) == "table" and npcId then
-        for i, enemy in ipairs(dungeonEnemies) do
-            local eid = enemy and (enemy.id or enemy.npcID or enemy.npcId or enemy.creatureId)
-            if tonumber(eid) == npcId then table.insert(indices, i) end
-        end
-    end
-    return indices
-end
-
-local function pullHasEnemyIndex(rawPull, idx)
-    if type(rawPull) ~= "table" or type(idx) ~= "number" then return false end
-    local function extractIndex(e)
-        if type(e) == "number" then return e end
-        if type(e) == "table" then
-            local v = e.index or e.enemyIndex or e.enemyIdx or e[1]
-            if type(v) == "number" then return v end
-        end
-        return nil
-    end
-
-    local function check(e)
-        local v = extractIndex(e)
-        if v and v == idx then return true end
-        if type(e) == "table" then
-            for _, sub in ipairs(e) do
-                local sv = extractIndex(sub)
-                if sv and sv == idx then return true end
-            end
-        end
-        return false
-    end
-
-    -- Array-like entries
-    for _, entry in ipairs(rawPull) do
-        if check(entry) then return true end
-    end
-    -- Keyed entries
-    for k, v in pairs(rawPull) do
-        if type(k) ~= "number" then
-            if check(v) then return true end
-        end
-    end
-    return false
-end
-
-function KeystonePercentageHelper:MI_Debug(msg)
-    local db = self.db and self.db.profile and self.db.profile.mobIndicator
-    if db and db.debug then
-        self:Print("[MobIndicator] " .. tostring(msg))
-    end
-end
+--
 
 -- ===============================
 -- MDT Presence Check
@@ -121,7 +64,6 @@ function KeystonePercentageHelper:CheckForMDTForIndicators()
     end
 
     self.mdtIndicator.loaded = not not loaded
-    self:MI_Debug("MDT loaded = " .. tostring(self.mdtIndicator.loaded))
 end
 
 -- ===============================
@@ -170,20 +112,25 @@ local function ensureMarkerFrame(self, unit)
     local frame = self.nameplateMarkerFrames[unit]
     local db = self.db.profile.mobIndicator
 
+    -- Reuse existing named frame if present to avoid CreateFrame name conflicts
+    local globalName = "KPH_MDTMarker_" .. unit
     if not frame then
-        frame = CreateFrame("Frame", "KPH_MDTMarker_" .. unit, UIParent)
+        frame = _G[globalName]
+        if frame then
+            self.nameplateMarkerFrames[unit] = frame
+        end
+    end
+
+    if not frame then
+        frame = CreateFrame("Frame", globalName, UIParent)
         frame:SetSize(db.size or 24, db.size or 24)
         frame:SetFrameStrata("TOOLTIP")
         frame:SetIgnoreParentAlpha(true)
+        frame:EnableMouse(false)
 
         frame.tex = frame:CreateTexture(nil, "OVERLAY")
         frame.tex:SetAllPoints()
-        -- Use a safe/visible texture during debug to rule out bad file IDs
-        if db.debug then
-            frame.tex:SetTexture("Interface\\Buttons\\WHITE8x8")
-        else
-            frame.tex:SetTexture(db.texture or 450928)
-        end
+        frame.tex:SetTexture(db.texture or 450928)
 
         if db.tintEnabled then
             local c = db.tint or { r = 1, g = 1, b = 1, a = 1 }
@@ -191,33 +138,18 @@ local function ensureMarkerFrame(self, unit)
         else
             frame.tex:SetVertexColor(1, 1, 1, 1)
         end
-
-        -- Overlay a big letter when debug is enabled for maximum visibility
-        frame.label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-        frame.label:SetPoint("CENTER")
-        frame.label:SetText("M")
-        frame.label:SetTextColor(1, 0, 0, 1) -- red for visibility
-        frame.label:Hide()
 
         self.nameplateMarkerFrames[unit] = frame
     else
         -- Update size/texture/tint live
         frame:SetSize(db.size or 24, db.size or 24)
-        if db.debug then
-            frame.tex:SetTexture("Interface\\Buttons\\WHITE8x8")
-        else
-            frame.tex:SetTexture(db.texture or 450928)
-        end
+        frame.tex:SetTexture(db.texture or 450928)
         if db.tintEnabled then
             local c = db.tint or { r = 1, g = 1, b = 1, a = 1 }
             frame.tex:SetVertexColor(c.r or 1, c.g or 1, c.b or 1, c.a or 1)
         else
             frame.tex:SetVertexColor(1, 1, 1, 1)
         end
-    end
-
-    if frame.label then
-        frame.label:SetShown(db.debug)
     end
 
     return frame
@@ -248,7 +180,6 @@ function KeystonePercentageHelper:UpdateNameplateMarker(unit)
     -- Only when nameplates are visible (has a nameplate frame)
     if not C_NamePlate.GetNamePlateForUnit(unit) then
         self:RemoveNameplateMarker(unit)
-        self:MI_Debug("No nameplate frame for unit " .. tostring(unit) .. ", hiding marker")
         return
     end
 
@@ -270,34 +201,11 @@ function KeystonePercentageHelper:UpdateNameplateMarker(unit)
         return
     end
 
-    -- Show marker if NPC is in pulls up to current index
-    if self.db and self.db.profile and self.db.profile.mobIndicator.debug then
-        local inAll = self.mdtIndicator.allNpcIds[npcId] and true or false
-        local inCur = self.mdtIndicator.currentPullNpcIds[npcId] and true or false
-        local name = UnitName(unit)
-        self:MI_Debug(string.format("Plate %s (npcId=%s): inAll=%s, inCurrent=%s", tostring(name), tostring(npcId), tostring(inAll), tostring(inCur)))
-    end
-
     if self.mdtIndicator.allNpcIds[npcId] then
         local frame = ensureMarkerFrame(self, unit)
         self:UpdateMarkerPosition(unit)
         frame:Show()
     else
-        if self.db and self.db.profile and self.db.profile.mobIndicator.debug then
-            local m = self.mdtIndicator
-            local indices = findEnemyIndicesByNpcId(m.dungeonEnemies, npcId)
-            if #indices > 0 then
-                local raw = m.pulls and m.pulls[m.currentPullIndex]
-                local listed = false
-                for _, idx in ipairs(indices) do
-                    if pullHasEnemyIndex(raw, idx) then listed = true break end
-                end
-                self:MI_Debug(string.format("npcId %s exists in dungeonEnemies at indices [%s]; listedInCurrentPull=%s",
-                    tostring(npcId), table.concat(indices, ","), tostring(listed)))
-            else
-                self:MI_Debug(string.format("npcId %s not found in dungeonEnemies (dungeonIdx=%s)", tostring(npcId), tostring(self.mdtIndicator.dungeonIdx)))
-            end
-        end
         self:RemoveNameplateMarker(unit)
     end
 end
@@ -306,14 +214,12 @@ function KeystonePercentageHelper:RemoveNameplateMarker(unit)
     local frame = self.nameplateMarkerFrames[unit]
     if frame then
         frame:Hide()
-        self.nameplateMarkerFrames[unit] = nil
     end
 end
 
 local function clearAllMarkers(self)
     for unit, frame in pairs(self.nameplateMarkerFrames) do
         frame:Hide()
-        self.nameplateMarkerFrames[unit] = nil
     end
 end
 
@@ -399,7 +305,6 @@ function KeystonePercentageHelper:RebuildIndicatorTargetSet()
     m.maxPulls = 0
     
     if not DungeonTools then
-        self:MI_Debug("RebuildTargetSet: MDT not available")
         return
     end
     
@@ -454,7 +359,6 @@ function KeystonePercentageHelper:RebuildIndicatorTargetSet()
     
     if type(pulls) ~= "table" then
         -- No route/pulls available
-        self:MI_Debug("No pulls found in preset")
         return
     end
 
@@ -471,7 +375,6 @@ function KeystonePercentageHelper:RebuildIndicatorTargetSet()
     if type(presetSelectedPull) == "number" then
         if presetSelectedPull >= 1 and presetSelectedPull <= m.maxPulls then
             m.currentPullIndex = presetSelectedPull
-            self:MI_Debug("Using MDT-selected currentPullIndex: " .. tostring(m.currentPullIndex))
         end
     end
 
@@ -479,7 +382,7 @@ function KeystonePercentageHelper:RebuildIndicatorTargetSet()
     if m.currentPullIndex < 1 then m.currentPullIndex = 1 end
     if m.currentPullIndex > m.maxPulls then m.currentPullIndex = m.maxPulls end
 
-    -- Persist dungeon context for later mapping/debug
+    -- Persist dungeon context for later mapping
     m.dungeonIdx = dungeonIdx
     m.dungeonEnemies = dungeonEnemies
 
@@ -489,37 +392,6 @@ function KeystonePercentageHelper:RebuildIndicatorTargetSet()
     end
     collectNpcIdsFromPull(pulls[m.currentPullIndex], m.currentPullNpcIds, dungeonEnemies)
 
-    self:MI_Debug(string.format(
-        "Pulls=%d, dungeonIdx=%s, enemiesTbl=%s, currentPull=%d, allCount=%d, curCount=%d",
-        m.maxPulls,
-        tostring(dungeonIdx),
-        tostring(dungeonEnemies and true or false),
-        m.currentPullIndex,
-        tableCountKeys(m.allNpcIds),
-        tableCountKeys(m.currentPullNpcIds)
-    ))
-    if self.db and self.db.profile and self.db.profile.mobIndicator.debug then
-        local cnt = 0
-        local sample = {}
-        for npcId, _ in pairs(m.currentPullNpcIds) do
-            cnt = cnt + 1
-            if #sample < 8 then table.insert(sample, tostring(npcId)) end
-        end
-        if cnt > 0 then
-            self:MI_Debug("Current pull NPC IDs (sample): " .. table.concat(sample, ", "))
-        end
-        -- Also log a small sample of raw entries and resolved IDs for the current pull
-        local raw = pulls[m.currentPullIndex]
-        if type(raw) == "table" then
-            local shown = 0
-            for idx, entry in ipairs(raw) do
-                local rid = resolveEntryToNpcId(entry, dungeonEnemies)
-                self:MI_Debug(string.format("PullEntry[%d]: type=%s -> resolvedNpcId=%s", idx, type(entry), tostring(rid)))
-                shown = shown + 1
-                if shown >= 6 then break end
-            end
-        end
-    end
 end
 
 -- ===============================
@@ -550,7 +422,6 @@ function KeystonePercentageHelper:TryAutoAdvancePull()
         m.currentPullIndex = m.currentPullIndex + 1
         -- Rebuild sets with new index
         self:RebuildIndicatorTargetSet()
-        self:MI_Debug("Auto-advanced to pull index " .. tostring(m.currentPullIndex))
     end
 end
 
@@ -611,9 +482,6 @@ function KeystonePercentageHelper:InitializeMobIndicator()
     self.mobIndicatorFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
     self.mobIndicatorFrame:SetScript("OnEvent", function(_, event, ...)
-        if self.db and self.db.profile and self.db.profile.mobIndicator.debug then
-            self:MI_Debug("Event: " .. tostring(event))
-        end
         if event == "NAME_PLATE_UNIT_ADDED" then
             local unit = ...
             self:UpdateNameplateMarker(unit)
@@ -644,7 +512,6 @@ function KeystonePercentageHelper:InitializeMobIndicator()
     else
         stopMobIndicatorTicker(self)
     end
-    self:MI_Debug("InitializeMobIndicator complete")
 end
 
 -- ===============================
@@ -663,8 +530,8 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                 fontSize = "medium",
             },
             enable = {
-                name = L["ENABLE"] or "Enable",
-                desc = L["ENABLE"] or "Enable",
+                name = L["ENABLE_MOB_INDICATORS"] or "Enable",
+                desc = L["ENABLE_MOB_INDICATORS_DESC"] or "Enable",
                 type = "toggle",
                 width = "full",
                 order = 1,
@@ -692,8 +559,8 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                 order = 2,
                 args = {
                     texture = {
-                        name = L["TEXTURE"] or "Texture (ID or Path)",
-                        desc = L["TEXTURE"] or "Texture (ID or Path)",
+                        name = L["MOB_INDICATOR_TEXTURE"] or "Texture (ID or Path)",
+                        desc = L["MOB_INDICATOR_TEXTURE_DESC"] or "Texture (ID or Path)",
                         type = "input",
                         order = 1,
                         width = 1.0,
@@ -714,8 +581,8 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                         end,
                     },
                     size = {
-                        name = L["SIZE"] or "Size",
-                        desc = L["SIZE"] or "Size",
+                        name = L["MOB_INDICATOR_TEXTURE_SIZE"] or "Size",
+                        desc = L["MOB_INDICATOR_TEXTURE_SIZE_DESC"] or "Set the texture size for the indicator",
                         type = "range",
                         order = 2,
                         min = 8, max = 64, step = 1,
@@ -729,8 +596,8 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                         end,
                     },
                     tintEnabled = {
-                        name = L["TINT"] or "Tint",
-                        desc = L["TINT"] or "Tint",
+                        name = L["MOB_INDICATOR_TINT"] or "Tint",
+                        desc = L["MOB_INDICATOR_TINT_DESC"] or "Tint",
                         type = "toggle",
                         order = 3,
                         get = function() return self.db.profile.mobIndicator.tintEnabled end,
@@ -747,8 +614,8 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                         end
                     },
                     tint = {
-                        name = L["COLOR"] or "Color",
-                        desc = L["COLOR"] or "Color",
+                        name = L["MOB_INDICATOR_TINT_COLOR"] or "Color",
+                        desc = L["MOB_INDICATOR_TINT_COLOR_DESC"] or "Color",
                         type = "color",
                         order = 4,
                         hasAlpha = true,
@@ -816,27 +683,18 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                 }
             },
             behavior = {
-                name = L["BEHAVIOR"] or "Behavior",
+                name = L["MOB_INDICATOR_BEHAVIOR"] or "Behavior",
                 type = "group",
                 inline = true,
                 order = 3,
                 args = {
                     autoAdvance = {
-                        name = L["AUTO_ADVANCE"] or "Auto-advance pull",
-                        desc = L["AUTO_ADVANCE"] or "Auto-advance pull when no current-pull mobs are visible.",
+                        name = L["MOB_INDICATOR_AUTO_ADVANCE"] or "Auto-advance pull",
+                        desc = L["MOB_INDICATOR_AUTO_ADVANCE_DESC"] or "Auto-advance pull when no current-pull mobs are visible.",
                         type = "toggle",
                         order = 1,
                         get = function() return self.db.profile.mobIndicator.autoAdvance end,
                         set = function(_, v) self.db.profile.mobIndicator.autoAdvance = v end
-                    },
-                    debug = {
-                        name = "Debug",
-                        desc = "Enable debug logs for the Mob Indicator",
-                        type = "toggle",
-                        order = 2,
-                        width = "full",
-                        get = function() return self.db.profile.mobIndicator.debug end,
-                        set = function(_, v) self.db.profile.mobIndicator.debug = v end
                     },
                 }
             }
