@@ -53,14 +53,14 @@ KeystonePercentageHelper.mdtIndicator = KeystonePercentageHelper.mdtIndicator or
 function KeystonePercentageHelper:CheckForMDTForIndicators()
     local loaded = false
     if C_AddOns and C_AddOns.IsAddOnLoaded then
-        loaded = C_AddOns.IsAddOnLoaded("MythicDungeonTools") or C_AddOns.IsAddOnLoaded("MethodDungeonTools")
+        loaded = C_AddOns.IsAddOnLoaded("MythicDungeonTools")
     elseif IsAddOnLoaded then
-        loaded = IsAddOnLoaded("MythicDungeonTools") or IsAddOnLoaded("MethodDungeonTools")
+        loaded = IsAddOnLoaded("MythicDungeonTools")
     end
 
     -- Fallback: check globals in case addon API check fails
     if not loaded then
-        loaded = (_G.MDT ~= nil) or (_G.MethodDungeonTools ~= nil)
+        loaded = (_G.MDT ~= nil)
     end
 
     self.mdtIndicator.loaded = not not loaded
@@ -297,7 +297,7 @@ local function collectNpcIdsFromPull(pull, outSet, dungeonEnemies)
 end
 
 function KeystonePercentageHelper:RebuildIndicatorTargetSet()
-    local DungeonTools = _G.MDT or _G.MethodDungeonTools
+    local DungeonTools = _G.MDT
     local m = self.mdtIndicator
     m.allNpcIds = {}
     m.currentPullNpcIds = {}
