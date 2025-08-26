@@ -229,9 +229,27 @@ function KeystonePercentageHelper:OnInitialize()
                         name = L["MDT_INTEGRATION"],
                     },
                     mdtWarning = {
-                        name = L["MDT_SECTION_WARNING"] or "This section requires Mythic Dungeon Tools (MDT) addon to be installed.",
+                        name = L["MDT_SECTION_WARNING"],
                         type = "description",
-                        order = 0,
+                        order = 1,
+                        fontSize = "medium",
+                    },
+                    -- Information about MDT integration features
+                    featuresHeader = {
+                        order = 2,
+                        type = "header",
+                        name = L["MDT_INTEGRATION_FEATURES"],
+                    },
+                    mobPercentagesInfo = {
+                        name = L["MOB_PERCENTAGES_INFO"],
+                        type = "description",
+                        order = 4,
+                        fontSize = "medium",
+                    },
+                    mobIndicatorInfo = {
+                        name = L["MOB_INDICATOR_INFO"],
+                        type = "description",
+                        order = 5,
                         fontSize = "medium",
                     },
                     mobPercentages = self:GetMobPercentagesOptions(),

@@ -177,6 +177,11 @@ L["FULLSCREEN"] = "Fullscreen"
 L["FULLSCREEN_DIALOG"] = "Fullscreen Dialog"
 L["TOOLTIP"] = "Tooltip"
 
+L["MDT_INTEGRATION_FEATURES"] = "Mythic Dungeon Tools Integration Features"
+L["MOB_PERCENTAGES_INFO"] = "• |cff00ff00Mob Percentages|r: Shows enemy forces contribution percentage on nameplates in M+ dungeons."
+L["MOB_INDICATOR_INFO"] = "• |cff00ff00Mobs Indicators|r: Marks nameplates to show which enemies are included in your current MDT route pull."
+
+
 -- Mob Indicators
 L["MOB_INDICATOR"] = "Mob Indicators"
 L["ENABLE_MOB_INDICATORS"] = "Enable Mob Indicators"
