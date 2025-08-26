@@ -519,19 +519,19 @@ end
 -- ===============================
 function KeystonePercentageHelper:GetMobIndicatorOptions()
     return {
-        name = L["MOB_INDICATOR"] or "Mob Indicator",
+        name = L["MOB_INDICATOR"],
         type = "group",
         order = 5,
         args = {
             intro = {
-                name = L["MDT_WARNING"] or "Requires Mythic Dungeon Tools.",
+                name = L["MDT_WARNING"],
                 type = "description",
                 order = 0,
                 fontSize = "medium",
             },
             enable = {
-                name = L["ENABLE_MOB_INDICATORS"] or "Enable",
-                desc = L["ENABLE_MOB_INDICATORS_DESC"] or "Enable",
+                name = L["ENABLE_MOB_INDICATORS"],
+                desc = L["ENABLE_MOB_INDICATORS_DESC"],
                 type = "toggle",
                 width = "full",
                 order = 1,
@@ -553,14 +553,14 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                 end
             },
             appearance = {
-                name = L["APPEARANCE_OPTIONS"] or "Appearance",
+                name = L["APPEARANCE_OPTIONS"],
                 type = "group",
                 inline = true,
                 order = 2,
                 args = {
                     texture = {
-                        name = L["MOB_INDICATOR_TEXTURE"] or "Texture (ID or Path)",
-                        desc = L["MOB_INDICATOR_TEXTURE_DESC"] or "Texture (ID or Path)",
+                        name = L["MOB_INDICATOR_TEXTURE"],
+                        desc = L["MOB_INDICATOR_TEXTURE_DESC"],
                         type = "input",
                         order = 1,
                         width = 1.0,
@@ -581,8 +581,8 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                         end,
                     },
                     size = {
-                        name = L["MOB_INDICATOR_TEXTURE_SIZE"] or "Size",
-                        desc = L["MOB_INDICATOR_TEXTURE_SIZE_DESC"] or "Set the texture size for the indicator",
+                        name = L["MOB_INDICATOR_TEXTURE_SIZE"],
+                        desc = L["MOB_INDICATOR_TEXTURE_SIZE_DESC"],
                         type = "range",
                         order = 2,
                         min = 8, max = 64, step = 1,
@@ -596,8 +596,8 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                         end,
                     },
                     tintEnabled = {
-                        name = L["MOB_INDICATOR_TINT"] or "Tint",
-                        desc = L["MOB_INDICATOR_TINT_DESC"] or "Tint",
+                        name = L["MOB_INDICATOR_TINT"],
+                        desc = L["MOB_INDICATOR_TINT_DESC"],
                         type = "toggle",
                         order = 3,
                         get = function() return self.db.profile.mobIndicator.tintEnabled end,
@@ -614,8 +614,8 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                         end
                     },
                     tint = {
-                        name = L["MOB_INDICATOR_TINT_COLOR"] or "Color",
-                        desc = L["MOB_INDICATOR_TINT_COLOR_DESC"] or "Color",
+                        name = L["MOB_INDICATOR_TINT_COLOR"],
+                        desc = L["MOB_INDICATOR_TINT_COLOR_DESC"],
                         type = "color",
                         order = 4,
                         hasAlpha = true,
@@ -634,12 +634,12 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                         disabled = function() return not self.db.profile.mobIndicator.tintEnabled end
                     },
                     position = {
-                        name = L["POSITION"] or "Position",
-                        desc = L["POSITION"] or "Position",
+                        name = L["POSITION"],
+                        desc = L["POSITION"],
                         type = "select",
                         order = 5,
                         values = {
-                            RIGHT = L["RIGHT"] or "RIGHT",
+                            RIGHT = L["RIGHT"],
                             LEFT  = L["LEFT"]  or "LEFT",
                             TOP   = L["TOP"]   or "TOP",
                             BOTTOM= L["BOTTOM"]or "BOTTOM",
@@ -653,8 +653,8 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                         end
                     },
                     xOffset = {
-                        name = L["X_OFFSET"] or "X Offset",
-                        desc = L["X_OFFSET_DESC"] or "Horizontal offset",
+                        name = L["X_OFFSET"],
+                        desc = L["X_OFFSET_DESC"],
                         type = "range",
                         order = 6,
                         min = -100, max = 100, step = 1,
@@ -667,8 +667,8 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                         end
                     },
                     yOffset = {
-                        name = L["Y_OFFSET"] or "Y Offset",
-                        desc = L["Y_OFFSET_DESC"] or "Vertical offset",
+                        name = L["Y_OFFSET"],
+                        desc = L["Y_OFFSET_DESC"],
                         type = "range",
                         order = 7,
                         min = -100, max = 100, step = 1,
@@ -683,14 +683,14 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                 }
             },
             behavior = {
-                name = L["MOB_INDICATOR_BEHAVIOR"] or "Behavior",
+                name = L["MOB_INDICATOR_BEHAVIOR"],
                 type = "group",
                 inline = true,
                 order = 3,
                 args = {
                     autoAdvance = {
-                        name = L["MOB_INDICATOR_AUTO_ADVANCE"] or "Auto-advance pull",
-                        desc = L["MOB_INDICATOR_AUTO_ADVANCE_DESC"] or "Auto-advance pull when no current-pull mobs are visible.",
+                        name = L["MOB_INDICATOR_AUTO_ADVANCE"],
+                        desc = L["MOB_INDICATOR_AUTO_ADVANCE_DESC"],
                         type = "toggle",
                         order = 1,
                         get = function() return self.db.profile.mobIndicator.autoAdvance end,
