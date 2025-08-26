@@ -124,7 +124,7 @@ local function ensureMarkerFrame(self, unit)
     if not frame then
         frame = CreateFrame("Frame", globalName, UIParent)
         frame:SetSize(db.size or 24, db.size or 24)
-        frame:SetFrameStrata("TOOLTIP")
+        frame:SetFrameStrata("MEDIUM")
         frame:SetIgnoreParentAlpha(true)
         frame:EnableMouse(false)
 
