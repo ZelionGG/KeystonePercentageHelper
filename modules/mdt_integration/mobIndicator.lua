@@ -12,11 +12,11 @@ local L = KeystonePercentageHelper.L
 KeystonePercentageHelper.defaults = KeystonePercentageHelper.defaults or { profile = {} }
 KeystonePercentageHelper.defaults.profile.mobIndicator = {
     enabled      = false,
-    texture      = 450928,            -- Provided by user
-    size         = 24,                -- Default suggestion
+    texture      = "Azerite-PointingArrow", -- Provided by user
+    size         = 24,                      -- Default suggestion
     position     = "TOP",
     xOffset      = 0,
-    yOffset      = 12,
+    yOffset      = 0,
     tintEnabled  = false,
     tint         = { r = 1, g = 1, b = 1, a = 1 },
     autoAdvance  = true,
@@ -108,6 +108,31 @@ function KeystonePercentageHelper:UpdateMarkerPosition(unit)
     end
 end
 
+-- Apply texture or atlas to the marker texture
+local function applyMarkerTexture(frame, tex)
+    local applied = false
+    if type(tex) == "number" then
+        frame.tex:SetTexture(tex)
+        frame.tex:SetTexCoord(0, 1, 0, 1)
+        applied = true
+    elseif type(tex) == "string" then
+        local isAtlas = (C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo(tex)) and true or false
+        if isAtlas and frame.tex.SetAtlas then
+            frame.tex:SetAtlas(tex, false) -- keep our frame size
+            applied = true
+        else
+            frame.tex:SetTexture(tex)
+            frame.tex:SetTexCoord(0, 1, 0, 1)
+            applied = true
+        end
+    end
+    if not applied then
+        -- Fallback icon
+        frame.tex:SetTexture(450928)
+        frame.tex:SetTexCoord(0, 1, 0, 1)
+    end
+end
+
 local function ensureMarkerFrame(self, unit)
     local frame = self.nameplateMarkerFrames[unit]
     local db = self.db.profile.mobIndicator
@@ -130,7 +155,7 @@ local function ensureMarkerFrame(self, unit)
 
         frame.tex = frame:CreateTexture(nil, "OVERLAY")
         frame.tex:SetAllPoints()
-        frame.tex:SetTexture(db.texture or 450928)
+        applyMarkerTexture(frame, db.texture or 450928)
 
         if db.tintEnabled then
             local c = db.tint or { r = 1, g = 1, b = 1, a = 1 }
@@ -143,7 +168,7 @@ local function ensureMarkerFrame(self, unit)
     else
         -- Update size/texture/tint live
         frame:SetSize(db.size or 24, db.size or 24)
-        frame.tex:SetTexture(db.texture or 450928)
+        applyMarkerTexture(frame, db.texture or 450928)
         if db.tintEnabled then
             local c = db.tint or { r = 1, g = 1, b = 1, a = 1 }
             frame.tex:SetVertexColor(c.r or 1, c.g or 1, c.b or 1, c.a or 1)
