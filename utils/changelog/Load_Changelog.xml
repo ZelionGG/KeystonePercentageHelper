@@ -15,6 +15,7 @@
 	<Script file='Old/v1/1.5.1.lua'/>
 	<Script file='Old/v1/1.6.lua'/>
 	<Script file='Old/v1/1.7.lua'/>
+	<Script file='Old/v1/1.7.1.lua'/>
 	<!-- LIVE -->
-	<Script file='1.7.1.lua'/>
+	<Script file='2.0.lua'/>
 </Ui>
