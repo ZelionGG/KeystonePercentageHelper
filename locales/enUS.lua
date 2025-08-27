@@ -137,6 +137,7 @@ L["GB_BOSS2"] = "Forgemaster Throngus"
 L["GB_BOSS3"] = "Drahga Shadowburner"
 L["GB_BOSS4"] = "Erudax, the Duke of Below"
 
+-- MDT Integration
 -- Mob Percentages
 L["MOB_PERCENTAGES"] = "Mob Percentages"
 L["ENABLE_MOB_PERCENTAGES"] = "Enable Mob Percentages"
@@ -149,8 +150,6 @@ L["RIGHT"] = "Right"
 L["LEFT"] = "Left"
 L["TOP"] = "Top"
 L["BOTTOM"] = "Bottom"
-
--- MDT Integration
 L["MDT_WARNING"] = "This feature requires Mythic Dungeon Tools (MDT) addon to be installed."
 L["MDT_FOUND"] = "Mythic Dungeon Tools found. Mob percentages will use MDT data."
 L["MDT_LOADED"] = "Mythic Dungeon Tools loaded successfully."
@@ -181,22 +180,22 @@ L["MDT_INTEGRATION_FEATURES"] = "Mythic Dungeon Tools Integration Features"
 L["MOB_PERCENTAGES_INFO"] = "• |cff00ff00Mob Percentages|r: Shows enemy forces contribution percentage on nameplates in M+ dungeons."
 L["MOB_INDICATOR_INFO"] = "• |cff00ff00Mobs Indicators|r: Marks nameplates to show which enemies are included in your current MDT route pull."
 
-
 -- Mob Indicators
 L["MOB_INDICATOR"] = "Mob Indicators"
 L["ENABLE_MOB_INDICATORS"] = "Enable Mob Indicators"
 L["ENABLE_MOB_INDICATORS_DESC"] = "Show an indicator for each mob included in the MDT route"
-L["MOB_INDICATOR_TEXTURE"] = "Texture (ID or Path)"
-L["MOB_INDICATOR_TEXTURE_DESC"] = "Texture (ID or Path)"
+L["MOB_INDICATOR_TEXTURE_HEADER"] = "Indicator icon"
+L["MOB_INDICATOR_TEXTURE"] = "Indicator icon (ID or Path)"
 L["MOB_INDICATOR_TEXTURE_SIZE"] = "Size"
-L["MOB_INDICATOR_TEXTURE_SIZE_DESC"] = "Set the texture size for the indicator"
+L["MOB_INDICATOR_TEXTURE_SIZE_DESC"] = "Set the texture size for the indicator icon"
+L["MOB_INDICATOR_COLORING_HEADER"] = "Coloring"
 L["MOB_INDICATOR_BEHAVIOR"] = "Behavior"
 L["MOB_INDICATOR_AUTO_ADVANCE"] = "Auto-advance pull"
 L["MOB_INDICATOR_AUTO_ADVANCE_DESC"] = "Auto-advance pull when no current-pull mobs are visible."
-L["MOB_INDICATOR_TINT_COLOR"] = "Color"
-L["MOB_INDICATOR_TINT_COLOR_DESC"] = "Color of the texture"
 L["MOB_INDICATOR_TINT"] = "Tint the indicator"
-L["MOB_INDICATOR_TINT_DESC"] = "Tint the indicator texture"
+L["MOB_INDICATOR_TINT_DESC"] = "Tint the indicator icon"
+L["MOB_INDICATOR_TINT_COLOR"] = "Color"
+L["MOB_INDICATOR_POSITION_HEADER"] = "Positioning"
 
 -- UI Strings
 L["FINISHED"] = "Dungeon percentage done"

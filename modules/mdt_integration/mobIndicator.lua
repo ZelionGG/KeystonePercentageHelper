@@ -41,6 +41,8 @@ KeystonePercentageHelper.mdtIndicator = KeystonePercentageHelper.mdtIndicator or
     currentPullNpcIds = {},      -- set of NPC IDs for current pull only
     dungeonIdx = nil,            -- remember current dungeon index
     dungeonEnemies = nil,        -- cached enemies table for current dungeon
+    requiredCounts = {},         -- map: npcId -> required clone count for current pull
+    selectedUnits = {},          -- set: unit token -> true (units chosen to highlight this tick)
 }
 
 --
@@ -215,18 +217,12 @@ function KeystonePercentageHelper:UpdateNameplateMarker(unit)
     end
 
     -- MDT available and target set constructed
-    if not (self.mdtIndicator.loaded and self.mdtIndicator.allNpcIds) then
+    if not (self.mdtIndicator.loaded and self.mdtIndicator.selectedUnits) then
         self:RemoveNameplateMarker(unit)
         return
     end
 
-    local npcId = getNpcIdFromUnit(unit)
-    if not npcId then
-        self:RemoveNameplateMarker(unit)
-        return
-    end
-
-    if self.mdtIndicator.allNpcIds[npcId] then
+    if self.mdtIndicator.selectedUnits[unit] then
         local frame = ensureMarkerFrame(self, unit)
         self:UpdateMarkerPosition(unit)
         frame:Show()
@@ -417,6 +413,70 @@ function KeystonePercentageHelper:RebuildIndicatorTargetSet()
     end
     collectNpcIdsFromPull(pulls[m.currentPullIndex], m.currentPullNpcIds, dungeonEnemies)
 
+    -- Build required counts for the current pull (WeakAura-compatible)
+    self:BuildCurrentPullNpcCounts()
+end
+
+-- Build per-NPC required counts for the CURRENT pull, based on MDT enemy indices and clone tables
+function KeystonePercentageHelper:BuildCurrentPullNpcCounts()
+    local m = self.mdtIndicator
+    wipe(m.requiredCounts)
+    local pull = m.pulls and m.pulls[m.currentPullIndex]
+    if type(pull) ~= "table" or type(m.dungeonEnemies) ~= "table" then return end
+
+    for enemyIdx, clones in pairs(pull) do
+        if type(enemyIdx) == "number" and type(clones) == "table" then
+            local enemy = m.dungeonEnemies[enemyIdx]
+            local npcId = enemy and (enemy.id or enemy.npcID or enemy.npcId or enemy.creatureId)
+            npcId = tonumber(npcId)
+            if npcId then
+                local count = 0
+                for _ in pairs(clones) do count = count + 1 end
+                if count > 0 then
+                    m.requiredCounts[npcId] = (m.requiredCounts[npcId] or 0) + count
+                end
+            end
+        end
+    end
+end
+
+-- Choose which nameplates to highlight: prefer engaged units first; then fill remaining up to required count per NPC
+function KeystonePercentageHelper:ComputeSelectedUnits()
+    local m = self.mdtIndicator
+    wipe(m.selectedUnits)
+    if not (m.requiredCounts and next(m.requiredCounts)) then return end
+
+    local perNpcSelected = {}
+
+    -- First pass: engaged units
+    for i = 1, 40 do
+        local unit = "nameplate" .. i
+        if UnitExists(unit) and C_NamePlate.GetNamePlateForUnit(unit) and isUnitHostile(unit) then
+            local npcId = getNpcIdFromUnit(unit)
+            if npcId and m.requiredCounts[npcId] then
+                local selected = perNpcSelected[npcId] or 0
+                if UnitAffectingCombat(unit) and selected < m.requiredCounts[npcId] then
+                    m.selectedUnits[unit] = true
+                    perNpcSelected[npcId] = selected + 1
+                end
+            end
+        end
+    end
+
+    -- Second pass: fill remaining with any remaining visible units (nearest preference can be added later)
+    for i = 1, 40 do
+        local unit = "nameplate" .. i
+        if UnitExists(unit) and C_NamePlate.GetNamePlateForUnit(unit) and isUnitHostile(unit) and not m.selectedUnits[unit] then
+            local npcId = getNpcIdFromUnit(unit)
+            if npcId and m.requiredCounts[npcId] then
+                local selected = perNpcSelected[npcId] or 0
+                if selected < m.requiredCounts[npcId] then
+                    m.selectedUnits[unit] = true
+                    perNpcSelected[npcId] = selected + 1
+                end
+            end
+        end
+    end
 end
 
 -- ===============================
@@ -425,28 +485,62 @@ end
 function KeystonePercentageHelper:TryAutoAdvancePull()
     local db = self.db.profile.mobIndicator
     local m = self.mdtIndicator
-    if not (db.autoAdvance and m.pulls and m.currentPullNpcIds and m.maxPulls and m.maxPulls > 0) then
-        return
-    end
+    if not (db.autoAdvance and m.pulls and m.maxPulls and m.maxPulls > 0) then return end
     if m.currentPullIndex >= m.maxPulls then return end
-    if not next(m.currentPullNpcIds) then return end
 
-    local foundVisible = false
-    for i = 1, 40 do
-        local unit = "nameplate" .. i
-        if UnitExists(unit) and isUnitHostile(unit) then
-            local npcId = getNpcIdFromUnit(unit)
-            if npcId and m.currentPullNpcIds[npcId] then
-                foundVisible = true
-                break
+    local MDT = _G.MDT
+    if not MDT or not MDT.CountForces then return end
+
+    -- Helpers mirroring the WeakAura
+    local function getSteps()
+        local _, _, numSteps = C_Scenario.GetStepInfo()
+        return numSteps or 0
+    end
+    local function isDungeonFinished()
+        return getSteps() < 1
+    end
+    local function isMythicPlus()
+        local difficulty = select(3, GetInstanceInfo()) or -1
+        return (difficulty == 8 and not isDungeonFinished())
+    end
+    local function getProgressInfo()
+        if isMythicPlus() then
+            local numSteps = getSteps()
+            if numSteps > 0 and C_ScenarioInfo and C_ScenarioInfo.GetCriteriaInfo then
+                local info = C_ScenarioInfo.GetCriteriaInfo(numSteps)
+                if info and info.isWeightedProgress then return info end
             end
         end
     end
+    local function getMaxQuantity()
+        local info = getProgressInfo()
+        return info and info.totalQuantity or nil
+    end
+    local function getForcePercentForEnemyCount(quantity)
+        local maxQ = getMaxQuantity()
+        if not maxQ or maxQ == 0 then return 100 end
+        local q = tonumber(quantity) or 0
+        return (q / maxQ) * 100
+    end
+    local function getEnemyForcesProgress()
+        local info = getProgressInfo()
+        if info and info.quantityString then
+            local value = string.gsub(info.quantityString, "%%", "")
+            return tonumber(value) or 0
+        end
+        return 0
+    end
 
-    if not foundVisible then
+    local currentPull = m.currentPullIndex
+    local stepSize = getForcePercentForEnemyCount(MDT:CountForces(currentPull))
+    local currentProg = getEnemyForcesProgress()
+    local left = (stepSize or 0) - (currentProg or 0)
+
+    if left <= 0 then
         m.currentPullIndex = m.currentPullIndex + 1
-        -- Rebuild sets with new index
+        -- Rebuild sets with new index and recompute selection
         self:RebuildIndicatorTargetSet()
+        self:ComputeSelectedUnits()
     end
 end
 
@@ -471,6 +565,8 @@ function KeystonePercentageHelper:OnMobIndicatorTick()
 
     -- Rebuild target sets and refresh plates
     self:RebuildIndicatorTargetSet()
+    -- Compute selected nameplates for current pull (engaged first)
+    self:ComputeSelectedUnits()
     self:UpdateAllNameplateMarkers()
 
     -- Try auto-advance if enabled
@@ -517,6 +613,7 @@ function KeystonePercentageHelper:InitializeMobIndicator()
             self.mdtIndicator.currentPullIndex = 1
             self:CheckForMDTForIndicators()
             self:RebuildIndicatorTargetSet()
+            self:ComputeSelectedUnits()
             self:UpdateAllNameplateMarkers()
             if C_ChallengeMode.IsChallengeModeActive() then
                 startMobIndicatorTicker(self)
@@ -530,6 +627,7 @@ function KeystonePercentageHelper:InitializeMobIndicator()
     -- Initial boot
     self:CheckForMDTForIndicators()
     self:RebuildIndicatorTargetSet()
+    self:ComputeSelectedUnits()
     self:UpdateAllNameplateMarkers()
 
     if C_ChallengeMode.IsChallengeModeActive() then
@@ -599,12 +697,16 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                     return not self.mdtIndicator.loaded
                 end,
                 args = {
+                    textureHeader = {
+                        type = "header",
+                        name = L["MOB_INDICATOR_TEXTURE_HEADER"],
+                        order = 0,
+                    },
                     texture = {
                         name = L["MOB_INDICATOR_TEXTURE"],
-                        desc = L["MOB_INDICATOR_TEXTURE_DESC"],
                         type = "input",
                         order = 1,
-                        width = 1.0,
+                        width = 1.5,
                         get = function() return tostring(self.db.profile.mobIndicator.texture or 450928) end,
                         set = function(_, v)
                             local id = tonumber(v)
@@ -619,6 +721,41 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                             for unit, _ in pairs(self.nameplateMarkerFrames) do
                                 self:UpdateNameplateMarker(unit)
                             end
+                            local ACR = LibStub and LibStub("AceConfigRegistry-3.0", true)
+                            if ACR then ACR:NotifyChange(AddOnName) end
+                        end,
+                    },
+                    texturePreview = {
+                        name = " ",
+                        type = "description",
+                        order = 1.4,
+                        width = 0.3,
+                        image = function()
+                            local tex = self.db.profile.mobIndicator.texture
+                            if type(tex) == "string" and C_Texture and C_Texture.GetAtlasInfo then
+                                local info = C_Texture.GetAtlasInfo(tex)
+                                if info and info.file then
+                                    return info.file
+                                end
+                            end
+                            return tex
+                        end,
+                        imageCoords = function()
+                            local tex = self.db.profile.mobIndicator.texture
+                            if type(tex) == "string" and C_Texture and C_Texture.GetAtlasInfo then
+                                local info = C_Texture.GetAtlasInfo(tex)
+                                if info then
+                                    return { info.leftTexCoord, info.rightTexCoord, info.topTexCoord, info.bottomTexCoord }
+                                end
+                            end
+                            -- no coords for plain textures/ids
+                            return nil
+                        end,
+                        imageWidth = 24,
+                        imageHeight = 24,
+                        disabled = function()
+                            self:CheckForMDTForIndicators()
+                            return not self.mdtIndicator.loaded
                         end,
                     },
                     resetTexture = {
@@ -634,6 +771,8 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                                     applyMarkerTexture(frame, def)
                                 end
                             end
+                            local ACR = LibStub and LibStub("AceConfigRegistry-3.0", true)
+                            if ACR then ACR:NotifyChange(AddOnName) end
                         end,
                     },
                     size = {
@@ -651,12 +790,17 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                             end
                         end,
                     },
-                    _newlineAfterSize = {
+                    coloringHeader = {
+                        type = "header",
+                        name = L["MOB_INDICATOR_COLORING_HEADER"],
+                        order = 2.5,
+                    },
+                    --[[ _newlineAfterSize = {
                         type = "description",
                         name = " ",
                         order = 2.9,
                         width = "full",
-                    },
+                    }, ]]
                     tintEnabled = {
                         name = L["MOB_INDICATOR_TINT"],
                         desc = L["MOB_INDICATOR_TINT_DESC"],
@@ -677,7 +821,6 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                     },
                     tint = {
                         name = L["MOB_INDICATOR_TINT_COLOR"],
-                        desc = L["MOB_INDICATOR_TINT_COLOR_DESC"],
                         type = "color",
                         order = 4,
                         hasAlpha = true,
@@ -698,11 +841,23 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                             return (not self.mdtIndicator.loaded) or (not self.db.profile.mobIndicator.tintEnabled)
                         end
                     },
+                    positionHeader = {
+                        type = "header",
+                        name = L["MOB_INDICATOR_POSITION_HEADER"],
+                        order = 4.5,
+                    },
+                    --[[ _newlineAfterPositionHeader = {
+                        type = "description",
+                        name = " ",
+                        order = 5.9,
+                        width = "full",
+                    }, ]]
                     position = {
                         name = L["POSITION"],
                         desc = L["POSITION"],
                         type = "select",
                         order = 5,
+                        width = 0.8,
                         values = {
                             RIGHT = L["RIGHT"],
                             LEFT  = L["LEFT"],
@@ -717,12 +872,19 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                             end
                         end
                     },
+                    --[[ _newlineAfterPosition = {
+                        type = "description",
+                        name = " ",
+                        order = 5.9,
+                        width = "full",
+                    }, ]]
                     xOffset = {
                         name = L["X_OFFSET"],
                         desc = L["X_OFFSET_DESC"],
                         type = "range",
                         order = 6,
-                        min = -100, max = 100, step = 1,
+                        width = 0.8,
+                        min = -500, max = 500, step = 1,
                         get = function() return self.db.profile.mobIndicator.xOffset end,
                         set = function(_, v)
                             self.db.profile.mobIndicator.xOffset = v
@@ -736,7 +898,8 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                         desc = L["Y_OFFSET_DESC"],
                         type = "range",
                         order = 7,
-                        min = -100, max = 100, step = 1,
+                        width = 0.8,
+                        min = -500, max = 500, step = 1,
                         get = function() return self.db.profile.mobIndicator.yOffset end,
                         set = function(_, v)
                             self.db.profile.mobIndicator.yOffset = v
