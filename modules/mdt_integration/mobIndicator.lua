@@ -611,13 +611,29 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                             if id then
                                 self.db.profile.mobIndicator.texture = id
                             elseif type(v) == "string" and v ~= "" then
-                                -- Accept texture path strings
+                                -- Accept texture path strings or atlas names
                                 self.db.profile.mobIndicator.texture = v
                             else
                                 return
                             end
                             for unit, _ in pairs(self.nameplateMarkerFrames) do
                                 self:UpdateNameplateMarker(unit)
+                            end
+                        end,
+                    },
+                    resetTexture = {
+                        name = L["RESET_TO_DEFAULT"],
+                        desc = L["RESET_TEXTURE_DESC"] or L["RESET_TO_DEFAULT"],
+                        type = "execute",
+                        order = 1.5,
+                        width = 0.6,
+                        func = function()
+                            local def = (KeystonePercentageHelper.defaults and KeystonePercentageHelper.defaults.profile and KeystonePercentageHelper.defaults.profile.mobIndicator and KeystonePercentageHelper.defaults.profile.mobIndicator.texture) or 450928
+                            self.db.profile.mobIndicator.texture = def
+                            for _, frame in pairs(self.nameplateMarkerFrames) do
+                                if frame and frame.tex then
+                                    applyMarkerTexture(frame, def)
+                                end
                             end
                         end,
                     },
@@ -635,6 +651,12 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                                 self:UpdateMarkerPosition(unit)
                             end
                         end,
+                    },
+                    _newlineAfterSize = {
+                        type = "description",
+                        name = " ",
+                        order = 2.9,
+                        width = "full",
                     },
                     tintEnabled = {
                         name = L["MOB_INDICATOR_TINT"],
