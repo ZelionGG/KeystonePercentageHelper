@@ -623,7 +623,6 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                     },
                     resetTexture = {
                         name = L["RESET_TO_DEFAULT"],
-                        desc = L["RESET_TEXTURE_DESC"] or L["RESET_TO_DEFAULT"],
                         type = "execute",
                         order = 1.5,
                         width = 0.6,
