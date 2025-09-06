@@ -6,8 +6,8 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
     AKCE = { -- Ara-Kara, City of Echoes
         id = 503,
         bosses = {
-            {1, 32.78, false},
-            {2, 78.76, false},
+            {1, 37.75, false},
+            {2, 73.50, false},
             {3, 100, true}
         }
     },
@@ -50,8 +50,8 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
     PotSF = { -- Priory of the Sacred Flame
         id = 499,
         bosses = {
-            {1, 48.23, false},
-            {2, 70.73, false},
+            {1, 46.98, false},
+            {2, 69.48, false},
             {3, 100, true}
         }
     },
@@ -83,8 +83,8 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
     EDAD = { -- Eco-Dome Al'dani
         id = 542,
         bosses = {
-            {1, 26.79, false},
-            {2, 54.40, false},
+            {1, 18.92, false},
+            {2, 57.12, false},
             {3, 100, true}
         }
     }

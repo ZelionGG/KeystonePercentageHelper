@@ -1598,11 +1598,12 @@ function KeystonePercentageHelper:CheckForNewRoutes()
     end
 
     -- If the version has changed and we need to prompt for route reset
+    local prevWasBeta = (lastVersionCheck ~= "" and lastVersionCheck:lower():find("beta", 1, true) ~= nil)
     if lastVersionCheck ~= currentVersion and
         self.db.profile.general.advancedOptionsEnabled and
         not InCombatLockdown() and
-        (lastRoutesUpdate > lastVersionCheck or lastVersionCheck == "") and
-        currentDate > lastSeasonCheck and currentVersion >= lastRoutesUpdate then
+        currentDate > lastSeasonCheck and
+        (((lastRoutesUpdate > lastVersionCheck or lastVersionCheck == "") and currentVersion >= lastRoutesUpdate) or prevWasBeta) then
 
         local changedDungeonsText = self:GetChangedDungeonsText()
 
