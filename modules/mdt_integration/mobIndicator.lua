@@ -1,4 +1,3 @@
----@diagnostic disable: undefined-global, undefined-field
 local AddOnName, KeystonePercentageHelper = ...
 local _G = _G
 local pairs, ipairs, select, strsplit = pairs, ipairs, select, strsplit
