@@ -285,3 +285,10 @@ L["MOB_INDICATOR_TINT"] = "Tint the indicator"
 L["MOB_INDICATOR_TINT_DESC"] = "Tint the indicator icon"
 L["MOB_INDICATOR_TINT_COLOR"] = "Color"
 L["MOB_INDICATOR_POSITION_HEADER"] = "Positioning"
+
+-- Group Reminder (Popup labels)
+L["KPH_GR_HEADER"] = "Keystone Percentage Helper - Group Reminder"
+L["KPH_GR_DUNGEON"] = "Dungeon:"
+L["KPH_GR_GROUP"] = "Group:"
+L["KPH_GR_DESCRIPTION"] = "Description:"
+L["KPH_GR_ROLE"] = "Role:"

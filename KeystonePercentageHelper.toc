@@ -38,6 +38,7 @@ utils/seasons/seasons.xml
 
 options.lua
 core.lua
+modules/groupReminder.lua
 modules/mdt_integration/mobPercentages.lua
 modules/mdt_integration/mobIndicator.lua
 

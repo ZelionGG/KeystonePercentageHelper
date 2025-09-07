@@ -229,6 +229,7 @@ function KeystonePercentageHelper:OnInitialize()
                 order = 2,
                 childGroups = "tree",
                 args = {
+                    groupReminder = self:GetGroupReminderOptions(),
                     mdtIntegration = {
                         name = L["MDT_INTEGRATION"],
                         type = "group",
@@ -293,6 +294,11 @@ function KeystonePercentageHelper:OnInitialize()
     --[[ if self.db.profile.mobIndicator and self.db.profile.mobIndicator.enabled then
         self:InitializeMobIndicator()
     end ]]
+
+    -- Initialize Group Reminder if enabled
+    if self.db.profile.groupReminder and self.db.profile.groupReminder.enabled then
+        self:InitializeGroupReminder()
+    end
 end
 
 -- Open configuration panel when command is used
