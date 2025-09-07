@@ -165,7 +165,6 @@ function KeystonePercentageHelper:InitializeGroupReminder()
         local activity = C_LFGList.GetActivityInfoTable and C_LFGList.GetActivityInfoTable(activityID)
         if not activity then return end
 
-        print(activity.mapID)
         -- Hide Blizzard's LFG invite dialog if it's still visible (post-accept)
         if self.db.profile.groupReminder.suppressQuickJoinToast and type(LFGListInviteDialog) == "table" and LFGListInviteDialog.Hide then
             if LFGListInviteDialog:IsShown() then
