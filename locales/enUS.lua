@@ -291,8 +291,7 @@ L["IMPORT_ERROR"] = "Invalid import string"
 L["IMPORT_DIFFERENT_DUNGEON"] = "Imported settings for %s. Opening options for that dungeon."
 
 -- Format de texte
-L["CUSTOM"] = "Custom Format"
 L["CUSTOM_FORMAT"] = "Text Format"
-L["CUSTOM_FORMAT_DESC"] = "Enter a custom format for the percentage text. Use %s where you want the percentage value to appear. Examples: (%s), [%s], %s, <%s>, etc."
+L["CUSTOM_FORMAT_DESC"] = "Enter a custom format. Use %s for percentage, %c for count, and %t for total. Examples: (%s), %s | %c/%t, %c, etc."
 L["RESET_TO_DEFAULT"] = "Reset"
 L["RESET_FORMAT_DESC"] = "Reset the text format to the default value (parentheses)"

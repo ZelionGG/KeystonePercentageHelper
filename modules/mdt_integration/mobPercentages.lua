@@ -151,39 +151,111 @@ function KeystonePercentageHelper:UpdateNameplate(unit)
 
     -- Update text based on user preferences
     if weight and weight > 0 then
-        local percentText = ""
-
-        -- Show percentage
+        -- Percent only string (for explicit placeholder usage)
+        local percentOnly = ""
         if self.db.profile.mobPercentages.showPercent then
-            percentText = format("%.2f%%", weight)
+            percentOnly = format("%.2f%%", weight)
         end
 
-        -- Show count if enabled
-        if self.db.profile.mobPercentages.showCount then
-            if percentText ~= "" then
-                percentText = percentText .. " | "
+        -- Backward-compatible combined string (percent + count[/max])
+        local combinedText = percentOnly
+        if self.db.profile.mobPercentages.showCount and count then
+            if combinedText ~= "" then
+                combinedText = combinedText .. " | "
             end
-            percentText = percentText .. count
+            combinedText = combinedText .. count
 
-            -- Show total if enabled
             if self.db.profile.mobPercentages.showTotal then
                 if isTeeming then
-                    percentText = percentText .. "/" .. maxTeeming
+                    combinedText = combinedText .. "/" .. (maxTeeming or "")
                 else
-                    percentText = percentText .. "/" .. max
+                    combinedText = combinedText .. "/" .. (max or "")
                 end
             end
         end
 
-        -- Format text according to user preference
-        local formattedText = format(self.db.profile.mobPercentages.customFormat, percentText)
+        -- Build replacement values for new placeholders
+        local countStr = ""
+        if self.db.profile.mobPercentages.showCount and count then
+            countStr = tostring(count)
+        end
+
+        local maxStr = ""
+        -- Only show total when both Show Count and Show Total are enabled (consistent with combined text behavior)
+        if self.db.profile.mobPercentages.showCount and self.db.profile.mobPercentages.showTotal then
+            if isTeeming and maxTeeming then
+                maxStr = tostring(maxTeeming)
+            elseif max then
+                maxStr = tostring(max)
+            end
+        end
+
+        -- Determine which base text to feed into %s
+        local fmt = self.db.profile.mobPercentages.customFormat or "(%s)"
+
+        -- Choose base content for %s depending on whether explicit placeholders are present
+        local hasExplicitPlaceholders = (
+            fmt:find("%c", 1, true) ~= nil or fmt:find("%t", 1, true) ~= nil
+        )
+        local base = hasExplicitPlaceholders and percentOnly or combinedText
+
+        -- Protect literal %% so we can restore them later
+        local PCT = "\1PCT\2"
+        fmt = fmt:gsub("%%%%", PCT)
+
+        -- Substitute placeholders
+        -- % tokens
+        fmt = fmt:gsub("%%c", countStr):gsub("%%t", maxStr)
+        -- Percent text
+        fmt = fmt:gsub("%%s", function() return base end)
+        -- Restore literal percent signs
+        fmt = fmt:gsub(PCT, function() return "%" end)
+
+        -- Cleanup formatting and ensure non-empty fallback
+        fmt = self:CleanupMobPercentFormat(fmt)
+        if fmt == "" then
+            if percentOnly ~= "" then
+                fmt = "(" .. percentOnly .. ")"
+            else
+                textFrame:Hide()
+                return
+            end
+        end
 
         -- Update and show the text
-        textFrame.text:SetText(formattedText)
+        textFrame.text:SetText(fmt)
         textFrame:Show()
     else
         textFrame:Hide()
     end
+end
+
+-- Helper: cleanup orphan separators/spaces in formatted mob percentage text
+function KeystonePercentageHelper:CleanupMobPercentFormat(s)
+    if not s or s == "" then return "" end
+
+    -- Remove combos like " - /", " | /" or "/ |"
+    s = s:gsub("%s*[|/%-]%s*/%s*", " ")
+    s = s:gsub("%s*/%s*[|/%-]%s*", " ")
+
+    -- Trim leading/trailing pipes, slashes or hyphens with optional spaces
+    s = s:gsub("^%s*[|/%-]%s*", "")
+    s = s:gsub("%s*[|/%-]%s*$", "")
+
+    -- Remove trailing or leading lone slash or hyphen
+    s = s:gsub("%s*[/-]%s*$", "")
+    s = s:gsub("^%s*[/-]%s*", "")
+
+    -- Collapse multiple spaces and trim
+    s = s:gsub("%s+", " ")
+    s = s:gsub("^%s+", ""):gsub("%s+$", "")
+
+    -- Final pass: remove separators adjacent to parentheses
+    s = s:gsub("%s*[|/%-]%s*%)", ")") -- remove trailing sep before )
+    s = s:gsub("%(%s*[|/%-]%s*", "(") -- remove leading sep after (
+    s = s:gsub("%s+%)", ")") -- remove space before )
+
+    return s
 end
 
 -- Remove nameplate text when nameplate is removed
@@ -311,9 +383,15 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
                         type = "input",
                         order = 4,
                         width = 1.5, -- Réduit la largeur pour faire de la place au bouton
-                        get = function() return self.db.profile.mobPercentages.customFormat end,
+                        get = function()
+                            local v = self.db.profile.mobPercentages.customFormat
+                            if not v or v == "" then return "(%s)" end
+                            return v
+                        end,
                         set = function(_, value)
-                            self.db.profile.mobPercentages.customFormat = value
+                            local v = (value or ""):gsub("^%s+", ""):gsub("%s+$", "")
+                            if v == "" then v = "(%s)" end
+                            self.db.profile.mobPercentages.customFormat = v
                             -- Update all nameplates
                             for unit, _ in pairs(self.nameplateTextFrames) do
                                 self:UpdateNameplate(unit)
