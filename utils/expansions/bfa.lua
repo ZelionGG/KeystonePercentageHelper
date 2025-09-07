@@ -5,6 +5,8 @@ KeystonePercentageHelper.BFA_DUNGEON_DATA = {
     -- Format: [shortName] = {id = dungeonID, bosses = {{bossID, percent, shouldInform}, ...}}
     OMGW = {
         id = 370,
+        mapID = 2773,
+        teleportID = 373274,
         bosses = {
             {1, 22.46, false},
             {2, 47.59, true},
@@ -14,6 +16,8 @@ KeystonePercentageHelper.BFA_DUNGEON_DATA = {
     },
     SoB = {
         id = 353,
+        mapID = 1822,
+        teleportID = 464256,
         bosses = {
             {1, 37.04, false},
             {2, 54.66, false},
@@ -23,6 +27,8 @@ KeystonePercentageHelper.BFA_DUNGEON_DATA = {
     },
     TML = {
         id = 247,
+        mapID = 1594,
+        teleportID = {467555, 467553},
         bosses = {
             {1, 26.91, false},
             {2, 59.30, false},
