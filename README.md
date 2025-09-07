@@ -111,6 +111,7 @@ While the original WeakAura served its purpose well, converting it to a standalo
 - [Hollicsh](https://github.com/Hollicsh) - Russian Localization
 - [BlueSea-jun](https://github.com/BlueSea-jun) - Korean Localization
 - [nanjuekaien1](https://github.com/nanjuekaien1) - Chinese-PRC Localization
+- [KazumaKuma](https://github.com/KazumaKuma) - German Localization
 
 __I am actually looking for people that want to help with localization of Keystone Percentage Helper, don't hesitate to contact me on [X (Twitter)](https://twitter.com/ZelionGG)__ 
 
