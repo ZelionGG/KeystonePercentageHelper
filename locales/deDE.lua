@@ -141,6 +141,7 @@ L["GB_BOSS3"] = "Drahga Schattenbrenner"
 L["GB_BOSS4"] = "Erudax, der Herzog der Tiefe"
 
 -- UI Strings
+L["MODULES"] = "Modules" -- To Translate
 L["FINISHED"] = "Dungeon-Prozentsatz erreicht"
 L["SECTION_DONE"] = "Abschnitt abgeschlossen"
 L["DONE"] = "Abschnittsprozentsatz erreicht"
