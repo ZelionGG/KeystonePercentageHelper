@@ -142,6 +142,7 @@ L["GB_BOSS3"] = "드라가 섀도버너"
 L["GB_BOSS4"] = "지하 군주, 에루닥스"
 
 -- UI Strings
+L["MODULES"] = "Modules" -- To Translate
 L["FINISHED"] = "던전 퍼센트 완료"
 L["SECTION_DONE"] = "구역 완료"
 L["DONE"] = "구역 퍼센트 완료"

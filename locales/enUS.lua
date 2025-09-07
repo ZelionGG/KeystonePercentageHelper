@@ -198,6 +198,7 @@ L["MOB_INDICATOR_TINT_COLOR"] = "Color"
 L["MOB_INDICATOR_POSITION_HEADER"] = "Positioning"
 
 -- UI Strings
+L["MODULES"] = "Modules"
 L["FINISHED"] = "Dungeon percentage done"
 L["SECTION_DONE"] = "Section finished"
 L["DONE"] = "Section percentage done"

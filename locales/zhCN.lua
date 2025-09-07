@@ -143,6 +143,7 @@ L["GB_BOSS3"] = "达加·燃影者"
 L["GB_BOSS4"] = "地狱公爵埃鲁达克"
 
 -- UI Strings
+L["MODULES"] = "Modules" -- To Translate
 L["FINISHED"] = "地下城进度完成"
 L["SECTION_DONE"] = "区域完成"
 L["DONE"] = "区域进度完成"

@@ -223,42 +223,50 @@ function KeystonePercentageHelper:OnInitialize()
                     otherOptions = self:GetOtherOptions(),
                 }
             },
-            mdtIntegration = {
-                name = L["MDT_INTEGRATION"],
+            modules = {
+                name = L["MODULES"],
                 type = "group",
                 order = 2,
+                childGroups = "tree",
                 args = {
-                    mdtIntegrationHeader = {
-                        order = 0,
-                        type = "header",
+                    mdtIntegration = {
                         name = L["MDT_INTEGRATION"],
-                    },
-                    mdtWarning = {
-                        name = L["MDT_SECTION_WARNING"],
-                        type = "description",
-                        order = 1,
-                        fontSize = "medium",
-                    },
-                    -- Information about MDT integration features
-                    featuresHeader = {
+                        type = "group",
                         order = 2,
-                        type = "header",
-                        name = L["MDT_INTEGRATION_FEATURES"],
+                        args = {
+                            mdtIntegrationHeader = {
+                                order = 0,
+                                type = "header",
+                                name = L["MDT_INTEGRATION"],
+                            },
+                            mdtWarning = {
+                                name = L["MDT_SECTION_WARNING"],
+                                type = "description",
+                                order = 1,
+                                fontSize = "medium",
+                            },
+                            -- Information about MDT integration features
+                            featuresHeader = {
+                                order = 2,
+                                type = "header",
+                                name = L["MDT_INTEGRATION_FEATURES"],
+                            },
+                            mobPercentagesInfo = {
+                                name = L["MOB_PERCENTAGES_INFO"],
+                                type = "description",
+                                order = 4,
+                                fontSize = "medium",
+                            },
+                            --[[ mobIndicatorInfo = {
+                                name = L["MOB_INDICATOR_INFO"],
+                                type = "description",
+                                order = 5,
+                                fontSize = "medium",
+                            }, ]]
+                            mobPercentages = self:GetMobPercentagesOptions(),
+                            --mobIndicator = self:GetMobIndicatorOptions(),
+                        }
                     },
-                    mobPercentagesInfo = {
-                        name = L["MOB_PERCENTAGES_INFO"],
-                        type = "description",
-                        order = 4,
-                        fontSize = "medium",
-                    },
-                    mobIndicatorInfo = {
-                        name = L["MOB_INDICATOR_INFO"],
-                        type = "description",
-                        order = 5,
-                        fontSize = "medium",
-                    },
-                    mobPercentages = self:GetMobPercentagesOptions(),
-                    mobIndicator = self:GetMobIndicatorOptions(),
                 }
             },
             advanced = self:GetAdvancedOptions()

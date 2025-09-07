@@ -139,6 +139,7 @@ L["GB_BOSS3"] = "Drahga Brûle-Ombre"
 L["GB_BOSS4"] = "Erudax, le Duc d'en bas"
 
 -- UI Strings
+L["MODULES"] = "Modules"
 L["FINISHED"] = "Pourcentage du donjon atteint"
 L["SECTION_DONE"] = "Section de donjon terminée"
 L["DONE"] = "Pourcentage de la section atteint"
