@@ -290,8 +290,9 @@ function KeystonePercentageHelper:OnInitialize()
     end
 
     -- After InitializeMobPercentages check
-    if self.db.profile.mobIndicator and self.db.profile.mobIndicator.enabled then
+    --[[ if self.db.profile.mobIndicator and self.db.profile.mobIndicator.enabled then
         self:InitializeMobIndicator()
+    end ]]
     end
 end
 
