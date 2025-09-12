@@ -63,9 +63,9 @@ KeystonePercentageHelper.SL_DUNGEON_DATA = {
         mapID = 2287,
         teleportID = 354465,
         bosses = {
-            {1, 55.79, false},
-            {2, 81.66, false},
-            {3, 93.24, true},
+            {1, 57.73, false},
+            {2, 79.83, false},
+            {3, 92.49, true},
             {4, 100, true}
         }
     }

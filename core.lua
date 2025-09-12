@@ -16,16 +16,11 @@ KeystonePercentageHelper.constants = {
 }
 
 -- Track the last routes update version for prompting users
-KeystonePercentageHelper.lastRoutesUpdate = "1.7.2" -- Set to true when routes have been updated
+KeystonePercentageHelper.lastRoutesUpdate = "2.0.1" -- Set to true when routes have been updated
 
 -- Table to store dungeons with changed routes
 KeystonePercentageHelper.CHANGED_ROUTES_DUNGEONS = {
-    ["AKCE"] = true,
-    ["EDAD"] = true,
     ["HoA"] = true,
-    ["PotSF"] = true,
-    ["TSLG"] = true,
-    ["TSoW"] = true
 }
 
 -- Initialize Ace3 configuration libraries
