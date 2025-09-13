@@ -541,33 +541,70 @@ function KeystonePercentageHelper:GetAdvancedOptions()
         end
     end
 
-    -- Create expansion-specific dungeon args
-    local function CreateExpansionDungeonArgs(dungeonIds, defaults)
+    -- Generic builder for section args (used for seasons and expansions)
+    local function CreateGenericSectionArgs(sectionLabel, dungeonKeys, dungeonFilter, getDefaultsFn)
         local args = {
+            disclaimer = {
+                order = 0,
+                type = "description",
+                fontSize = "medium",
+                name = L["ROUTES_DISCLAIMER"],
+            },
+            separator = {order = 1, type = "header", name = ""},
+            export = {
+                order = 1.25,
+                type = "execute",
+                name = L["EXPORT_SECTION"],
+                desc = (L["EXPORT_SECTION_DESC"]):format(sectionLabel),
+                func = function()
+                    local addon = KeystonePercentageHelper
+                    local sectionData = {}
+                    for _, dungeonKey in ipairs(dungeonKeys) do
+                        if addon.db and addon.db.profile and addon.db.profile.advanced and addon.db.profile.advanced[dungeonKey] then
+                            sectionData[dungeonKey] = addon.db.profile.advanced[dungeonKey]
+                        end
+                    end
+                    addon:ExportDungeonSettings(sectionData, "section", sectionLabel)
+                end
+            },
+            import = {
+                order = 1.5,
+                type = "execute",
+                name = L["IMPORT_SECTION"],
+                desc = (L["IMPORT_SECTION_DESC"]):format(sectionLabel),
+                func = function()
+                    KeystonePercentageHelper:ShowImportDialog(sectionLabel, dungeonFilter)
+                end
+            },
+            separatorDefaultPercentages = {
+                order = 2,
+                type = "header",
+                name = L["DEFAULT_PERCENTAGES"],
+            },
             defaultPercentages = {
+                order = 2.5,
+                type = "description",
+                fontSize = "medium",
+                name = L["DEFAULT_PERCENTAGES_DESC"],
+            },
+            defaultPercentagesText = {
                 order = 3,
                 type = "description",
                 fontSize = "medium",
                 name = function()
-                    local text = L["DEFAULT_PERCENTAGES"] .. ":\n\n"
-                    for dungeonKey, _ in pairs(dungeonIds or {}) do
-                        if defaults and defaults[dungeonKey] then
-                            text = text ..
-                                       FormatDungeonText(self, dungeonKey,
-                                                         defaults[dungeonKey])
-                        end
+                    local text = ""
+                    for _, dungeonKey in ipairs(dungeonKeys) do
+                        local defaults = getDefaultsFn and getDefaultsFn(dungeonKey) or nil
+                        text = text .. FormatDungeonText(self, dungeonKey, defaults)
                     end
                     return text
                 end
             }
         }
 
-        -- Add dungeon options (alphabetical)
-        if dungeonIds then
-            local keys = {}
-            for key, _ in pairs(dungeonIds) do table.insert(keys, key) end
-            InsertSortedDungeonOptions(self, keys, sharedDungeonOptions, args, 3)
-        end
+        -- Add per-dungeon options (alphabetical by localized name)
+        -- Start at order 4 to come after the defaults header/description/text
+        InsertSortedDungeonOptions(self, dungeonKeys, sharedDungeonOptions, args, 4)
         return args
     end
 
@@ -624,99 +661,28 @@ function KeystonePercentageHelper:GetAdvancedOptions()
         return nameA < nameB
     end)
 
-    -- Create current season dungeon args
-    local dungeonArgs = {
-        disclaimer = {
-            order = 0,
-            type = "description",
-            fontSize = "medium",
-            name = L["ROUTES_DISCLAIMER"],
-        },
-        separator = {
-            order = 1,
-            type = "header",
-            name = "",
-        },
-        export = {
-            order = 1.25,
-            type = "execute",
-            name = L["EXPORT_SECTION"],
-            desc = (L["EXPORT_SECTION_DESC"]):format(L["CURRENT_SEASON"]),
-            func = function()
-                local addon = KeystonePercentageHelper
-                local dungeonIds = {}
-
-                -- Collect current season dungeon data
-                for _, dungeon in ipairs(currentSeasonDungeons) do
-                    local dungeonKey = dungeon.key
-                    if addon.db.profile.advanced[dungeonKey] then
-                        dungeonIds[dungeonKey] =
-                            addon.db.profile.advanced[dungeonKey]
-                    end
-                end
-
-                -- Export current season dungeon data
-                addon:ExportDungeonSettings(dungeonIds, "section",
-                                            L["CURRENT_SEASON"])
-            end
-        },
-        import = {
-            order = 1.5,
-            type = "execute",
-            name = L["IMPORT_SECTION"],
-            desc = (L["IMPORT_SECTION_DESC"]):format(L["CURRENT_SEASON"]),
-            func = function()
-                local addon = KeystonePercentageHelper
-
-                -- Create filter for current season dungeons
-                local dungeonFilter = {}
-                for _, dungeon in ipairs(currentSeasonDungeons) do
-                    dungeonFilter[dungeon.key] = true
-                end
-
-                addon:ShowImportDialog(L["CURRENT_SEASON"], dungeonFilter)
-            end
-        },
-        separatorDefaultPercentages = {
-            order = 2,
-            type = "header",
-            name = L["DEFAULT_PERCENTAGES"],
-        },
-        defaultPercentages = {
-            order = 2.5,
-            type = "description",
-            fontSize = "medium",
-            name = L["DEFAULT_PERCENTAGES_DESC"],
-        },
-        defaultPercentagesText = {
-            order = 3,
-            type = "description",
-            fontSize = "medium",
-            name = function()
-                local text = ""
-                for _, dungeon in ipairs(currentSeasonDungeons) do
-                    local dungeonKey = dungeon.key
-                    local defaults
-                    for _, expansion in ipairs(expansions) do
-                        if self[expansion.id .. "_DUNGEON_IDS"][dungeonKey] then
-                            defaults =
-                                self[expansion.id .. "_DEFAULTS"][dungeonKey]
-                            break
-                        end
-                    end
-
-                    text = text .. FormatDungeonText(self, dungeonKey, defaults)
-                end
-                return text
-            end
-        }
-    }
-
-    -- Add current season dungeon options (alphabetical)
+    -- Create current season dungeon args (using generic builder)
+    local dungeonArgs
     do
         local keys = {}
-        for _, d in ipairs(currentSeasonDungeons) do table.insert(keys, d.key) end
-        InsertSortedDungeonOptions(self, keys, sharedDungeonOptions, dungeonArgs, 2)
+        local filter = {}
+        for _, d in ipairs(currentSeasonDungeons) do
+            table.insert(keys, d.key)
+            filter[d.key] = true
+        end
+
+        local function getDefaultsFn(dungeonKey)
+            for _, expansion in ipairs(expansions) do
+                local ids = self[expansion.id .. "_DUNGEON_IDS"]
+                if ids and ids[dungeonKey] then
+                    local defaults = self[expansion.id .. "_DEFAULTS"]
+                    return defaults and defaults[dungeonKey] or nil
+                end
+            end
+            return nil
+        end
+
+        dungeonArgs = CreateGenericSectionArgs(L["CURRENT_SEASON"], keys, filter, getDefaultsFn)
     end
 
     -- Create next season dungeon args
@@ -772,88 +738,28 @@ function KeystonePercentageHelper:GetAdvancedOptions()
         return nameA < nameB
     end)
 
-    -- Create next season dungeon args
-    local nextSeasonDungeonArgs = {
-        disclaimer = {
-            order = 0,
-            type = "description",
-            fontSize = "medium",
-            name = L["ROUTES_DISCLAIMER"],
-        },
-        separator = {
-            order = 1,
-            type = "header",
-            name = "",
-        },
-        export = {
-            order = 1.25,
-            type = "execute",
-            name = L["EXPORT_SECTION"],
-            desc = (L["EXPORT_SECTION_DESC"]):format(L["NEXT_SEASON"]),
-            func = function()
-                local addon = KeystonePercentageHelper
-                local dungeonIds = {}
-
-                -- Collect next season dungeon data
-                for _, dungeon in ipairs(nextSeasonDungeons) do
-                    local dungeonKey = dungeon.key
-                    if addon.db.profile.advanced[dungeonKey] then
-                        dungeonIds[dungeonKey] =
-                            addon.db.profile.advanced[dungeonKey]
-                    end
-                end
-
-                -- Export next season dungeon data
-                addon:ExportDungeonSettings(dungeonIds, "section",
-                                            L["NEXT_SEASON"])
-            end
-        },
-        import = {
-            order = 1.5,
-            type = "execute",
-            name = L["IMPORT_SECTION"],
-            desc = (L["IMPORT_SECTION_DESC"]):format(L["NEXT_SEASON"]),
-            func = function()
-                local addon = KeystonePercentageHelper
-
-                -- Create filter for next season dungeons
-                local dungeonFilter = {}
-                for _, dungeon in ipairs(nextSeasonDungeons) do
-                    dungeonFilter[dungeon.key] = true
-                end
-
-                addon:ShowImportDialog(L["NEXT_SEASON"], dungeonFilter)
-            end
-        },
-        defaultPercentages = {
-            order = 2,
-            type = "description",
-            fontSize = "medium",
-            name = function()
-                local text = L["DEFAULT_PERCENTAGES"] .. ":\n\n"
-                for _, dungeon in ipairs(nextSeasonDungeons) do
-                    local dungeonKey = dungeon.key
-                    local defaults
-                    for _, expansion in ipairs(expansions) do
-                        if self[expansion.id .. "_DUNGEON_IDS"][dungeonKey] then
-                            defaults =
-                                self[expansion.id .. "_DEFAULTS"][dungeonKey]
-                            break
-                        end
-                    end
-
-                    text = text .. FormatDungeonText(self, dungeonKey, defaults)
-                end
-                return text
-            end
-        }
-    }
-
-    -- Add next season dungeon options (alphabetical)
+    -- Create next season dungeon args (using generic builder)
+    local nextSeasonDungeonArgs
     do
         local keys = {}
-        for _, d in ipairs(nextSeasonDungeons) do table.insert(keys, d.key) end
-        InsertSortedDungeonOptions(self, keys, sharedDungeonOptions, nextSeasonDungeonArgs, 2)
+        local filter = {}
+        for _, d in ipairs(nextSeasonDungeons) do
+            table.insert(keys, d.key)
+            filter[d.key] = true
+        end
+
+        local function getDefaultsFn(dungeonKey)
+            for _, expansion in ipairs(expansions) do
+                local ids = self[expansion.id .. "_DUNGEON_IDS"]
+                if ids and ids[dungeonKey] then
+                    local defaults = self[expansion.id .. "_DEFAULTS"]
+                    return defaults and defaults[dungeonKey] or nil
+                end
+            end
+            return nil
+        end
+
+        nextSeasonDungeonArgs = CreateGenericSectionArgs(L["NEXT_SEASON"], keys, filter, getDefaultsFn)
     end
 
     -- Create expansion sections
@@ -935,80 +841,27 @@ function KeystonePercentageHelper:GetAdvancedOptions()
     -- Create expansion sections
     for _, expansion in ipairs(expansions) do
         local sectionKey = expansion.id:lower()
+        local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
+        local defaults = self[expansion.id .. "_DEFAULTS"]
+        local keys = {}
+        local filter = {}
+        if dungeonIds then
+            for dungeonKey, _ in pairs(dungeonIds) do
+                table.insert(keys, dungeonKey)
+                filter[dungeonKey] = true
+            end
+        end
+
+        local function getDefaultsFn(dungeonKey)
+            return defaults and defaults[dungeonKey] or nil
+        end
+
         args[sectionKey] = {
             name = "|cffffffff" .. L[expansion.name] .. "|r",
             type = "group",
             childGroups = "tree",
             order = expansion.order + 4, -- Shift expansion orders to after next season
-            args = {
-                disclaimer = {
-                    order = 0,
-                    type = "description",
-                    fontSize = "medium",
-                    name = L["ROUTES_DISCLAIMER"],
-                },
-                separator = {
-                    order = 1,
-                    type = "header",
-                    name = "",
-                },
-            }
-        }
-
-        -- Add expansion-specific dungeon args
-        local expansionArgs = CreateExpansionDungeonArgs(
-            self[expansion.id .. "_DUNGEON_IDS"],
-            self[expansion.id .. "_DEFAULTS"])
-        for key, value in pairs(expansionArgs) do
-            args[sectionKey].args[key] = value
-        end
-
-        -- Add export/import buttons for this section
-        args[sectionKey].args.exportSection = {
-            order = 2, -- Before defaultPercentages
-            type = "execute",
-            name = L["EXPORT_SECTION"],
-            desc = (L["EXPORT_SECTION_DESC"]):format(L[expansion.name]),
-            func = function()
-                local addon = KeystonePercentageHelper
-                local dungeonIds = addon[expansion.id .. "_DUNGEON_IDS"]
-
-                if not dungeonIds then return end
-
-                -- Collect section dungeon data
-                local sectionData = {}
-                for dungeonKey, _ in pairs(dungeonIds) do
-                    if addon.db.profile.advanced[dungeonKey] then
-                        sectionData[dungeonKey] =
-                            addon.db.profile.advanced[dungeonKey]
-                    end
-                end
-
-                -- Export section dungeon data
-                addon:ExportDungeonSettings(sectionData, "section",
-                                            L[expansion.name])
-            end
-        }
-
-        args[sectionKey].args.importSection = {
-            order = 2.5, -- Immediately after exportSection (and before defaultPercentages at 3)
-            type = "execute",
-            name = L["IMPORT_SECTION"],
-            desc = (L["IMPORT_SECTION_DESC"]):format(L[expansion.name]),
-            func = function()
-                local addon = KeystonePercentageHelper
-                local dungeonIds = addon[expansion.id .. "_DUNGEON_IDS"]
-
-                if not dungeonIds then return end
-
-                -- Create filter for this expansion's dungeons
-                local dungeonFilter = {}
-                for dungeonKey, _ in pairs(dungeonIds) do
-                    dungeonFilter[dungeonKey] = true
-                end
-
-                addon:ShowImportDialog(L[expansion.name], dungeonFilter)
-            end
+            args = CreateGenericSectionArgs(L[expansion.name], keys, filter, getDefaultsFn)
         }
     end
     return {
