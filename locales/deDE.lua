@@ -232,7 +232,7 @@ L["IMPORT_ERROR"] = "Ungültiger Import-Text"
 L["IMPORT_DIFFERENT_DUNGEON"] = "Einstellungen für %s importiert. Optionen für diesen Dungeon werden geöffnet."
 
 -- MDT Integration
-LL["MDT_INTEGRATION_FEATURES"] = "Mythic Dungeon Tools Integrationsfunktionen"
+L["MDT_INTEGRATION_FEATURES"] = "Mythic Dungeon Tools Integrationsfunktionen"
 L["MOB_PERCENTAGES_INFO"] = "• |cff00ff00Gegner-Prozente|r: Zeigt den Beitrag zur Gegnerstärke in Prozent auf den Namensplaketten in M+-Dungeons an."
 L["MOB_INDICATOR_INFO"] = "• |cff00ff00Gegner-Indikatoren|r: Markiert Namensplaketten, um anzuzeigen, welche Gegner im aktuellen MDT-Pull enthalten sind."
 
