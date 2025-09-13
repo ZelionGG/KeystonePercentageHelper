@@ -626,8 +626,19 @@ function KeystonePercentageHelper:GetAdvancedOptions()
 
     -- Create current season dungeon args
     local dungeonArgs = {
-        export = {
+        disclaimer = {
+            order = 0,
+            type = "description",
+            fontSize = "medium",
+            name = L["ROUTES_DISCLAIMER"],
+        },
+        separator = {
             order = 1,
+            type = "header",
+            name = "",
+        },
+        export = {
+            order = 1.25,
             type = "execute",
             name = L["EXPORT_SECTION"],
             desc = (L["EXPORT_SECTION_DESC"]):format(L["CURRENT_SEASON"]),
@@ -650,7 +661,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             end
         },
         import = {
-            order = 2,
+            order = 1.5,
             type = "execute",
             name = L["IMPORT_SECTION"],
             desc = (L["IMPORT_SECTION_DESC"]):format(L["CURRENT_SEASON"]),
@@ -666,12 +677,23 @@ function KeystonePercentageHelper:GetAdvancedOptions()
                 addon:ShowImportDialog(L["CURRENT_SEASON"], dungeonFilter)
             end
         },
+        separatorDefaultPercentages = {
+            order = 2,
+            type = "header",
+            name = L["DEFAULT_PERCENTAGES"],
+        },
         defaultPercentages = {
+            order = 2.5,
+            type = "description",
+            fontSize = "medium",
+            name = L["DEFAULT_PERCENTAGES_DESC"],
+        },
+        defaultPercentagesText = {
             order = 3,
             type = "description",
             fontSize = "medium",
             name = function()
-                local text = L["DEFAULT_PERCENTAGES"] .. ":\n\n"
+                local text = ""
                 for _, dungeon in ipairs(currentSeasonDungeons) do
                     local dungeonKey = dungeon.key
                     local defaults
@@ -694,7 +716,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
     do
         local keys = {}
         for _, d in ipairs(currentSeasonDungeons) do table.insert(keys, d.key) end
-        InsertSortedDungeonOptions(self, keys, sharedDungeonOptions, dungeonArgs, 3)
+        InsertSortedDungeonOptions(self, keys, sharedDungeonOptions, dungeonArgs, 2)
     end
 
     -- Create next season dungeon args
@@ -752,8 +774,19 @@ function KeystonePercentageHelper:GetAdvancedOptions()
 
     -- Create next season dungeon args
     local nextSeasonDungeonArgs = {
-        export = {
+        disclaimer = {
+            order = 0,
+            type = "description",
+            fontSize = "medium",
+            name = L["ROUTES_DISCLAIMER"],
+        },
+        separator = {
             order = 1,
+            type = "header",
+            name = "",
+        },
+        export = {
+            order = 1.25,
             type = "execute",
             name = L["EXPORT_SECTION"],
             desc = (L["EXPORT_SECTION_DESC"]):format(L["NEXT_SEASON"]),
@@ -776,7 +809,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             end
         },
         import = {
-            order = 2,
+            order = 1.5,
             type = "execute",
             name = L["IMPORT_SECTION"],
             desc = (L["IMPORT_SECTION_DESC"]):format(L["NEXT_SEASON"]),
@@ -793,7 +826,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             end
         },
         defaultPercentages = {
-            order = 3,
+            order = 2,
             type = "description",
             fontSize = "medium",
             name = function()
@@ -820,13 +853,24 @@ function KeystonePercentageHelper:GetAdvancedOptions()
     do
         local keys = {}
         for _, d in ipairs(nextSeasonDungeons) do table.insert(keys, d.key) end
-        InsertSortedDungeonOptions(self, keys, sharedDungeonOptions, nextSeasonDungeonArgs, 3)
+        InsertSortedDungeonOptions(self, keys, sharedDungeonOptions, nextSeasonDungeonArgs, 2)
     end
 
     -- Create expansion sections
     local args = {
-        resetAll = {
+        disclaimer = {
+            order = 0,
+            type = "description",
+            fontSize = "medium",
+            name = L["ROUTES_DISCLAIMER"],
+        },
+        separator = {
             order = 1,
+            type = "header",
+            name = "",
+        },
+        resetAll = {
+            order = 2,
             type = "execute",
             name = L["RESET_ALL_DUNGEONS"],
             desc = L["RESET_ALL_DUNGEONS_DESC"],
@@ -838,7 +882,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             end
         },
         exportAllDungeons = {
-            order = 2,
+            order = 3,
             type = "execute",
             name = L["EXPORT_ALL_DUNGEONS"],
             desc = L["EXPORT_ALL_DUNGEONS_DESC"],
@@ -859,7 +903,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             end
         },
         importAllDungeons = {
-            order = 3,
+            order = 4,
             type = "execute",
             name = L["IMPORT_ALL_DUNGEONS"],
             desc = L["IMPORT_ALL_DUNGEONS_DESC"],
@@ -872,7 +916,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             name = "|cff40E0D0" .. L["CURRENT_SEASON"] .. "|r",
             type = "group",
             childGroups = "tree",
-            order = 3,
+            order = 5,
             args = dungeonArgs
         }
     }
@@ -896,14 +940,32 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             type = "group",
             childGroups = "tree",
             order = expansion.order + 4, -- Shift expansion orders to after next season
-            args = CreateExpansionDungeonArgs(
-                self[expansion.id .. "_DUNGEON_IDS"],
-                self[expansion.id .. "_DEFAULTS"])
+            args = {
+                disclaimer = {
+                    order = 0,
+                    type = "description",
+                    fontSize = "medium",
+                    name = L["ROUTES_DISCLAIMER"],
+                },
+                separator = {
+                    order = 1,
+                    type = "header",
+                    name = "",
+                },
+            }
         }
+
+        -- Add expansion-specific dungeon args
+        local expansionArgs = CreateExpansionDungeonArgs(
+            self[expansion.id .. "_DUNGEON_IDS"],
+            self[expansion.id .. "_DEFAULTS"])
+        for key, value in pairs(expansionArgs) do
+            args[sectionKey].args[key] = value
+        end
 
         -- Add export/import buttons for this section
         args[sectionKey].args.exportSection = {
-            order = 1, -- Place before defaultPercentages
+            order = 2, -- Before defaultPercentages
             type = "execute",
             name = L["EXPORT_SECTION"],
             desc = (L["EXPORT_SECTION_DESC"]):format(L[expansion.name]),
@@ -929,7 +991,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
         }
 
         args[sectionKey].args.importSection = {
-            order = 2, -- Place before defaultPercentages
+            order = 2.5, -- Immediately after exportSection (and before defaultPercentages at 3)
             type = "execute",
             name = L["IMPORT_SECTION"],
             desc = (L["IMPORT_SECTION_DESC"]):format(L[expansion.name]),
@@ -1098,7 +1160,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                 end
             },
             import = {
-                order = 4,
+                order = 3.5,
                 type = "execute",
                 name = L["IMPORT_DUNGEON"],
                 desc = L["IMPORT_DUNGEON_DESC"],
@@ -1131,7 +1193,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                     StaticPopup_Show("KPH_IMPORT_DIALOG")
                 end
             },
-            header = {order = 5, type = "header", name = L["TANK_GROUP_HEADER"]}
+            header = {order = 4, type = "header", name = L["TANK_GROUP_HEADER"]}
         }
     }
 
@@ -1144,7 +1206,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
             type = "group",
             name = bossName,
             inline = true,
-            order = i + 5, -- Start boss orders at 6 (after header)
+            order = i + 4, -- Start boss orders at 5 (after header)
             args = {
                 percent = {
                     name = L["PERCENTAGE"],
@@ -1411,7 +1473,8 @@ function KeystonePercentageHelper:ResetAllDungeons()
                 local defaults
                 for _, expansion in ipairs(expansions) do
                     if self[expansion.id .. "_DUNGEON_IDS"][dungeonKey] then
-                        defaults = self[expansion.id .. "_DEFAULTS"][dungeonKey]
+                        defaults =
+                            self[expansion.id .. "_DEFAULTS"][dungeonKey]
                         break
                     end
                 end

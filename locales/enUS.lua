@@ -153,6 +153,7 @@ L["Bugfixes"] = "Bug fixes"
 L["Improvment"] = "Improvements"
 L["%month%-%day%-%year%"] = "%year%-%month%-%day%"
 L["DEFAULT_PERCENTAGES"] = "Default percentages"
+L["DEFAULT_PERCENTAGES_DESC"] = "This view shows the addon's built-in defaults and does not reflect your custom routes configuration."
 L["ADVANCED_SETTINGS"] = "Custom routes"
 L["TANK_GROUP_HEADER"] = "Boss Percentages"
 L["ROLES_ENABLED"] = "Role(s) required"
@@ -206,6 +207,7 @@ L["NEW_ROUTES_RESET_PROMPT"] = "The default dungeon routes have been updated in 
 L["RESET_ALL"] = "Reset All Dungeons"
 L["RESET_CHANGED_ONLY"] = "Reset Changed Only"
 L["CHANGED_ROUTES_DUNGEONS_LIST"] = "The following dungeons have updated routes:"
+L["ROUTES_DISCLAIMER"] = "By default, Keystone Percentage Helper uses Raider.IO Weekly Routes (Beginner). Custom routes let you define your own different routes. To enable these routes, make sure to enable \"Custom routes\" in the addon's General Settings."
 
 -- Export/Import
 L["EXPORT_DUNGEON"] = "Export Dungeon"
