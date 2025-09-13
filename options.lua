@@ -587,6 +587,11 @@ function KeystonePercentageHelper:GetAdvancedOptions()
                 fontSize = "medium",
                 name = L["DEFAULT_PERCENTAGES_DESC"],
             },
+            separatorDefaultPercentagesText = {
+                order = 2.8,
+                type = "header",
+                name = "",
+            },
             defaultPercentagesText = {
                 order = 3,
                 type = "description",
