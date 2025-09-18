@@ -78,6 +78,7 @@ KeystonePercentageHelper.defaults = {
                 requiredLabel = L["REQUIRED_DEFAULT"], -- Label for the required base value when numeric
                 currentLabel = L["CURRENT_DEFAULT"],   -- Label for current percent
                 pullLabel = L["PULL_DEFAULT"],         -- Label for current pull percent
+                formatMode = "percent",               -- Display format: "percent" or "count"
                 prefixColor = { r = 0.8, g = 0.8, b = 0.8, a = 1 }, -- Color for prefixes (labels)
                 singleLineSeparator = " | ",           -- Separator for single-line layout
                 textAlign = "CENTER"                   -- Horizontal font alignment: LEFT, CENTER, RIGHT
@@ -439,11 +440,36 @@ function KeystonePercentageHelper:GetMainDisplayOptions()
         inline = true,
         order = 5.75,
         args = {
+            formatMode = {
+                name = L["FORMAT_MODE"],
+                desc = L["FORMAT_MODE_DESC"],
+                type = "select",
+                order = 0,
+                values = function()
+                    local percentLabel = L["PERCENTAGE"]
+                    local countLabel = L["COUNT"]
+                    return { percent = percentLabel, count = countLabel }
+                end,
+                get = function()
+                    return self.db.profile.general.mainDisplay.formatMode or "percent"
+                end,
+                set = function(_, value)
+                    self.db.profile.general.mainDisplay.formatMode = value == "count" and "count" or "percent"
+                    if self.UpdatePercentageText then self:UpdatePercentageText() end
+                    if self.ApplyTextLayout then self:ApplyTextLayout() end
+                    if self.AdjustDisplayFrameSize then self:AdjustDisplayFrameSize() end
+                end
+            },
+            separator0 = {
+                type = "header",
+                name = "",
+                order = 0.05
+            },
             prefixColor = {
                 name = L["PREFIX_COLOR"],
                 desc = L["PREFIX_COLOR_DESC"],
                 type = "color",
-                order = 0,
+                order = 0.1,
                 width = "full",
                 hasAlpha = false,
                 get = function()

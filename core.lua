@@ -437,6 +437,32 @@ function KeystonePercentageHelper:GetCurrentPercentage()
     return 0
 end
 
+-- Retrieve raw Enemy Forces counts: current and total. Returns 0,0 if unavailable.
+function KeystonePercentageHelper:GetCurrentForcesInfo()
+    local stepCount = select(3, C_Scenario.GetStepInfo())
+    if not stepCount or stepCount <= 0 then return 0, 0 end
+
+    local bestTotal = 0
+    local bestCurrent = 0
+    for i = 1, stepCount do
+        local info = C_ScenarioInfo.GetCriteriaInfo(i)
+        if info and info.isWeightedProgress and info.totalQuantity and info.totalQuantity > 0 then
+            local currentCount = 0
+            if type(info.quantityString) == "string" then
+                currentCount = tonumber(info.quantityString:match("%d+")) or 0
+            else
+                currentCount = tonumber(info.quantity) or 0
+            end
+            if info.totalQuantity > bestTotal then
+                bestTotal = info.totalQuantity
+                bestCurrent = currentCount
+            end
+        end
+    end
+
+    return bestCurrent, bestTotal
+end
+
 -- Get data for the current section of the dungeon
 function KeystonePercentageHelper:GetDungeonData()
     if not self.DUNGEONS[self.currentDungeonID] or not self.DUNGEONS[self.currentDungeonID][self.currentSection] then
@@ -472,10 +498,12 @@ function KeystonePercentageHelper:UpdatePercentageText()
         return
     end
 
-    -- Get current enemy forces percentage
-    local currentPercentage = self:GetCurrentPercentage()
+    -- Get current enemy forces counts and percentage
+    local currentCount, totalCount = self:GetCurrentForcesInfo()
+    local currentPercentage = (totalCount and totalCount > 0) and ((currentCount / totalCount) * 100) or self:GetCurrentPercentage()
     -- Try to get current pull percent from MDT
     local currentPullPercent = self:GetCurrentPullPercent()
+    local currentPullCount = tonumber(self.realPull and self.realPull.sum) or 0
 
     -- Skip sections that have 0 or negative percentage requirements
     while self.DUNGEONS[self.currentDungeonID][self.currentSection] and self.DUNGEONS[self.currentDungeonID][self.currentSection][2] <= 0 do
@@ -491,7 +519,7 @@ function KeystonePercentageHelper:UpdatePercentageText()
         -- Check if boss is killed
         local isBossKilled = C_ScenarioInfo.GetCriteriaInfo(bossID).completed
 
-        -- Calculate remaining percentage needed
+        -- Calculate remaining needed (percent and count)
         local remainingPercent = neededPercent - currentPercentage
         -- Ensure remainingPercent never goes below zero
         if remainingPercent < 0 then
@@ -501,8 +529,17 @@ function KeystonePercentageHelper:UpdatePercentageText()
         if remainingPercent < 0.05 and remainingPercent > 0.00 then
             remainingPercent = 0.00
         end
+        local remainingCount = 0
+        if totalCount and totalCount > 0 then
+            local neededCount = math.ceil((neededPercent / 100) * totalCount)
+            remainingCount = math.max(0, neededCount - (currentCount or 0))
+        end
 
+        local cfg = self.db.profile.general.mainDisplay
+        local formatMode = cfg and cfg.formatMode or "percent"
+        local fmtData = { currentCount = currentCount or 0, totalCount = totalCount or 0, pullCount = currentPullCount or 0, remainingCount = remainingCount or 0 }
         local displayPercent = string.format("%.2f%%", remainingPercent)
+        local displayCount = tostring(remainingCount)
         local color = self.db.profile.color.inProgress
 
         if remainingPercent > 0 and isBossKilled then -- Boss has been killed but percentage is missing
@@ -512,22 +549,24 @@ function KeystonePercentageHelper:UpdatePercentageText()
                 self.DUNGEONS[self.currentDungeonID][self.currentSection][4] = true
             end
             color = self.db.profile.color.missing
-            self.displayFrame.text:SetText(self:FormatMainDisplayText(displayPercent, currentPercentage, currentPullPercent, remainingPercent))
+            local base = (formatMode == "count") and displayCount or displayPercent
+            self.displayFrame.text:SetText(self:FormatMainDisplayText(base, currentPercentage, currentPullPercent, remainingPercent, fmtData))
         elseif remainingPercent > 0 and not isBossKilled then -- Boss has not been killed yet and percentage is missing
-            self.displayFrame.text:SetText(self:FormatMainDisplayText(displayPercent, currentPercentage, currentPullPercent, remainingPercent))
+            local base = (formatMode == "count") and displayCount or displayPercent
+            self.displayFrame.text:SetText(self:FormatMainDisplayText(base, currentPercentage, currentPullPercent, remainingPercent, fmtData))
         elseif remainingPercent <= 0 and not isBossKilled then -- Boss has not been killed yet but percentage is done
             color = self.db.profile.color.finished
             if(currentPercentage >= 100) then
-                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["FINISHED"], currentPercentage, currentPullPercent, remainingPercent))
+                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["FINISHED"], currentPercentage, currentPullPercent, remainingPercent, fmtData))
             else
-                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DONE"], currentPercentage, currentPullPercent, remainingPercent))
+                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DONE"], currentPercentage, currentPullPercent, remainingPercent, fmtData))
             end
         elseif remainingPercent <= 0 and isBossKilled then -- Boss has been killed and percentage is done
             color = self.db.profile.color.finished
             if(currentPercentage >= 100) then
-                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["FINISHED"], currentPercentage, currentPullPercent, remainingPercent))
+                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["FINISHED"], currentPercentage, currentPullPercent, remainingPercent, fmtData))
             else
-                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["SECTION_DONE"], currentPercentage, currentPullPercent, remainingPercent))
+                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["SECTION_DONE"], currentPercentage, currentPullPercent, remainingPercent, fmtData))
             end
             self.currentSection = self.currentSection + 1
             if self.currentSection <= #self.DUNGEONS[self.currentDungeonID] then -- Next section exists
@@ -539,14 +578,23 @@ function KeystonePercentageHelper:UpdatePercentageText()
                         end
                     if currentPercentage >= 100 then -- Percentage is already done for the dungeon
                         color = self.db.profile.color.finished
-                        self.displayFrame.text:SetText(self:FormatMainDisplayText(L["FINISHED"], currentPercentage, currentPullPercent))
+                        self.displayFrame.text:SetText(self:FormatMainDisplayText(L["FINISHED"], currentPercentage, currentPullPercent, nil, fmtData))
                     else -- Dungeon has not been completed
                         if nextRequired == 0 then
                             color = self.db.profile.color.finished
-                            self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DONE"], currentPercentage, currentPullPercent))
+                            self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DONE"], currentPercentage, currentPullPercent, nil, fmtData))
                         else
                             color = self.db.profile.color.inProgress
-                            self.displayFrame.text:SetText(self:FormatMainDisplayText(string.format("%.2f%%", nextRequired), currentPercentage, currentPullPercent))
+                            local baseNext
+                            if (cfg and cfg.formatMode == "count") and (totalCount and totalCount > 0) then
+                                local nextNeededPercent = self.DUNGEONS[self.currentDungeonID][self.currentSection][2]
+                                local nextNeededCount = math.ceil((nextNeededPercent / 100) * totalCount)
+                                local nextRemainingCount = math.max(0, nextNeededCount - (currentCount or 0))
+                                baseNext = tostring(nextRemainingCount)
+                            else
+                                baseNext = string.format("%.2f%%", nextRequired)
+                            end
+                            self.displayFrame.text:SetText(self:FormatMainDisplayText(baseNext, currentPercentage, currentPullPercent, nextRequired, fmtData))
                         end
                     end
                     self.displayFrame.text:SetTextColor(color.r, color.g, color.b, color.a)
@@ -556,7 +604,7 @@ function KeystonePercentageHelper:UpdatePercentageText()
                     self:ApplyTextLayout()
                 end)
             else
-                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DUNGEON_DONE"], currentPercentage, currentPullPercent)) -- Dungeon has been completed
+                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DUNGEON_DONE"], currentPercentage, currentPullPercent, nil, fmtData)) -- Dungeon has been completed
             end
         end
 
@@ -579,7 +627,7 @@ function KeystonePercentageHelper:GetCurrentPullPercent()
 end
 
 -- Build final display text by appending optional values (current percent, pull percent)
-function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent, currentPullPercent, remainingNeeded)
+function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent, currentPullPercent, remainingNeeded, fmtData)
     local cfg = self.db and self.db.profile and self.db.profile.general and self.db.profile.general.mainDisplay or nil
     if not cfg then return baseText end
 
@@ -597,26 +645,51 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
 
     if cfg.showCurrentPercent and (currentPercent ~= nil) then
         local label = colorizePrefix(cfg.currentLabel or L["CURRENT_DEFAULT"])
-        table.insert(extras, string.format("%s %.2f%%", label, currentPercent or 0))
+        if (cfg.formatMode == "count") and fmtData then
+            local cc = tonumber(fmtData.currentCount) or 0
+            local tt = tonumber(fmtData.totalCount) or 0
+            table.insert(extras, string.format("%s %d/%d", label, cc, tt))
+        else
+            table.insert(extras, string.format("%s %.2f%%", label, currentPercent or 0))
+        end
     end
     if cfg.showCurrentPullPercent and (currentPullPercent ~= nil) then
         local label = colorizePrefix(cfg.pullLabel or L["PULL_DEFAULT"])
-        local value = string.format("%.2f%%", currentPullPercent or 0)
-        -- Highlight pull in finished color if it's enough to meet remaining needed for the current section
-        if remainingNeeded and remainingNeeded > 0 and (currentPullPercent or 0) >= remainingNeeded then
-            local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
-            local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
-            value = string.format("|cff%s%s|r", hex, value)
+        if cfg.formatMode == "count" and fmtData then
+            local value = tostring(tonumber(fmtData.pullCount) or 0)
+            local remainingCount = tonumber(fmtData.remainingCount) or 0
+            if remainingCount > 0 and (tonumber(fmtData.pullCount) or 0) >= remainingCount then
+                local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
+                local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
+                value = string.format("|cff%s%s|r", hex, value)
+            end
+            table.insert(extras, string.format("%s %s", label, value))
+        else
+            local value = string.format("%.2f%%", currentPullPercent or 0)
+            -- Highlight pull in finished color if it's enough to meet remaining needed for the current section
+            if remainingNeeded and remainingNeeded > 0 and (currentPullPercent or 0) >= remainingNeeded then
+                local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
+                local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
+                value = string.format("|cff%s%s|r", hex, value)
+            end
+            table.insert(extras, string.format("%s %s", label, value))
         end
-        table.insert(extras, string.format("%s %s", label, value))
     end
 
     -- Optionally show the base required text prefix if it's numeric
     local base = baseText    
     local isNumericPercent = type(baseText) == "string" and baseText:find("%%$") and tonumber((baseText:gsub("%%",""))) ~= nil
+    local isNumericCount = type(baseText) == "string" and baseText:find("^%d+$") ~= nil
     if isNumericPercent then
         if cfg.showRequiredText == false then 
             base = baseText 
+        else
+            local rlabel = colorizePrefix(cfg.requiredLabel or L["REQUIRED_DEFAULT"])
+            base = rlabel .. " " .. baseText
+        end
+    elseif isNumericCount and (cfg.formatMode == "count") then
+        if cfg.showRequiredText == false then
+            base = baseText
         else
             local rlabel = colorizePrefix(cfg.requiredLabel or L["REQUIRED_DEFAULT"])
             base = rlabel .. " " .. baseText
