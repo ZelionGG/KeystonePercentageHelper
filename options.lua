@@ -78,6 +78,7 @@ KeystonePercentageHelper.defaults = {
                 requiredLabel = L["REQUIRED_DEFAULT"], -- Label for the required base value when numeric
                 currentLabel = L["CURRENT_DEFAULT"],   -- Label for current percent
                 pullLabel = L["PULL_DEFAULT"],         -- Label for current pull percent
+                prefixColor = { r = 0.8, g = 0.8, b = 0.8, a = 1 }, -- Color for prefixes (labels)
                 singleLineSeparator = " | ",           -- Separator for single-line layout
                 textAlign = "CENTER"                   -- Horizontal font alignment: LEFT, CENTER, RIGHT
             }
@@ -438,11 +439,28 @@ function KeystonePercentageHelper:GetMainDisplayOptions()
         inline = true,
         order = 5.75,
         args = {
+            prefixColor = {
+                name = L["PREFIX_COLOR"],
+                desc = L["PREFIX_COLOR_DESC"],
+                type = "color",
+                order = 0,
+                width = "full",
+                hasAlpha = false,
+                get = function()
+                    local c = self.db.profile.general.mainDisplay.prefixColor or {r=0.8,g=0.8,b=0.8,a=1}
+                    return c.r, c.g, c.b, c.a
+                end,
+                set = function(_, r, g, b, a)
+                    local c = self.db.profile.general.mainDisplay.prefixColor
+                    c.r, c.g, c.b, c.a = r, g, b, a
+                    if self.UpdatePercentageText then self:UpdatePercentageText() end
+                end
+            },
             showRequiredText = {
                 name = L["SHOW_REQUIRED_PREFIX"],
                 desc = L["SHOW_REQUIRED_PREFIX_DESC"],
                 type = "toggle",
-                order = 0,
+                order = 0.25,
                 width = 1.4,
                 get = function() return self.db.profile.general.mainDisplay.showRequiredText end,
                 set = function(_, value)
@@ -638,7 +656,7 @@ function KeystonePercentageHelper:GetMainDisplayOptions()
                 disabled = function()
                     return not self.db.profile.general.mainDisplay.multiLine
                 end
-            }
+            },
         }
     }
 end

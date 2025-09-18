@@ -574,12 +574,23 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
     if not cfg then return baseText end
 
     local extras = {}
+    -- Build hex color for prefixes
+    local pc = cfg.prefixColor or { r = 0.8, g = 0.8, b = 0.8, a = 1 }
+    local hexPrefix = string.format("%02x%02x%02x",
+        math.floor((pc.r or 0.8) * 255),
+        math.floor((pc.g or 0.8) * 255),
+        math.floor((pc.b or 0.8) * 255)
+    )
+    local function colorizePrefix(text)
+        return string.format("|cff%s%s|r", hexPrefix, tostring(text or ""))
+    end
+
     if cfg.showCurrentPercent and (currentPercent ~= nil) then
-        local label = tostring(cfg.currentLabel or "Curr:")
+        local label = colorizePrefix(cfg.currentLabel or "Curr:")
         table.insert(extras, string.format("%s %.2f%%", label, currentPercent or 0))
     end
     if cfg.showCurrentPullPercent and (currentPullPercent ~= nil) then
-        local label = tostring(cfg.pullLabel or "Pull:")
+        local label = colorizePrefix(cfg.pullLabel or "Pull:")
         local value = string.format("%.2f%%", currentPullPercent or 0)
         -- Highlight pull in finished color if it's enough to meet remaining needed for the current section
         if remainingNeeded and remainingNeeded > 0 and (currentPullPercent or 0) >= remainingNeeded then
@@ -597,7 +608,7 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
         if cfg.showRequiredText == false then 
             base = baseText 
         else
-            local rlabel = tostring(cfg.requiredLabel or "Required:")
+            local rlabel = colorizePrefix(cfg.requiredLabel or "Required:")
             base = rlabel .. " " .. baseText
         end
     else
