@@ -235,6 +235,10 @@ L["REQUIRED_DEFAULT"] = "Required :"
 L["CURRENT_DEFAULT"] = "Current :"
 L["PULL_DEFAULT"] = "Pull :"
 
+L["FORMAT_MODE"] = "Text format"
+L["FORMAT_MODE_DESC"] = "Select how to display the progress."
+L["COUNT"] = "Count"
+
 -- Export/Import
 L["EXPORT_DUNGEON"] = "Dungeon exportieren"
 L["EXPORT_DUNGEON_DESC"] = "Benutzerdefinierte Prozentsätze für diesen Dungeon exportieren"

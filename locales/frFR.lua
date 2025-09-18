@@ -233,6 +233,10 @@ L["REQUIRED_DEFAULT"] = "Requis :"
 L["CURRENT_DEFAULT"] = "Actuel :"
 L["PULL_DEFAULT"] = "En cours :"
 
+L["FORMAT_MODE"] = "Format de texte"
+L["FORMAT_MODE_DESC"] = "Sélectionnez comment afficher la progression du donjon."
+L["COUNT"] = "Compte"
+
 -- Export/Import
 L["EXPORT_DUNGEON"] = "Exporter le donjon"
 L["EXPORT_DUNGEON_DESC"] = "Exporter les paramètres personnalisés pour ce donjon"

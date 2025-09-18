@@ -237,6 +237,10 @@ L["REQUIRED_DEFAULT"] = "Required :"
 L["CURRENT_DEFAULT"] = "Current :"
 L["PULL_DEFAULT"] = "Pull :"
 
+L["FORMAT_MODE"] = "Text format"
+L["FORMAT_MODE_DESC"] = "Select how to display the progress."
+L["COUNT"] = "Count"
+
 -- Export/Import
 L["EXPORT_DUNGEON"] = "导出地下城"
 L["EXPORT_DUNGEON_DESC"] = "导出此地下城的自定义百分比"
