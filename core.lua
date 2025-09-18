@@ -409,21 +409,31 @@ end
 
 -- Get the current enemy forces percentage from the scenario UI
 function KeystonePercentageHelper:GetCurrentPercentage()
-    local steps = select(3, C_Scenario.GetStepInfo())
-    local criteriaInfo = C_ScenarioInfo.GetCriteriaInfo(steps) or {}
-    local quantity, total, quantityString = criteriaInfo.quantity, criteriaInfo.totalQuantity, criteriaInfo.quantityString
+    -- Mirror WarpDeplete logic: scan criteria and use weighted progress with the
+    local stepCount = select(3, C_Scenario.GetStepInfo())
+    if not stepCount or stepCount <= 0 then return 0 end
 
-    -- Prefer Blizzard's provided percentage string when available
-    if type(quantityString) == "string" and quantityString:find("%%") then
-        local v = tonumber((quantityString:gsub("%%", "")))
-        if v then return v end
+    local bestTotal = 0
+    local bestCurrent = 0
+    for i = 1, stepCount do
+        local info = C_ScenarioInfo.GetCriteriaInfo(i)
+        if info and info.isWeightedProgress and info.totalQuantity and info.totalQuantity > 0 then
+            local currentCount = 0
+            if type(info.quantityString) == "string" then
+                currentCount = tonumber(info.quantityString:match("%d+")) or 0
+            else
+                currentCount = tonumber(info.quantity) or 0
+            end
+            if info.totalQuantity > bestTotal then
+                bestTotal = info.totalQuantity
+                bestCurrent = currentCount
+            end
+        end
     end
 
-    -- Fallback: compute percent from quantities
-    if quantity and total and total > 0 then
-        return (quantity / total) * 100
+    if bestTotal > 0 then
+        return (bestCurrent / bestTotal) * 100
     end
-
     return 0
 end
 
