@@ -68,6 +68,18 @@ KeystonePercentageHelper.defaults = {
                 TANK = true,
                 HEALER = true,
                 DAMAGER = true
+            },
+            -- Main display content options
+            mainDisplay = {
+                showCurrentPercent = false,            -- Show overall current enemy forces percent
+                showCurrentPullPercent = false,        -- Show current MDT pull percent (if MDT is available)
+                multiLine = false,                     -- Display extras on new lines instead of a single line
+                showRequiredText = false,              -- Show the required/remaining text base
+                requiredLabel = L["REQUIRED_DEFAULT"], -- Label for the required base value when numeric
+                currentLabel = L["CURRENT_DEFAULT"],   -- Label for current percent
+                pullLabel = L["PULL_DEFAULT"],         -- Label for current pull percent
+                singleLineSeparator = " | ",           -- Separator for single-line layout
+                textAlign = "CENTER"                   -- Horizontal font alignment: LEFT, CENTER, RIGHT
             }
         },
         text = {font = "Friz Quadrata TT"},
@@ -404,6 +416,227 @@ function KeystonePercentageHelper:GetColorOptions()
                     local color = self.db.profile.color.missing
                     color.r, color.g, color.b, color.a = r, g, b, a
                     self:Refresh()
+                end
+            }
+        }
+    }
+end
+
+-- Main display options: control which values to show and layout
+function KeystonePercentageHelper:GetMainDisplayOptions()
+    local self = KeystonePercentageHelper
+    -- Local helper for MDT availability
+    local function IsMDTAvailable()
+        if C_AddOns and C_AddOns.IsAddOnLoaded then
+            return C_AddOns.IsAddOnLoaded("MythicDungeonTools") or (_G.MDT ~= nil) or (_G.MethodDungeonTools ~= nil)
+        end
+        return (_G and (_G.MDT or _G.MethodDungeonTools))
+    end
+    return {
+        name = L["MAIN_DISPLAY"],
+        type = "group",
+        inline = true,
+        order = 5.75,
+        args = {
+            showRequiredText = {
+                name = L["SHOW_REQUIRED_PREFIX"],
+                desc = L["SHOW_REQUIRED_PREFIX_DESC"],
+                type = "toggle",
+                order = 0,
+                width = 1.4,
+                get = function() return self.db.profile.general.mainDisplay.showRequiredText end,
+                set = function(_, value)
+                    self.db.profile.general.mainDisplay.showRequiredText = value
+                    self:UpdatePercentageText()
+                end
+            },
+            requiredLabel = {
+                name = L["LABEL"],
+                desc = L["REQUIRED_LABEL_DESC"],
+                type = "input",
+                order = 0.5,
+                width = 1,
+                get = function() return self.db.profile.general.mainDisplay.requiredLabel end,
+                set = function(_, value)
+                    local text = type(value) == "string" and value or ""
+                    text = (text ~= "" and text) or L["REQUIRED_DEFAULT"]
+                    self.db.profile.general.mainDisplay.requiredLabel = text
+                    self:UpdatePercentageText()
+                end,
+                disabled = function()
+                    return not self.db.profile.general.mainDisplay.showRequiredText
+                end
+            },
+            showCurrentPercent = {
+                name = L["SHOW_CURRENT_PERCENT"],
+                desc = L["SHOW_CURRENT_PERCENT_DESC"],
+                type = "toggle",
+                order = 1,
+                width = 1.4,
+                get = function() return self.db.profile.general.mainDisplay.showCurrentPercent end,
+                set = function(_, value)
+                    self.db.profile.general.mainDisplay.showCurrentPercent = value
+                    self:UpdatePercentageText()
+                end
+            },
+            currentLabel = {
+                name = L["LABEL"],
+                desc = L["CURRENT_LABEL_DESC"],
+                type = "input",
+                order = 1.1,
+                width = 1,
+                get = function() return self.db.profile.general.mainDisplay.currentLabel end,
+                set = function(_, value)
+                    local text = type(value) == "string" and value or ""
+                    text = (text ~= "" and text) or L["CURRENT_DEFAULT"]
+                    self.db.profile.general.mainDisplay.currentLabel = text
+                    self:UpdatePercentageText()
+                end,
+                disabled = function()
+                    return not self.db.profile.general.mainDisplay.showCurrentPercent
+                end
+            },
+            showCurrentPullPercent = {
+                name = L["SHOW_CURRENT_PULL_PERCENT"],
+                desc = L["SHOW_CURRENT_PULL_PERCENT_DESC"],
+                type = "toggle",
+                order = 2,
+                width = 1.4,
+                get = function() return self.db.profile.general.mainDisplay.showCurrentPullPercent end,
+                set = function(_, value)
+                    self.db.profile.general.mainDisplay.showCurrentPullPercent = value
+                    self:UpdatePercentageText()
+                end,
+                disabled = function()
+                    return not IsMDTAvailable()
+                end
+            },
+            pullLabel = {
+                name = L["LABEL"],
+                desc = L["PULL_LABEL_DESC"],
+                type = "input",
+                order = 2.1,
+                width = 1,
+                get = function() return self.db.profile.general.mainDisplay.pullLabel end,
+                set = function(_, value)
+                    local text = type(value) == "string" and value or ""
+                    text = (text ~= "" and text) or L["PULL_DEFAULT"]
+                    self.db.profile.general.mainDisplay.pullLabel = text
+                    self:UpdatePercentageText()
+                end,
+                disabled = function()
+                    return not self.db.profile.general.mainDisplay.showCurrentPullPercent or not IsMDTAvailable()
+                end
+            },
+            multiLine = {
+                name = L["USE_MULTI_LINE_LAYOUT"],
+                desc = L["USE_MULTI_LINE_LAYOUT_DESC"],
+                type = "toggle",
+                order = 3,
+                width = 1.4,
+                get = function() return self.db.profile.general.mainDisplay.multiLine end,
+                set = function(_, value)
+                    self.db.profile.general.mainDisplay.multiLine = value
+                    -- Immediate refresh
+                    if self.UpdatePercentageText then self:UpdatePercentageText() end
+                    if self.ApplyTextLayout then self:ApplyTextLayout() end
+                    if self.AdjustDisplayFrameSize then self:AdjustDisplayFrameSize() end
+                    -- Notify AceConfig to repaint controls bound to this value
+                    local ACR = LibStub and LibStub("AceConfigRegistry-3.0", true)
+                    if ACR and AddOnName then ACR:NotifyChange(AddOnName) end
+                    -- Multi-frame re-apply to avoid sticky states
+                    local function reapply()
+                        if self.displayFrame and self.displayFrame.text then
+                            if self.UpdatePercentageText then self:UpdatePercentageText() end
+                            if self.ApplyTextLayout then self:ApplyTextLayout() end
+                            if self.AdjustDisplayFrameSize then self:AdjustDisplayFrameSize() end
+                            local t = self.displayFrame.text
+                            t:SetText(t:GetText())
+                        end
+                    end
+                    C_Timer.After(0.03, reapply)
+                    C_Timer.After(0.08, reapply)
+                    C_Timer.After(0.15, reapply)
+                end
+            },
+            singleLineSeparator = {
+                name = L["SINGLE_LINE_SEPARATOR"],
+                desc = L["SINGLE_LINE_SEPARATOR_DESC"],
+                type = "input",
+                order = 3.1,
+                width = 1,
+                get = function() return self.db.profile.general.mainDisplay.singleLineSeparator end,
+                set = function(_, value)
+                    self.db.profile.general.mainDisplay.singleLineSeparator = tostring(value or " | ")
+                    self:UpdatePercentageText()
+                end,
+                disabled = function()
+                    return self.db.profile.general.mainDisplay.multiLine
+                end
+            },
+            textAlign = {
+                name = L["FONT_ALIGN"],
+                desc = L["FONT_ALIGN_DESC"],
+                type = "select",
+                order = 3.2,
+                values = {
+                    LEFT = L["LEFT"],
+                    CENTER = L["CENTER"],
+                    RIGHT = L["RIGHT"],
+                },
+                get = function() return self.db.profile.general.mainDisplay.textAlign end,
+                set = function(_, value)
+                    self.db.profile.general.mainDisplay.textAlign = value
+                    -- Immediate layout apply and text reflow
+                    if self.ApplyTextLayout then self:ApplyTextLayout() end
+                    if self.displayFrame and self.displayFrame.text then
+                        local t = self.displayFrame.text
+                        t:SetText(t:GetText())
+                    end
+                    -- Re-render text then re-apply layout and size
+                    if self.UpdatePercentageText then self:UpdatePercentageText() end
+                    if self.ApplyTextLayout then self:ApplyTextLayout() end
+                    if self.AdjustDisplayFrameSize then self:AdjustDisplayFrameSize() end
+
+                    -- Multi-frame re-apply for select UI timing
+                    local function reapply()
+                        if self.displayFrame and self.displayFrame.text then
+                            if self.ApplyTextLayout then self:ApplyTextLayout() end
+                            local t = self.displayFrame.text
+                            t:SetText(t:GetText())
+                            if self.AdjustDisplayFrameSize then self:AdjustDisplayFrameSize() end
+                        end
+                    end
+                    C_Timer.After(0.03, reapply)
+                    C_Timer.After(0.08, reapply)
+                    C_Timer.After(0.15, reapply)
+
+                    -- Hidden toggle workaround: flip multiLine off/on to force UI reflow without changing final setting
+                    local origMulti = self.db.profile.general.mainDisplay.multiLine
+                    local ACR = LibStub and LibStub("AceConfigRegistry-3.0", true)
+                    local function setMulti(val)
+                        self.db.profile.general.mainDisplay.multiLine = val
+                        if ACR and AddOnName then ACR:NotifyChange(AddOnName) end
+                    end
+                    -- Flip off/on around the layout reapply
+                    setMulti(not origMulti)
+                    reapply()
+                    -- Restore with repeated assertions
+                    C_Timer.After(0.05, function()
+                        setMulti(origMulti)
+                        reapply()
+                    end)
+                    C_Timer.After(0.10, function()
+                        setMulti(origMulti)
+                        reapply()
+                    end)
+                    C_Timer.After(0.20, function()
+                        setMulti(origMulti)
+                        reapply()
+                    end)
+                end,
+                disabled = function()
+                    return not self.db.profile.general.mainDisplay.multiLine
                 end
             }
         }

@@ -1,4 +1,5 @@
 local AddOnName, KeystonePercentageHelper = ...;
+
 local _G = _G;
 -- Cache frequently used global functions for better performance
 local pairs, unpack, select = pairs, unpack, select
@@ -35,6 +36,13 @@ local L = KeystonePercentageHelper.L;
 
 -- Initialize dungeons table to store all dungeon data
 KeystonePercentageHelper.DUNGEONS = {}
+
+-- Track currently engaged mobs for real pull percent
+KeystonePercentageHelper.realPull = {
+    mobs = {},    -- [guid] = { npcID = number, count = number }
+    sum = 0,      -- total count across engaged GUIDs
+    denom = 0,    -- MDT total required count for 100%
+}
 
 -- Track current dungeon and section
 KeystonePercentageHelper.currentDungeonID = 0
@@ -140,6 +148,58 @@ function KeystonePercentageHelper:OnInitialize()
         Settings.OpenToCategory("Keystone Percentage Helper")
     end
 
+-- Helpers to manage real pull set
+function KeystonePercentageHelper:AddEngagedMobByGUID(guid)
+    if not guid or self.realPull.mobs[guid] then return end
+    local DungeonTools = _G and (_G.MDT or _G.MethodDungeonTools)
+    if not DungeonTools or not DungeonTools.GetEnemyForces then return end
+
+    local _, _, _, _, _, npcID = strsplit("-", guid)
+    local id = tonumber(npcID)
+    if not id then return end
+
+    local count, max, maxTeeming, teemingCount = DungeonTools:GetEnemyForces(id)
+    local isTeeming = self.IsTeeming and self:IsTeeming() or false
+    local denom = (isTeeming and maxTeeming) or max
+    local c = (isTeeming and teemingCount) or count
+    c = tonumber(c) or 0
+    denom = tonumber(denom) or 0
+
+    -- Initialize denominator when first known
+    if self.realPull.denom == 0 and denom > 0 then
+        self.realPull.denom = denom
+    end
+
+    if c > 0 then
+        self.realPull.mobs[guid] = { npcID = id, count = c }
+        self.realPull.sum = self.realPull.sum + c
+    end
+end
+
+function KeystonePercentageHelper:RemoveEngagedMobByGUID(guid)
+    local data = guid and self.realPull.mobs[guid]
+    if not data then return end
+    self.realPull.sum = math.max(0, self.realPull.sum - (data.count or 0))
+    self.realPull.mobs[guid] = nil
+end
+
+-- Resize the display frame to fit multi-line content when enabled
+function KeystonePercentageHelper:AdjustDisplayFrameSize()
+    if not self.displayFrame or not self.db or not self.db.profile then return end
+    local cfg = self.db.profile.general.mainDisplay
+    if not (cfg and cfg.multiLine) then
+        -- Reset to default height for single-line usage
+        self.displayFrame:SetHeight(30)
+        return
+    end
+    local text = self.displayFrame.text:GetText() or ""
+    local _, count = text:gsub("\n", "")
+    local lines = (count or 0) + 1
+    local lineHeight = self.db.profile.general.fontSize or 12
+    local padding = 6
+    self.displayFrame:SetHeight(lines * lineHeight + padding)
+end
+
     cancelButton:SetScript("OnClick", CancelPositioning)
 
     -- Handle ESC key to cancel positioning
@@ -215,6 +275,7 @@ function KeystonePercentageHelper:OnInitialize()
                     positioning = self:GetPositioningOptions(),
                     font = self:GetFontOptions(),
                     colors = self:GetColorOptions(),
+                    mainDisplay = self:GetMainDisplayOptions(),
                     otherOptions = self:GetOtherOptions(),
                 }
             },
@@ -324,6 +385,7 @@ function KeystonePercentageHelper:CreateDisplay()
     end
 
     -- Ensure text is visible and settings are applied
+    self:ApplyTextLayout()
     self:Refresh()
 end
 
@@ -349,13 +411,17 @@ end
 function KeystonePercentageHelper:GetCurrentPercentage()
     local steps = select(3, C_Scenario.GetStepInfo())
     local criteriaInfo = C_ScenarioInfo.GetCriteriaInfo(steps) or {}
-    local percent, total, current = criteriaInfo.quantity, criteriaInfo.totalQuantity, criteriaInfo.quantityString
+    local quantity, total, quantityString = criteriaInfo.quantity, criteriaInfo.totalQuantity, criteriaInfo.quantityString
 
-    if current then
-        -- Extract percentage from the string (remove % symbol)
-        current = tonumber(string.sub(current, 1, string.len(current) - 1)) or 0
-        local currentPercent = (current / total) * 100
-        return currentPercent or 0
+    -- Prefer Blizzard's provided percentage string when available
+    if type(quantityString) == "string" and quantityString:find("%%") then
+        local v = tonumber((quantityString:gsub("%%", "")))
+        if v then return v end
+    end
+
+    -- Fallback: compute percent from quantities
+    if quantity and total and total > 0 then
+        return (quantity / total) * 100
     end
 
     return 0
@@ -398,6 +464,8 @@ function KeystonePercentageHelper:UpdatePercentageText()
 
     -- Get current enemy forces percentage
     local currentPercentage = self:GetCurrentPercentage()
+    -- Try to get current pull percent from MDT
+    local currentPullPercent = self:GetCurrentPullPercent()
 
     -- Skip sections that have 0 or negative percentage requirements
     while self.DUNGEONS[self.currentDungeonID][self.currentSection] and self.DUNGEONS[self.currentDungeonID][self.currentSection][2] <= 0 do
@@ -434,22 +502,22 @@ function KeystonePercentageHelper:UpdatePercentageText()
                 self.DUNGEONS[self.currentDungeonID][self.currentSection][4] = true
             end
             color = self.db.profile.color.missing
-            self.displayFrame.text:SetText(displayPercent)
+            self.displayFrame.text:SetText(self:FormatMainDisplayText(displayPercent, currentPercentage, currentPullPercent, remainingPercent))
         elseif remainingPercent > 0 and not isBossKilled then -- Boss has not been killed yet and percentage is missing
-            self.displayFrame.text:SetText(displayPercent)
+            self.displayFrame.text:SetText(self:FormatMainDisplayText(displayPercent, currentPercentage, currentPullPercent, remainingPercent))
         elseif remainingPercent <= 0 and not isBossKilled then -- Boss has not been killed yet but percentage is done
             color = self.db.profile.color.finished
             if(currentPercentage >= 100) then
-                self.displayFrame.text:SetText(L["FINISHED"])
+                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["FINISHED"], currentPercentage, currentPullPercent, remainingPercent))
             else
-                self.displayFrame.text:SetText(L["DONE"])
+                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DONE"], currentPercentage, currentPullPercent, remainingPercent))
             end
         elseif remainingPercent <= 0 and isBossKilled then -- Boss has been killed and percentage is done
             color = self.db.profile.color.finished
             if(currentPercentage >= 100) then
-                self.displayFrame.text:SetText(L["FINISHED"])
+                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["FINISHED"], currentPercentage, currentPullPercent, remainingPercent))
             else
-                self.displayFrame.text:SetText(L["SECTION_DONE"])
+                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["SECTION_DONE"], currentPercentage, currentPullPercent, remainingPercent))
             end
             self.currentSection = self.currentSection + 1
             if self.currentSection <= #self.DUNGEONS[self.currentDungeonID] then -- Next section exists
@@ -461,25 +529,141 @@ function KeystonePercentageHelper:UpdatePercentageText()
                         end
                     if currentPercentage >= 100 then -- Percentage is already done for the dungeon
                         color = self.db.profile.color.finished
-                        self.displayFrame.text:SetText(L["FINISHED"])
+                        self.displayFrame.text:SetText(self:FormatMainDisplayText(L["FINISHED"], currentPercentage, currentPullPercent))
                     else -- Dungeon has not been completed
                         if nextRequired == 0 then
                             color = self.db.profile.color.finished
-                            self.displayFrame.text:SetText(L["DONE"])
+                            self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DONE"], currentPercentage, currentPullPercent))
                         else
                             color = self.db.profile.color.inProgress
-                            self.displayFrame.text:SetText(string.format("%.2f%%", nextRequired))
+                            self.displayFrame.text:SetText(self:FormatMainDisplayText(string.format("%.2f%%", nextRequired), currentPercentage, currentPullPercent))
                         end
                     end
                     self.displayFrame.text:SetTextColor(color.r, color.g, color.b, color.a)
+                    -- Adjust frame size if multi-line is enabled
+                    self:AdjustDisplayFrameSize()
+                    -- Ensure alignment reflects new text layout immediately
+                    self:ApplyTextLayout()
                 end)
             else
-                self.displayFrame.text:SetText(L["DUNGEON_DONE"]) -- Dungeon has been completed
+                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DUNGEON_DONE"], currentPercentage, currentPullPercent)) -- Dungeon has been completed
             end
         end
 
         -- Apply text color based on status
         self.displayFrame.text:SetTextColor(color.r, color.g, color.b, color.a)
+        -- Adjust frame size if multi-line is enabled
+        self:AdjustDisplayFrameSize()
+        -- Ensure alignment reflects latest text
+        self:ApplyTextLayout()
+    end
+end
+
+-- Compute current planned pull percent via MDT (if available)
+function KeystonePercentageHelper:GetCurrentPullPercent()
+    if not C_ChallengeMode.IsChallengeModeActive() then return 0 end
+    local denom = tonumber(self.realPull.denom) or 0
+    local sum = tonumber(self.realPull.sum) or 0
+    if denom <= 0 or sum <= 0 then return 0 end
+    return (sum / denom) * 100
+end
+
+-- Build final display text by appending optional values (current percent, pull percent)
+function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent, currentPullPercent, remainingNeeded)
+    local cfg = self.db and self.db.profile and self.db.profile.general and self.db.profile.general.mainDisplay or nil
+    if not cfg then return baseText end
+
+    local extras = {}
+    if cfg.showCurrentPercent and (currentPercent ~= nil) then
+        local label = tostring(cfg.currentLabel or "Curr:")
+        table.insert(extras, string.format("%s %.2f%%", label, currentPercent or 0))
+    end
+    if cfg.showCurrentPullPercent and (currentPullPercent ~= nil) then
+        local label = tostring(cfg.pullLabel or "Pull:")
+        local value = string.format("%.2f%%", currentPullPercent or 0)
+        -- Highlight pull in finished color if it's enough to meet remaining needed for the current section
+        if remainingNeeded and remainingNeeded > 0 and (currentPullPercent or 0) >= remainingNeeded then
+            local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
+            local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
+            value = string.format("|cff%s%s|r", hex, value)
+        end
+        table.insert(extras, string.format("%s %s", label, value))
+    end
+
+    -- Optionally show the base required text prefix if it's numeric
+    local base = baseText    
+    local isNumericPercent = type(baseText) == "string" and baseText:find("%%$") and tonumber((baseText:gsub("%%",""))) ~= nil
+    if isNumericPercent then
+        if cfg.showRequiredText == false then 
+            base = baseText 
+        else
+            local rlabel = tostring(cfg.requiredLabel or "Required:")
+            base = rlabel .. " " .. baseText
+        end
+    else
+        base = baseText -- keep DONE/SECTION DONE/FINISHED as-is without label
+    end
+
+    if #extras == 0 then return base end
+
+    if base == nil or base == "" then
+        if cfg.multiLine then
+            return table.concat(extras, "\n")
+        else
+            local sep = tostring(cfg.singleLineSeparator or " | ")
+            return table.concat(extras, sep)
+        end
+    end
+
+    if cfg.multiLine then
+        return base .. "\n" .. table.concat(extras, "\n")
+    else
+        local sep = tostring(cfg.singleLineSeparator or " | ")
+        return base .. sep .. table.concat(extras, sep)
+    end
+end
+
+-- Apply text layout to support configurable text alignment (LEFT/CENTER/RIGHT)
+function KeystonePercentageHelper:ApplyTextLayout()
+    if not (self.displayFrame and self.displayFrame.text and self.db and self.db.profile) then return end
+    local cfg = self.db.profile.general.mainDisplay
+    if not cfg then return end
+
+    local align = cfg.textAlign or "CENTER"
+    local multi = cfg.multiLine and true or false
+    local maxWidth = tonumber(cfg.maxWidth) or 0
+
+    self.displayFrame.text:ClearAllPoints()
+
+    if multi then
+        -- Multi-line: constrain to frame width and wrap
+        self.displayFrame.text:SetPoint("TOPLEFT", self.displayFrame, "TOPLEFT", 0, 0)
+        self.displayFrame.text:SetPoint("TOPRIGHT", self.displayFrame, "TOPRIGHT", 0, 0)
+        self.displayFrame.text:SetWidth(self.displayFrame:GetWidth())
+        self.displayFrame.text:SetWordWrap(true)
+        self.displayFrame.text:SetJustifyV("TOP")
+    else
+        -- Single-line: ALWAYS center-align regardless of option
+        self.displayFrame.text:SetPoint("CENTER", self.displayFrame, "CENTER", 0, 0)
+        if maxWidth > 0 then
+            self.displayFrame.text:SetWidth(maxWidth)
+            self.displayFrame.text:SetWordWrap(true)
+        else
+            -- Autosize to text; no wrapping
+            self.displayFrame.text:SetWidth(0)
+            self.displayFrame.text:SetWordWrap(false)
+        end
+        self.displayFrame.text:SetJustifyV("MIDDLE")
+        self.displayFrame.text:SetJustifyH("CENTER")
+        return
+    end
+
+    -- Multi-line justification
+    self.displayFrame.text:SetJustifyH(align)
+    -- Force reflow so alignment applies immediately
+    local _cur = self.displayFrame.text:GetText()
+    if _cur ~= nil then
+        self.displayFrame.text:SetText(_cur)
     end
 end
 
@@ -498,6 +682,14 @@ function KeystonePercentageHelper:OnEnable()
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
 
+    -- Extra refresh triggers for dynamic current pull percent
+    self:RegisterEvent("NAME_PLATE_UNIT_ADDED")
+    self:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
+    self:RegisterEvent("UNIT_THREAT_LIST_UPDATE")
+    self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    self:RegisterEvent("PLAYER_REGEN_DISABLED")
+    self:RegisterEvent("PLAYER_REGEN_ENABLED")
+
     -- Force an initial update
     self:UpdatePercentageText()
 end
@@ -510,6 +702,91 @@ end
 -- Event handler for criteria updates (enemy forces percentage changes)
 function KeystonePercentageHelper:SCENARIO_CRITERIA_UPDATE()
     self:UpdatePercentageText()
+end
+
+-- React to nameplate additions/removals to refresh dynamic pull percent
+function KeystonePercentageHelper:NAME_PLATE_UNIT_ADDED()
+    self:UpdatePercentageText()
+end
+
+function KeystonePercentageHelper:NAME_PLATE_UNIT_REMOVED()
+    self:UpdatePercentageText()
+end
+
+-- Update when threat list changes (engagement state)
+function KeystonePercentageHelper:UNIT_THREAT_LIST_UPDATE()
+    self:UpdatePercentageText()
+end
+
+-- Start of combat: reset real pull state
+function KeystonePercentageHelper:PLAYER_REGEN_DISABLED()
+    self.realPull.mobs = {}
+    self.realPull.sum = 0
+    self.realPull.denom = 0
+end
+
+-- End of combat: clear and refresh
+function KeystonePercentageHelper:PLAYER_REGEN_ENABLED()
+    self.realPull.mobs = {}
+    self.realPull.sum = 0
+    self.realPull.denom = 0
+    self:UpdatePercentageText()
+end
+
+-- Throttled updater for combat log bursts
+function KeystonePercentageHelper:_QueuePullUpdate()
+    if self._pullUpdateQueued then return end
+    self._pullUpdateQueued = true
+    C_Timer.After(0.1, function()
+        self._pullUpdateQueued = nil
+        self:UpdatePercentageText()
+    end)
+end
+
+-- Listen to combat log to track engaged NPCs even when nameplates are not visible
+function KeystonePercentageHelper:COMBAT_LOG_EVENT_UNFILTERED()
+    if not C_ChallengeMode.IsChallengeModeActive() then return end
+    local info = { CombatLogGetCurrentEventInfo() }
+    local subEvent = info[2]
+    -- WoW API order: 4=sourceGUID, 6=sourceFlags, 8=destGUID, 10=destFlags
+    local srcGUID, srcFlags = info[4], info[6]
+    local destGUID, destFlags = info[8], info[10]
+
+    local function IsGroup(flags)
+        local mask = bit.bor(
+            COMBATLOG_OBJECT_AFFILIATION_MINE or 0,
+            COMBATLOG_OBJECT_AFFILIATION_PARTY or 0,
+            COMBATLOG_OBJECT_AFFILIATION_RAID or 0
+        )
+        local f = tonumber(flags) or 0
+        return bit.band(f, mask) ~= 0
+    end
+    local function IsNPCGuid(guid)
+        return type(guid) == "string" and (guid:find("^Creature%-") or guid:find("^Vehicle%-"))
+    end
+
+    if subEvent == "UNIT_DIED" or subEvent == "UNIT_DESTROYED" then
+        if IsNPCGuid(destGUID) then
+            self:RemoveEngagedMobByGUID(destGUID)
+            self:_QueuePullUpdate()
+        end
+        return
+    end
+
+    -- Detect engagement in both directions (group -> npc or npc -> group)
+    local isDamage = subEvent and (subEvent:find("_DAMAGE") or subEvent:find("_MISSED") or subEvent:find("AURA_APPLIED") or subEvent:find("AURA_REFRESH"))
+    if not isDamage then return end
+
+    if IsGroup(srcFlags) and IsNPCGuid(destGUID) then
+        self:AddEngagedMobByGUID(destGUID)
+        self:_QueuePullUpdate()
+        return
+    end
+    if IsGroup(destFlags) and IsNPCGuid(srcGUID) then
+        self:AddEngagedMobByGUID(srcGUID)
+        self:_QueuePullUpdate()
+        return
+    end
 end
 
 -- Event handler for starting a Mythic+ dungeon
@@ -550,6 +827,8 @@ function KeystonePercentageHelper:Refresh()
 
     -- Update font size and font
     self.displayFrame.text:SetFont(self.LSM:Fetch('font', self.db.profile.text.font), self.db.profile.general.fontSize, "OUTLINE")
+    -- Update horizontal alignment
+    self:ApplyTextLayout()
 
     -- Update text color
     local color = self.db.profile.color.inProgress
