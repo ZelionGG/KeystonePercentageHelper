@@ -231,9 +231,9 @@ L["PREFIX_COLOR"] = "Prefixes color"
 L["PREFIX_COLOR_DESC"] = "Color applied to labels/prefixes (Required, Current, Pull)."
 L["MAX_WIDTH"] = "Max width (single-line)"
 L["MAX_WIDTH_DESC"] = "Maximum width in pixels for single-line layout. 0 = automatic (no wrapping)."
-L["REQUIRED_DEFAULT"] = "Required :"
-L["CURRENT_DEFAULT"] = "Current :"
-L["PULL_DEFAULT"] = "Pull :"
+L["REQUIRED_DEFAULT"] = "Required:"
+L["CURRENT_DEFAULT"] = "Current:"
+L["PULL_DEFAULT"] = "Pull:"
 
 -- Export/Import
 L["EXPORT_DUNGEON"] = "Export Dungeon"

@@ -586,11 +586,11 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
     end
 
     if cfg.showCurrentPercent and (currentPercent ~= nil) then
-        local label = colorizePrefix(cfg.currentLabel or "Curr:")
+        local label = colorizePrefix(cfg.currentLabel or L["CURRENT_DEFAULT"])
         table.insert(extras, string.format("%s %.2f%%", label, currentPercent or 0))
     end
     if cfg.showCurrentPullPercent and (currentPullPercent ~= nil) then
-        local label = colorizePrefix(cfg.pullLabel or "Pull:")
+        local label = colorizePrefix(cfg.pullLabel or L["PULL_DEFAULT"])
         local value = string.format("%.2f%%", currentPullPercent or 0)
         -- Highlight pull in finished color if it's enough to meet remaining needed for the current section
         if remainingNeeded and remainingNeeded > 0 and (currentPullPercent or 0) >= remainingNeeded then
@@ -608,7 +608,7 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
         if cfg.showRequiredText == false then 
             base = baseText 
         else
-            local rlabel = colorizePrefix(cfg.requiredLabel or "Required:")
+            local rlabel = colorizePrefix(cfg.requiredLabel or L["REQUIRED_DEFAULT"])
             base = rlabel .. " " .. baseText
         end
     else
