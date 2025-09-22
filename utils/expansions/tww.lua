@@ -52,8 +52,8 @@ KeystonePercentageHelper.TWW_DUNGEON_DATA = {
         teleportID = 1216786,
         bosses = {
             {1, 36.81, false},
-            {2, 67.86, false},
-            {3, 57.87, true},
+            {2, 57.87, false}, -- Demolition Duo
+            {3, 67.86, true}, -- Swampface
             {4, 100, true}
         }
     },
