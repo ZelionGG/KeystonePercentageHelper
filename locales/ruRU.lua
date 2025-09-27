@@ -5,7 +5,7 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0");
 local L = AceLocale:NewLocale(AddonName, "ruRU", false, false);
 if not L then return end
 
--- Last translated September 8th, 2025.
+-- Last translated September 27th, 2025.
 -- Translation by Hollicsh (https://github.com/Hollicsh)
 
 -- Dungeons Group
@@ -211,34 +211,34 @@ L["RESET_CHANGED_ONLY"] = "Сбросить только измененные"
 L["CHANGED_ROUTES_DUNGEONS_LIST"] = "Обновлены маршруты следующих подземелий:"
 
 -- Main Display
-L["MAIN_DISPLAY"] = "Main Display"
-L["SHOW_REQUIRED_PREFIX"] = "Show required text prefix"
-L["SHOW_REQUIRED_PREFIX_DESC"] = "When the base value is numeric (e.g., 12.34%), prefix it with a label (e.g., 'Required:'). No prefix is added for DONE/SECTION/DUNGEON states."
-L["LABEL"] = "Prefix"
-L["REQUIRED_LABEL_DESC"] = "Label displayed before the numeric required percentage (e.g., 'Required: 12.34%').\n\nClear the field to reset to the default value."
-L["SHOW_CURRENT_PERCENT"] = "Show current %"
-L["SHOW_CURRENT_PERCENT_DESC"] = "Display the current overall enemy forces percent (from the scenario tracker)."
-L["CURRENT_LABEL_DESC"] = "Label displayed before the current percentage value.\n\nClear the field to reset to the default value."
-L["SHOW_CURRENT_PULL_PERCENT"] = "Show current pull % (MDT)"
-L["SHOW_CURRENT_PULL_PERCENT_DESC"] = "Display the real current pull percent based on engaged mobs using MDT data."
-L["PULL_LABEL_DESC"] = "Label displayed before the current pull percentage value.\n\nClear the field to reset to the default value."
-L["USE_MULTI_LINE_LAYOUT"] = "Use multi-line layout"
-L["USE_MULTI_LINE_LAYOUT_DESC"] = "Show each selected value on a new line."
-L["SINGLE_LINE_SEPARATOR"] = "Single-line separator"
-L["SINGLE_LINE_SEPARATOR_DESC"] = "Separator used between items when not using multi-line layout."
-L["FONT_ALIGN"] = "Font align"
-L["FONT_ALIGN_DESC"] = "Horizontal alignment for the display text."
-L["PREFIX_COLOR"] = "Prefixes color"
-L["PREFIX_COLOR_DESC"] = "Color applied to labels/prefixes (Required, Current, Pull)."
-L["MAX_WIDTH"] = "Max width (single-line)"
-L["MAX_WIDTH_DESC"] = "Maximum width in pixels for single-line layout. 0 = automatic (no wrapping)."
-L["REQUIRED_DEFAULT"] = "Required :"
-L["CURRENT_DEFAULT"] = "Current :"
-L["PULL_DEFAULT"] = "Pull :"
+L["MAIN_DISPLAY"] = "Основное отображение"
+L["SHOW_REQUIRED_PREFIX"] = "Показать требуемый текстовый префикс"
+L["SHOW_REQUIRED_PREFIX_DESC"] = "Если базовое значение в виде числа (например, 12,34%), добавьте к нему метку (например, 'Требуется:'). Для состояний 'ГОТОВО', 'РАЗДЕЛ' или 'ПОДЗЕМЕЛЬЕ' префикс не добавляется."
+L["LABEL"] = "Префикс"
+L["REQUIRED_LABEL_DESC"] = "Метка, отображаемая перед требуемым числовым процентом (например, 'Требуется: 12,34%').\n\nОчистите поле, чтобы сбросить значение по умолчанию."
+L["SHOW_CURRENT_PERCENT"] = "Показать текущий %"
+L["SHOW_CURRENT_PERCENT_DESC"] = "Отображение текущего процента общей численности противника (из отслеживания сценариев)."
+L["CURRENT_LABEL_DESC"] = "Метка отображается перед текущим процентным значением.\n\nОчистите поле, чтобы сбросить значение по умолчанию."
+L["SHOW_CURRENT_PULL_PERCENT"] = "Показать текущий процент пулла (MDT)"
+L["SHOW_CURRENT_PULL_PERCENT_DESC"] = "Отображение реального текущего процента пулла на основе вовлечённых мобов с использованием данных MDT."
+L["PULL_LABEL_DESC"] = "Метка, отображаемая перед текущим значением процента извлечения.\n\nОчистите поле, чтобы сбросить значение по умолчанию."
+L["USE_MULTI_LINE_LAYOUT"] = "Использовать многострочное расположение"
+L["USE_MULTI_LINE_LAYOUT_DESC"] = "Показывать каждое выбранное значение в новой строке."
+L["SINGLE_LINE_SEPARATOR"] = "Однострочный разделитель"
+L["SINGLE_LINE_SEPARATOR_DESC"] = "Разделитель, используемый между элементами, если не используется многострочное расположение."
+L["FONT_ALIGN"] = "Выравнивание шрифта"
+L["FONT_ALIGN_DESC"] = "Горизонтальное выравнивание отображаемого текста."
+L["PREFIX_COLOR"] = "Цвет префиксов"
+L["PREFIX_COLOR_DESC"] = "Цвет, применяемый к меткам/префиксам ('Требуется', 'текущий', 'пулл')."
+L["MAX_WIDTH"] = "Максимальная ширина (однострочная)"
+L["MAX_WIDTH_DESC"] = "Максимальная ширина в пикселях для однострочного расположения; 0 = автоматически (без переноса)."
+L["REQUIRED_DEFAULT"] = "Требуется:"
+L["CURRENT_DEFAULT"] = "Текущий:"
+L["PULL_DEFAULT"] = "Пулл:"
 
-L["FORMAT_MODE"] = "Text format"
-L["FORMAT_MODE_DESC"] = "Select how to display the progress."
-L["COUNT"] = "Count"
+L["FORMAT_MODE"] = "Формат текста"
+L["FORMAT_MODE_DESC"] = "Выберите способ отображения прогресса."
+L["COUNT"] = "Счётчик"
 
 -- Export/Import
 L["EXPORT_DUNGEON"] = "Экспорт подземелья"
