@@ -557,23 +557,29 @@ function KeystonePercentageHelper:UpdatePercentageText()
             end
             color = self.db.profile.color.missing
             local base = (formatMode == "count") and displayCount or displayPercent
-            self.displayFrame.text:SetText(self:FormatMainDisplayText(base, currentPercentage, currentPullPercent, remainingPercent, fmtData))
+            local allBosses = self:AreAllBossesKilled()
+            self.displayFrame.text:SetText(self:FormatMainDisplayText(base, currentPercentage, currentPullPercent, remainingPercent, fmtData, isBossKilled, allBosses))
         elseif remainingPercent > 0 and not isBossKilled then -- Boss has not been killed yet and percentage is missing
             local base = (formatMode == "count") and displayCount or displayPercent
-            self.displayFrame.text:SetText(self:FormatMainDisplayText(base, currentPercentage, currentPullPercent, remainingPercent, fmtData))
+            local allBosses = self:AreAllBossesKilled()
+            self.displayFrame.text:SetText(self:FormatMainDisplayText(base, currentPercentage, currentPullPercent, remainingPercent, fmtData, isBossKilled, allBosses))
         elseif remainingPercent <= 0 and not isBossKilled then -- Boss has not been killed yet but percentage is done
             color = self.db.profile.color.finished
             if(currentPercentage >= 100) then
-                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["FINISHED"], currentPercentage, currentPullPercent, remainingPercent, fmtData))
+                local allBosses = self:AreAllBossesKilled()
+                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["FINISHED"], currentPercentage, currentPullPercent, remainingPercent, fmtData, isBossKilled, allBosses))
             else
-                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DONE"], currentPercentage, currentPullPercent, remainingPercent, fmtData))
+                local allBosses = self:AreAllBossesKilled()
+                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DONE"], currentPercentage, currentPullPercent, remainingPercent, fmtData, isBossKilled, allBosses))
             end
         elseif remainingPercent <= 0 and isBossKilled then -- Boss has been killed and percentage is done
             color = self.db.profile.color.finished
             if(currentPercentage >= 100) then
-                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["FINISHED"], currentPercentage, currentPullPercent, remainingPercent, fmtData))
+                local allBosses = self:AreAllBossesKilled()
+                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["FINISHED"], currentPercentage, currentPullPercent, remainingPercent, fmtData, isBossKilled, allBosses))
             else
-                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["SECTION_DONE"], currentPercentage, currentPullPercent, remainingPercent, fmtData))
+                local allBosses = self:AreAllBossesKilled()
+                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["SECTION_DONE"], currentPercentage, currentPullPercent, remainingPercent, fmtData, isBossKilled, allBosses))
             end
             self.currentSection = self.currentSection + 1
             if self.currentSection <= #self.DUNGEONS[self.currentDungeonID] then -- Next section exists
@@ -585,11 +591,13 @@ function KeystonePercentageHelper:UpdatePercentageText()
                         end
                     if currentPercentage >= 100 then -- Percentage is already done for the dungeon
                         color = self.db.profile.color.finished
-                        self.displayFrame.text:SetText(self:FormatMainDisplayText(L["FINISHED"], currentPercentage, currentPullPercent, nil, fmtData))
+                        local allBosses = self:AreAllBossesKilled()
+                        self.displayFrame.text:SetText(self:FormatMainDisplayText(L["FINISHED"], currentPercentage, currentPullPercent, nil, fmtData, isBossKilled, allBosses))
                     else -- Dungeon has not been completed
                         if nextRequired == 0 then
                             color = self.db.profile.color.finished
-                            self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DONE"], currentPercentage, currentPullPercent, nil, fmtData))
+                            local allBosses = self:AreAllBossesKilled()
+                            self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DONE"], currentPercentage, currentPullPercent, nil, fmtData, isBossKilled, allBosses))
                         else
                             color = self.db.profile.color.inProgress
                             local nextNeededPercent = self.DUNGEONS[self.currentDungeonID][self.currentSection][2]
@@ -609,7 +617,9 @@ function KeystonePercentageHelper:UpdatePercentageText()
                                 sectionRequiredPercent = nextNeededPercent or 0,
                                 sectionRequiredCount = nextNeededCount or 0,
                             }
-                            self.displayFrame.text:SetText(self:FormatMainDisplayText(baseNext, currentPercentage, currentPullPercent, nextRequired, fmtNext))
+                            local allBosses = self:AreAllBossesKilled()
+                            -- For next section preview, the current section boss context shouldn't mark as killed for the new section; pass false
+                            self.displayFrame.text:SetText(self:FormatMainDisplayText(baseNext, currentPercentage, currentPullPercent, nextRequired, fmtNext, false, allBosses))
                         end
                     end
                     self.displayFrame.text:SetTextColor(color.r, color.g, color.b, color.a)
@@ -619,7 +629,8 @@ function KeystonePercentageHelper:UpdatePercentageText()
                     self:ApplyTextLayout()
                 end)
             else
-                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DUNGEON_DONE"], currentPercentage, currentPullPercent, nil, fmtData)) -- Dungeon has been completed
+                local allBosses = self:AreAllBossesKilled()
+                self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DUNGEON_DONE"], currentPercentage, currentPullPercent, nil, fmtData, isBossKilled, allBosses)) -- Dungeon has been completed
             end
         end
 
@@ -641,8 +652,22 @@ function KeystonePercentageHelper:GetCurrentPullPercent()
     return (sum / denom) * 100
 end
 
+-- Determine if all non-weighted (boss) criteria are completed
+function KeystonePercentageHelper:AreAllBossesKilled()
+    local stepInfo = C_ScenarioInfo and C_ScenarioInfo.GetStepInfo and C_ScenarioInfo.GetStepInfo()
+    local numCriteria = stepInfo and stepInfo.numCriteria or 0
+    if numCriteria == 0 then return false end
+    for i = 1, numCriteria do
+        local info = C_ScenarioInfo.GetCriteriaInfo(i)
+        if info and not info.isWeightedProgress then
+            if not info.completed then return false end
+        end
+    end
+    return true
+end
+
 -- Build final display text by appending optional values (current percent, pull percent)
-function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent, currentPullPercent, remainingNeeded, fmtData)
+function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent, currentPullPercent, remainingNeeded, fmtData, isBossKilled, allBossesKilled)
     local cfg = self.db and self.db.profile and self.db.profile.general and self.db.profile.general.mainDisplay or nil
     if not cfg then return baseText end
 
@@ -744,25 +769,62 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
         base = baseText -- keep DONE/SECTION DONE/FINISHED as-is without label
     end
 
-    -- Optionally append projected value next to numeric Required base
+    -- Optionally append projected value next to numeric Required base (do not replace base label)
     if cfg.showProjected and UnitAffectingCombat and UnitAffectingCombat("player") then
         if isNumericPercent and (type(remainingNeeded) == "number") then
             local pull = tonumber(currentPullPercent) or 0
             local projReq = (tonumber(remainingNeeded) or 0) - pull
             if projReq < 0 then projReq = 0 end
             if projReq > 100 then projReq = 100 end
-            if projReq == 0 then
-                base = L["SECTION_DONE"] .. string.format(" (%.2f%%)", projReq)
+            local projTotal = tonumber(currentPercent or 0) + (tonumber(currentPullPercent) or 0)
+            if projTotal < 0 then projTotal = 0 end
+            if projTotal > 100 then projTotal = 100 end
+            if projReq <= 0 then
+                -- Distinction: Section done vs Dungeon percentage done vs Dungeon finished (projected)
+                local suffix
+                local isLastSection = false
+                if self.DUNGEONS and self.currentDungeonID and self.DUNGEONS[self.currentDungeonID] then
+                    isLastSection = (self.currentSection == #self.DUNGEONS[self.currentDungeonID])
+                end
+                if allBossesKilled and projTotal >= 100 then
+                    suffix = L["FINISHED"]
+                elseif isLastSection then
+                    suffix = L["DONE"]
+                elseif isBossKilled then
+                    suffix = L["SECTION_DONE"]
+                else
+                    suffix = L["DONE"]
+                end
+                base = string.format("%s (%s)", base, suffix)
             else
                 base = string.format("%s (%.2f%%)", base, projReq)
             end
         elseif isNumericCount and (cfg.formatMode == "count") and fmtData then
+            local cc   = tonumber(fmtData.currentCount) or 0
+            local tt   = tonumber(fmtData.totalCount) or 0
             local remC = tonumber(fmtData.remainingCount) or 0
             local pullC = tonumber(fmtData.pullCount) or 0
             local projC = remC - pullC
             if projC < 0 then projC = 0 end
             if projC == 0 then
-                base = L["SECTION_DONE"] .. string.format(" (%d)", projC)
+                local suffix
+                local projShare = 0
+                if tt > 0 then projShare = ((cc + pullC) / tt) * 100 end
+                if projShare > 100 then projShare = 100 end
+                local isLastSection = false
+                if self.DUNGEONS and self.currentDungeonID and self.DUNGEONS[self.currentDungeonID] then
+                    isLastSection = (self.currentSection == #self.DUNGEONS[self.currentDungeonID])
+                end
+                if allBossesKilled and projShare >= 100 then
+                    suffix = L["FINISHED"]
+                elseif isLastSection then
+                    suffix = L["DONE"]
+                elseif isBossKilled then
+                    suffix = L["SECTION_DONE"]
+                else
+                    suffix = L["DONE"]
+                end
+                base = string.format("%s (%s)", base, suffix)
             else
                 base = string.format("%s (%d)", base, projC)
             end
