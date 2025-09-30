@@ -83,7 +83,8 @@ KeystonePercentageHelper.defaults = {
                 formatMode = "percent",               -- Display format: "percent" or "count"
                 prefixColor = { r = 0.8, g = 0.8, b = 0.8, a = 1 }, -- Color for prefixes (labels)
                 singleLineSeparator = " | ",           -- Separator for single-line layout
-                textAlign = "CENTER"                   -- Horizontal font alignment: LEFT, CENTER, RIGHT
+                textAlign = "CENTER",                  -- Horizontal font alignment: LEFT, CENTER, RIGHT
+                showProjected = false                   -- Append projected values next to Current/Required
             }
         },
         text = {font = "Friz Quadrata TT"},
@@ -712,6 +713,20 @@ function KeystonePercentageHelper:GetMainDisplayOptions()
                 end,
                 disabled = function()
                     return not self.db.profile.general.mainDisplay.multiLine
+                end
+            },
+            showProjected = {
+                name = L["SHOW_PROJECTED"],
+                desc = L["SHOW_PROJECTED_DESC"],
+                type = "toggle",
+                order = 3.25,
+                width = 1.6,
+                get = function() return self.db.profile.general.mainDisplay.showProjected end,
+                set = function(_, value)
+                    self.db.profile.general.mainDisplay.showProjected = value
+                    if self.UpdatePercentageText then self:UpdatePercentageText() end
+                    if self.ApplyTextLayout then self:ApplyTextLayout() end
+                    if self.AdjustDisplayFrameSize then self:AdjustDisplayFrameSize() end
                 end
             },
         }

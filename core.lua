@@ -660,12 +660,30 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
 
     if cfg.showCurrentPercent and (currentPercent ~= nil) then
         local label = colorizePrefix(cfg.currentLabel or L["CURRENT_DEFAULT"])
+        local showProj = (cfg.showProjected and UnitAffectingCombat and UnitAffectingCombat("player")) and true or false
         if (cfg.formatMode == "count") and fmtData then
             local cc = tonumber(fmtData.currentCount) or 0
             local tt = tonumber(fmtData.totalCount) or 0
-            table.insert(extras, string.format("%s %d/%d", label, cc, tt))
+            local baseStr = string.format("%s %d/%d", label, cc, tt)
+            if showProj then
+                local pullC = tonumber(fmtData.pullCount) or 0
+                local projC = cc + pullC
+                if projC < 0 then projC = 0 end
+                if tt > 0 and projC > tt then projC = tt end
+                baseStr = string.format("%s (%d/%d)", baseStr, projC, tt)
+            end
+            table.insert(extras, baseStr)
         else
-            table.insert(extras, string.format("%s %.2f%%", label, currentPercent or 0))
+            local cur = tonumber(currentPercent) or 0
+            local baseStr = string.format("%s %.2f%%", label, cur)
+            if showProj then
+                local pull = tonumber(currentPullPercent) or 0
+                local proj = cur + pull
+                if proj < 0 then proj = 0 end
+                if proj > 100 then proj = 100 end
+                baseStr = string.format("%s (%.2f%%)", baseStr, proj)
+            end
+            table.insert(extras, baseStr)
         end
     end
     if cfg.showCurrentPullPercent and (currentPullPercent ~= nil) then
@@ -711,6 +729,24 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
         end
     else
         base = baseText -- keep DONE/SECTION DONE/FINISHED as-is without label
+    end
+
+    -- Optionally append projected value next to numeric Required base
+    if cfg.showProjected and UnitAffectingCombat and UnitAffectingCombat("player") then
+        if isNumericPercent and (type(remainingNeeded) == "number") then
+            local pull = tonumber(currentPullPercent) or 0
+            local projReq = (tonumber(remainingNeeded) or 0) - pull
+            if projReq < 0 then projReq = 0 end
+            if projReq > 100 then projReq = 100 end
+            -- Append to base (after label if present)
+            base = string.format("%s (%.2f%%)", base, projReq)
+        elseif isNumericCount and (cfg.formatMode == "count") and fmtData then
+            local remC = tonumber(fmtData.remainingCount) or 0
+            local pullC = tonumber(fmtData.pullCount) or 0
+            local projC = remC - pullC
+            if projC < 0 then projC = 0 end
+            base = string.format("%s (%d)", base, projC)
+        end
     end
 
     -- Optionally insert the section required value right after the base required and before Current percent
