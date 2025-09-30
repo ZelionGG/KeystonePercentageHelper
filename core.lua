@@ -664,9 +664,16 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
         if (cfg.formatMode == "count") and fmtData then
             local cc = tonumber(fmtData.currentCount) or 0
             local tt = tonumber(fmtData.totalCount) or 0
-            local baseStr = string.format("%s %d/%d", label, cc, tt)
+            local pullC = tonumber(fmtData.pullCount) or 0
+            local remC  = tonumber(fmtData.remainingCount) or 0
+            local ccStr = tostring(cc)
+            if showProj and remC > 0 and pullC >= remC then
+                local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
+                local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
+                ccStr = string.format("|cff%s%s|r", hex, ccStr)
+            end
+            local baseStr = string.format("%s %s/%d", label, ccStr, tt)
             if showProj then
-                local pullC = tonumber(fmtData.pullCount) or 0
                 local projC = cc + pullC
                 if projC < 0 then projC = 0 end
                 if tt > 0 and projC > tt then projC = tt end
@@ -675,12 +682,18 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
             table.insert(extras, baseStr)
         else
             local cur = tonumber(currentPercent) or 0
-            local baseStr = string.format("%s %.2f%%", label, cur)
+            local pull = tonumber(currentPullPercent) or 0
+            local proj = cur + pull
+            if proj < 0 then proj = 0 end
+            if proj > 100 then proj = 100 end
+            local curStr = string.format("%.2f%%", cur)
+            if showProj and remainingNeeded and remainingNeeded > 0 and proj >= remainingNeeded then
+                local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
+                local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
+                curStr = string.format("|cff%s%s|r", hex, curStr)
+            end
+            local baseStr = string.format("%s %s", label, curStr)
             if showProj then
-                local pull = tonumber(currentPullPercent) or 0
-                local proj = cur + pull
-                if proj < 0 then proj = 0 end
-                if proj > 100 then proj = 100 end
                 baseStr = string.format("%s (%.2f%%)", baseStr, proj)
             end
             table.insert(extras, baseStr)
@@ -738,14 +751,21 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
             local projReq = (tonumber(remainingNeeded) or 0) - pull
             if projReq < 0 then projReq = 0 end
             if projReq > 100 then projReq = 100 end
-            -- Append to base (after label if present)
-            base = string.format("%s (%.2f%%)", base, projReq)
+            if projReq == 0 then
+                base = L["SECTION_DONE"] .. string.format(" (%.2f%%)", projReq)
+            else
+                base = string.format("%s (%.2f%%)", base, projReq)
+            end
         elseif isNumericCount and (cfg.formatMode == "count") and fmtData then
             local remC = tonumber(fmtData.remainingCount) or 0
             local pullC = tonumber(fmtData.pullCount) or 0
             local projC = remC - pullC
             if projC < 0 then projC = 0 end
-            base = string.format("%s (%d)", base, projC)
+            if projC == 0 then
+                base = L["SECTION_DONE"] .. string.format(" (%d)", projC)
+            else
+                base = string.format("%s (%d)", base, projC)
+            end
         end
     end
 
