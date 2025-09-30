@@ -76,6 +76,8 @@ KeystonePercentageHelper.defaults = {
                 multiLine = false,                     -- Display extras on new lines instead of a single line
                 showRequiredText = false,              -- Show the required/remaining text base
                 requiredLabel = L["REQUIRED_DEFAULT"], -- Label for the required base value when numeric
+                showSectionRequiredText = false,       -- Show the required/remaining text base
+                sectionRequiredLabel = L["REQUIRED_DEFAULT"], -- Label for the required base value when numeric
                 currentLabel = L["CURRENT_DEFAULT"],   -- Label for current percent
                 pullLabel = L["PULL_DEFAULT"],         -- Label for current pull percent
                 formatMode = "percent",               -- Display format: "percent" or "count"
@@ -509,6 +511,35 @@ function KeystonePercentageHelper:GetMainDisplayOptions()
                 end,
                 disabled = function()
                     return not self.db.profile.general.mainDisplay.showRequiredText
+                end
+            },
+            showSectionRequiredText = {
+                name = L["SHOW_SECTION_REQUIRED_PREFIX"],
+                desc = L["SHOW_SECTION_REQUIRED_PREFIX_DESC"],
+                type = "toggle",
+                order = 0.55,
+                width = 1.4,
+                get = function() return self.db.profile.general.mainDisplay.showSectionRequiredText end,
+                set = function(_, value)
+                    self.db.profile.general.mainDisplay.showSectionRequiredText = value
+                    self:UpdatePercentageText()
+                end
+            },
+            sectionRequiredLabel = {
+                name = L["LABEL"],
+                desc = L["SECTION_REQUIRED_LABEL_DESC"],
+                type = "input",
+                order = 0.60,
+                width = 1,
+                get = function() return self.db.profile.general.mainDisplay.sectionRequiredLabel end,
+                set = function(_, value)
+                    local text = type(value) == "string" and value or ""
+                    text = (text ~= "" and text) or L["SECTION_REQUIRED_DEFAULT"]
+                    self.db.profile.general.mainDisplay.sectionRequiredLabel = text
+                    self:UpdatePercentageText()
+                end,
+                disabled = function()
+                    return not self.db.profile.general.mainDisplay.showSectionRequiredText
                 end
             },
             showCurrentPercent = {

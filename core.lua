@@ -537,7 +537,14 @@ function KeystonePercentageHelper:UpdatePercentageText()
 
         local cfg = self.db.profile.general.mainDisplay
         local formatMode = cfg and cfg.formatMode or "percent"
-        local fmtData = { currentCount = currentCount or 0, totalCount = totalCount or 0, pullCount = currentPullCount or 0, remainingCount = remainingCount or 0 }
+        local fmtData = {
+            currentCount = currentCount or 0,
+            totalCount = totalCount or 0,
+            pullCount = currentPullCount or 0,
+            remainingCount = remainingCount or 0,
+            sectionRequiredPercent = neededPercent or 0,
+            sectionRequiredCount = ((totalCount and totalCount > 0) and math.ceil((neededPercent / 100) * totalCount) or 0),
+        }
         local displayPercent = string.format("%.2f%%", remainingPercent)
         local displayCount = tostring(remainingCount)
         local color = self.db.profile.color.inProgress
@@ -585,16 +592,24 @@ function KeystonePercentageHelper:UpdatePercentageText()
                             self.displayFrame.text:SetText(self:FormatMainDisplayText(L["DONE"], currentPercentage, currentPullPercent, nil, fmtData))
                         else
                             color = self.db.profile.color.inProgress
+                            local nextNeededPercent = self.DUNGEONS[self.currentDungeonID][self.currentSection][2]
+                            local nextNeededCount = (totalCount and totalCount > 0) and math.ceil((nextNeededPercent / 100) * totalCount) or 0
+                            local nextRemainingCount = (totalCount and totalCount > 0) and math.max(0, nextNeededCount - (currentCount or 0)) or 0
                             local baseNext
                             if (cfg and cfg.formatMode == "count") and (totalCount and totalCount > 0) then
-                                local nextNeededPercent = self.DUNGEONS[self.currentDungeonID][self.currentSection][2]
-                                local nextNeededCount = math.ceil((nextNeededPercent / 100) * totalCount)
-                                local nextRemainingCount = math.max(0, nextNeededCount - (currentCount or 0))
                                 baseNext = tostring(nextRemainingCount)
                             else
                                 baseNext = string.format("%.2f%%", nextRequired)
                             end
-                            self.displayFrame.text:SetText(self:FormatMainDisplayText(baseNext, currentPercentage, currentPullPercent, nextRequired, fmtData))
+                            local fmtNext = {
+                                currentCount = currentCount or 0,
+                                totalCount = totalCount or 0,
+                                pullCount = currentPullCount or 0,
+                                remainingCount = nextRemainingCount or 0,
+                                sectionRequiredPercent = nextNeededPercent or 0,
+                                sectionRequiredCount = nextNeededCount or 0,
+                            }
+                            self.displayFrame.text:SetText(self:FormatMainDisplayText(baseNext, currentPercentage, currentPullPercent, nextRequired, fmtNext))
                         end
                     end
                     self.displayFrame.text:SetTextColor(color.r, color.g, color.b, color.a)
@@ -677,12 +692,12 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
     end
 
     -- Optionally show the base required text prefix if it's numeric
-    local base = baseText    
+    local base = baseText
     local isNumericPercent = type(baseText) == "string" and baseText:find("%%$") and tonumber((baseText:gsub("%%",""))) ~= nil
     local isNumericCount = type(baseText) == "string" and baseText:find("^%d+$") ~= nil
     if isNumericPercent then
         if cfg.showRequiredText == false then 
-            base = baseText 
+            base = baseText
         else
             local rlabel = colorizePrefix(cfg.requiredLabel or L["REQUIRED_DEFAULT"])
             base = rlabel .. " " .. baseText
@@ -696,6 +711,21 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
         end
     else
         base = baseText -- keep DONE/SECTION DONE/FINISHED as-is without label
+    end
+
+    -- Optionally insert the section required value right after the base required and before Current percent
+    if (isNumericPercent or isNumericCount) and cfg.showSectionRequiredText and fmtData then
+        local sLabel = colorizePrefix(cfg.sectionRequiredLabel or L["REQUIRED_DEFAULT"])
+        local sValue
+        if cfg.formatMode == "count" and tonumber(fmtData.totalCount or 0) > 0 then
+            if fmtData.sectionRequiredCount then sValue = tostring(tonumber(fmtData.sectionRequiredCount) or 0) end
+        else
+            if fmtData.sectionRequiredPercent then sValue = string.format("%.2f%%", tonumber(fmtData.sectionRequiredPercent) or 0) end
+        end
+        if sValue then
+            -- Put at the beginning so it appears before Current percent in the extras list
+            table.insert(extras, 1, string.format("%s %s", sLabel, sValue))
+        end
     end
 
     if #extras == 0 then return base end
@@ -730,11 +760,15 @@ function KeystonePercentageHelper:ApplyTextLayout()
     self.displayFrame.text:ClearAllPoints()
 
     if multi then
-        -- Multi-line: constrain to frame width and wrap
+        -- Multi-line: fixed default width (600px); each metric on its own line
+        self.displayFrame:SetWidth(600)
         self.displayFrame.text:SetPoint("TOPLEFT", self.displayFrame, "TOPLEFT", 0, 0)
         self.displayFrame.text:SetPoint("TOPRIGHT", self.displayFrame, "TOPRIGHT", 0, 0)
         self.displayFrame.text:SetWidth(self.displayFrame:GetWidth())
         self.displayFrame.text:SetWordWrap(true)
+        if self.displayFrame.text.SetMaxLines then
+            self.displayFrame.text:SetMaxLines(0) -- unlimited lines
+        end
         self.displayFrame.text:SetJustifyV("TOP")
     else
         -- Single-line: ALWAYS center-align regardless of option
