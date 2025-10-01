@@ -682,54 +682,90 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
     local function colorizePrefix(text)
         return string.format("|cff%s%s|r", hexPrefix, tostring(text or ""))
     end
+    -- Display logic notes:
+    -- - Projected values (the parenthesized part) are shown only while in combat (showProj below).
+    -- - Base Current can be highlighted even out of combat if it already meets the section requirement.
+    -- - All comparisons use greater-than-or-equal (>=); values are already rounded to two decimals.
 
     if cfg.showCurrentPercent and (currentPercent ~= nil) then
         local label = colorizePrefix(cfg.currentLabel or L["CURRENT_DEFAULT"])
-        local showProj = (cfg.showProjected and UnitAffectingCombat and UnitAffectingCombat("player")) and true or false
+        local inCombat = UnitAffectingCombat and UnitAffectingCombat("player")
+        local showProj = (cfg.showProjected and inCombat) and true or false
         if (cfg.formatMode == "count") and fmtData then
+            -- Current (count) base highlighting:
+            -- If currentCount >= sectionRequiredCount, color the base value in finished green (works out of combat too).
             local cc = tonumber(fmtData.currentCount) or 0
             local tt = tonumber(fmtData.totalCount) or 0
             local pullC = tonumber(fmtData.pullCount) or 0
-            local remC  = tonumber(fmtData.remainingCount) or 0
             local ccStr = tostring(cc)
-            if showProj and remC > 0 and pullC >= remC then
-                local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
-                local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
-                ccStr = string.format("|cff%s%s|r", hex, ccStr)
+            do
+                local reqC = tonumber(fmtData.sectionRequiredCount) or 0
+                if reqC > 0 and cc >= reqC then
+                    local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
+                    local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
+                    ccStr = string.format("|cff%s%s|r", hex, ccStr)
+                end
             end
             local baseStr = string.format("%s %s/%d", label, ccStr, tt)
             if showProj then
+                -- Current (count) projected highlighting (combat only):
+                -- If (currentCount + pullCount) >= sectionRequiredCount, color the parenthesized value in finished green.
                 local projC = cc + pullC
                 if projC < 0 then projC = 0 end
                 if tt > 0 and projC > tt then projC = tt end
-                baseStr = string.format("%s (%d/%d)", baseStr, projC, tt)
+                local paren = string.format("%d/%d", projC, tt)
+                local reqC = tonumber(fmtData.sectionRequiredCount) or 0
+                if inCombat and reqC > 0 and projC >= reqC then
+                    local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
+                    local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
+                    paren = string.format("|cff%s%s|r", hex, paren)
+                end
+                baseStr = string.format("%s (%s)", baseStr, paren)
             end
             table.insert(extras, baseStr)
         else
+            -- Current (percent) base highlighting:
+            -- If currentPercent >= sectionRequiredPercent, color the base value in finished green (works out of combat too).
             local cur = tonumber(currentPercent) or 0
             local pull = tonumber(currentPullPercent) or 0
             local proj = cur + pull
             if proj < 0 then proj = 0 end
             if proj > 100 then proj = 100 end
             local curStr = string.format("%.2f%%", cur)
-            if showProj and remainingNeeded and remainingNeeded > 0 and proj >= remainingNeeded then
-                local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
-                local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
-                curStr = string.format("|cff%s%s|r", hex, curStr)
+            if fmtData and tonumber(fmtData.sectionRequiredPercent) then
+                local req = tonumber(fmtData.sectionRequiredPercent) or 0
+                if req > 0 and cur >= req then
+                    local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
+                    local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
+                    curStr = string.format("|cff%s%s|r", hex, curStr)
+                end
             end
             local baseStr = string.format("%s %s", label, curStr)
             if showProj then
-                baseStr = string.format("%s (%.2f%%)", baseStr, proj)
+                -- Current (percent) projected highlighting (combat only):
+                -- If (currentPercent + pullPercent) >= sectionRequiredPercent, color the parenthesized value in finished green.
+                local paren = string.format("%.2f%%", proj)
+                if inCombat and fmtData and tonumber(fmtData.sectionRequiredPercent) then
+                    local req = tonumber(fmtData.sectionRequiredPercent) or 0
+                    if req > 0 and proj >= req then
+                        local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
+                        local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
+                        paren = string.format("|cff%s%s|r", hex, paren)
+                    end
+                end
+                baseStr = string.format("%s (%s)", baseStr, paren)
             end
             table.insert(extras, baseStr)
         end
     end
     if cfg.showCurrentPullPercent and (currentPullPercent ~= nil) then
+        -- Pull highlighting:
+        -- If Pull >= section required (percent or count), color Pull in finished green. Not gated by combat.
         local label = colorizePrefix(cfg.pullLabel or L["PULL_DEFAULT"])
         if cfg.formatMode == "count" and fmtData then
             local value = tostring(tonumber(fmtData.pullCount) or 0)
-            local remainingCount = tonumber(fmtData.remainingCount) or 0
-            if remainingCount > 0 and (tonumber(fmtData.pullCount) or 0) >= remainingCount then
+            local reqC = tonumber(fmtData.sectionRequiredCount) or 0
+            if reqC > 0 and (tonumber(fmtData.pullCount) or 0) >= reqC then
                 local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
                 local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
                 value = string.format("|cff%s%s|r", hex, value)
@@ -737,11 +773,14 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
             table.insert(extras, string.format("%s %s", label, value))
         else
             local value = string.format("%.2f%%", currentPullPercent or 0)
-            -- Highlight pull in finished color if it's enough to meet remaining needed for the current section
-            if remainingNeeded and remainingNeeded > 0 and (currentPullPercent or 0) >= remainingNeeded then
+            -- Highlight pull if it meets or exceeds the total required for the current section
+            if fmtData and tonumber(fmtData.sectionRequiredPercent) then
+                local req = tonumber(fmtData.sectionRequiredPercent) or 0
+                if req > 0 and (currentPullPercent or 0) >= req then
                 local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
                 local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
                 value = string.format("|cff%s%s|r", hex, value)
+                end
             end
             table.insert(extras, string.format("%s %s", label, value))
         end
@@ -769,6 +808,14 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
         base = baseText -- keep DONE/SECTION DONE/FINISHED as-is without label
     end
 
+    -- Required (projected) behavior (combat only):
+    -- - If the base is numeric, append a parenthesized projected value.
+    -- - If the projection completes the target:
+    --     * Last section: (FINISHED) only if projected total >= 100 and all bosses are killed; otherwise (DONE).
+    --     * Other sections: (DONE).
+    -- - Else: show the numeric projected value (percent or count).
+    -- The suffix is colored using the finished color.
+    -- Note: projected values are hidden out of combat via the showProjected + UnitAffectingCombat gate.
     -- Optionally append projected value next to numeric Required base (do not replace base label)
     if cfg.showProjected and UnitAffectingCombat and UnitAffectingCombat("player") then
         if isNumericPercent and (type(remainingNeeded) == "number") then
@@ -790,12 +837,12 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
                     suffix = L["FINISHED"]
                 elseif isLastSection then
                     suffix = L["DONE"]
-                elseif isBossKilled then
-                    suffix = L["SECTION_DONE"]
                 else
                     suffix = L["DONE"]
                 end
-                base = string.format("%s (%s)", base, suffix)
+                local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
+                local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
+                base = string.format("%s (|cff%s%s|r)", base, hex, suffix)
             else
                 base = string.format("%s (%.2f%%)", base, projReq)
             end
@@ -819,12 +866,12 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
                     suffix = L["FINISHED"]
                 elseif isLastSection then
                     suffix = L["DONE"]
-                elseif isBossKilled then
-                    suffix = L["SECTION_DONE"]
                 else
                     suffix = L["DONE"]
                 end
-                base = string.format("%s (%s)", base, suffix)
+                local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
+                local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
+                base = string.format("%s (|cff%s%s|r)", base, hex, suffix)
             else
                 base = string.format("%s (%d)", base, projC)
             end
