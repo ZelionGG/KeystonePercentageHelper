@@ -666,7 +666,23 @@ function KeystonePercentageHelper:AreAllBossesKilled()
     return true
 end
 
--- Build final display text by appending optional values (current percent, pull percent)
+-- FormatMainDisplayText: builds the final display string with optional Current/Pull/Required parts and projected values.
+-- Params:
+--   baseText (string): numeric required (percent or count) or textual state (DONE/SECTION_DONE/FINISHED)
+--   currentPercent (number): current enemy forces percent [0..100]
+--   currentPullPercent (number): projected pull percent [0..100]
+--   remainingNeeded (number|nil): remaining percent to hit current section target (for projected Required)
+--   fmtData (table): { currentCount, totalCount, pullCount, remainingCount, sectionRequiredPercent, sectionRequiredCount }
+--   isBossKilled (bool): current section boss killed
+--   allBossesKilled (bool): all dungeon bosses killed
+-- Behavior:
+--   - Projected values are shown only in combat (showProj depends on UnitAffectingCombat and the option).
+--   - Current (base) is green if >= section required (works out of combat, percent and count).
+--   - Current (projected) is green if (Current + Pull) >= section required (combat-only, shown in parentheses).
+--   - Pull is green if >= section required (not combat-gated; percent and count).
+--   - Required (projected):
+--       * Last section: (FINISHED) only if projected total >= 100 and all bosses are killed; else (DONE).
+--       * Other sections: (DONE). Otherwise, show numeric projected value.
 function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent, currentPullPercent, remainingNeeded, fmtData, isBossKilled, allBossesKilled)
     local cfg = self.db and self.db.profile and self.db.profile.general and self.db.profile.general.mainDisplay or nil
     if not cfg then return baseText end
