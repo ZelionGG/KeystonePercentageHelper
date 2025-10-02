@@ -20,12 +20,10 @@ KeystonePercentageHelper.Changelog[2100] = {
         ["zhCN"] = {},
         ["zhTW"] = {},
         ["enUS"] = {
-            "Added new options to show [Current percentage] and [Pull percentage] (Requires MDT) alongside the actual required percentage display.",
-            "Added new option to switch between [percentage] and [count-based] display."
+            "Introduced a unified display with optional [Total required for section] and [Current percentage] and [Pull percentage] (Requires MDT), projected values (parentheses) in combat for Required/Current, suffixes per line, configurable layout (single-line or multi-line), and a switch between [percentage] and [count-based] modes."
         },
         ["frFR"] = {
-            "Ajout de nouvelles options pour afficher [Pourcentage actuel] et [Pourcentage du pull] (Requiert MDT) à côté du pourcentage réel requis.",
-            "Ajout d'une option pour basculer entre l'affichage en [pourcentage] et en [compte]."
+            "Introduction d’un affichage unifié avec [Total requis pour la section], [Pourcentage actuel] et [Pourcentage du pull] (requiert MDT) en option, des valeurs prévisionnelles (entre parenthèses) en combat pour Required/Current, des suffixes par ligne, une mise en page configurable (une seule ligne ou multi‑lignes), et une bascule entre les modes [pourcentage] et [compte]."
         },
         ["koKR"] = {},
         ["ruRU"] = {},
