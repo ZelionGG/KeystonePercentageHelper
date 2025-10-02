@@ -687,6 +687,11 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
     local cfg = self.db and self.db.profile and self.db.profile.general and self.db.profile.general.mainDisplay or nil
     if not cfg then return baseText end
 
+    -- If dungeon percentage is done (100%) or dungeon is fully done, show only the end text (no extras appended)
+    if type(baseText) == "string" and (baseText == L["FINISHED"] or baseText == L["DUNGEON_DONE"]) then
+        return baseText
+    end
+
     local extras = {}
     -- Build hex color for prefixes
     local pc = cfg.prefixColor or { r = 0.8, g = 0.8, b = 0.8, a = 1 }
@@ -723,7 +728,7 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
                 end
             end
             local baseStr = string.format("%s %s/%d", label, ccStr, tt)
-            if showProj then
+            if showProj and (pullC or 0) > 0 then
                 -- Current (count) projected highlighting (combat only):
                 -- If (currentCount + pullCount) >= sectionRequiredCount, color the parenthesized value in finished green.
                 local projC = cc + pullC
@@ -757,7 +762,7 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
                 end
             end
             local baseStr = string.format("%s %s", label, curStr)
-            if showProj then
+            if showProj and ((currentPullPercent or 0) > 0) then
                 -- Current (percent) projected highlighting (combat only):
                 -- If (currentPercent + pullPercent) >= sectionRequiredPercent, color the parenthesized value in finished green.
                 local paren = string.format("%.2f%%", proj)
@@ -779,26 +784,32 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
         -- If Pull >= section required (percent or count), color Pull in finished green. Not gated by combat.
         local label = colorizePrefix(cfg.pullLabel or L["PULL_DEFAULT"])
         if cfg.formatMode == "count" and fmtData then
-            local value = tostring(tonumber(fmtData.pullCount) or 0)
-            local reqC = tonumber(fmtData.sectionRequiredCount) or 0
-            if reqC > 0 and (tonumber(fmtData.pullCount) or 0) >= reqC then
-                local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
-                local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
-                value = string.format("|cff%s%s|r", hex, value)
-            end
-            table.insert(extras, string.format("%s %s", label, value))
-        else
-            local value = string.format("%.2f%%", currentPullPercent or 0)
-            -- Highlight pull if it meets or exceeds the total required for the current section
-            if fmtData and tonumber(fmtData.sectionRequiredPercent) then
-                local req = tonumber(fmtData.sectionRequiredPercent) or 0
-                if req > 0 and (currentPullPercent or 0) >= req then
-                local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
-                local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
-                value = string.format("|cff%s%s|r", hex, value)
+            local pullCount = tonumber(fmtData.pullCount) or 0
+            if pullCount > 0 then
+                local value = tostring(pullCount)
+                local reqC = tonumber(fmtData.sectionRequiredCount) or 0
+                if reqC > 0 and pullCount >= reqC then
+                    local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
+                    local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
+                    value = string.format("|cff%s%s|r", hex, value)
                 end
+                table.insert(extras, string.format("%s %s", label, value))
             end
-            table.insert(extras, string.format("%s %s", label, value))
+        else
+            local pullPct = tonumber(currentPullPercent) or 0
+            if pullPct > 0 then
+                local value = string.format("%.2f%%", pullPct)
+                -- Highlight pull if it meets or exceeds the total required for the current section
+                if fmtData and tonumber(fmtData.sectionRequiredPercent) then
+                    local req = tonumber(fmtData.sectionRequiredPercent) or 0
+                    if req > 0 and pullPct >= req then
+                        local col = self.db.profile.color.finished or { r = 0, g = 1, b = 0 }
+                        local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
+                        value = string.format("|cff%s%s|r", hex, value)
+                    end
+                end
+                table.insert(extras, string.format("%s %s", label, value))
+            end
         end
     end
 
@@ -839,17 +850,19 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
             local projReq = (tonumber(remainingNeeded) or 0) - pull
             if projReq < 0 then projReq = 0 end
             if projReq > 100 then projReq = 100 end
+            -- Round to two decimals to avoid printing 0.00% instead of DONE when the true value is an epsilon > 0
+            local projReqRounded = math.floor((projReq * 100) + 0.5) / 100
             local projTotal = tonumber(currentPercent or 0) + (tonumber(currentPullPercent) or 0)
             if projTotal < 0 then projTotal = 0 end
             if projTotal > 100 then projTotal = 100 end
-            if projReq <= 0 then
+            if projReqRounded <= 0 then
                 -- Distinction: Section done vs Dungeon percentage done vs Dungeon finished (projected)
                 local suffix
                 local isLastSection = false
                 if self.DUNGEONS and self.currentDungeonID and self.DUNGEONS[self.currentDungeonID] then
                     isLastSection = (self.currentSection == #self.DUNGEONS[self.currentDungeonID])
                 end
-                if allBossesKilled and projTotal >= 100 then
+                if projTotal >= 100 then
                     suffix = L["FINISHED"]
                 elseif isLastSection then
                     suffix = L["DONE"]
@@ -860,7 +873,7 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
                 local hex = string.format("%02x%02x%02x", math.floor((col.r or 1)*255), math.floor((col.g or 1)*255), math.floor((col.b or 1)*255))
                 base = string.format("%s (|cff%s%s|r)", base, hex, suffix)
             else
-                base = string.format("%s (%.2f%%)", base, projReq)
+                base = string.format("%s (%.2f%%)", base, projReqRounded)
             end
         elseif isNumericCount and (cfg.formatMode == "count") and fmtData then
             local cc   = tonumber(fmtData.currentCount) or 0
@@ -878,7 +891,7 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
                 if self.DUNGEONS and self.currentDungeonID and self.DUNGEONS[self.currentDungeonID] then
                     isLastSection = (self.currentSection == #self.DUNGEONS[self.currentDungeonID])
                 end
-                if allBossesKilled and projShare >= 100 then
+                if projShare >= 100 then
                     suffix = L["FINISHED"]
                 elseif isLastSection then
                     suffix = L["DONE"]
@@ -1014,11 +1027,31 @@ function KeystonePercentageHelper:SCENARIO_CRITERIA_UPDATE()
 end
 
 -- React to nameplate additions/removals to refresh dynamic pull percent
-function KeystonePercentageHelper:NAME_PLATE_UNIT_ADDED()
+function KeystonePercentageHelper:NAME_PLATE_UNIT_ADDED(event, unit)
+    -- Maintain a map of nameplate unit -> GUID so we can cleanly remove on REMOVED
+    self._nameplateUnits = self._nameplateUnits or {}
+    if unit then
+        local guid = UnitGUID(unit)
+        if guid then
+            self._nameplateUnits[unit] = guid
+        end
+    end
+    -- Engagement tracking remains via COMBAT_LOG to avoid double counting
     self:UpdatePercentageText()
 end
 
-function KeystonePercentageHelper:NAME_PLATE_UNIT_REMOVED()
+function KeystonePercentageHelper:NAME_PLATE_UNIT_REMOVED(event, unit)
+    -- Use stored GUID (UnitGUID may be nil after removal)
+    if unit then
+        local guid
+        if self._nameplateUnits then
+            guid = self._nameplateUnits[unit]
+            self._nameplateUnits[unit] = nil
+        end
+        if guid then
+            self:RemoveEngagedMobByGUID(guid)
+        end
+    end
     self:UpdatePercentageText()
 end
 
