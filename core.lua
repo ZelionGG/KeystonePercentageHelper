@@ -1042,15 +1042,15 @@ end
 
 function KeystonePercentageHelper:NAME_PLATE_UNIT_REMOVED(event, unit)
     -- Use stored GUID (UnitGUID may be nil after removal)
+    -- Do not remove engaged mobs here: nameplates can disappear when rotating camera;
+    -- rely on COMBAT_LOG (UNIT_DIED/UNIT_DESTROYED) and end-of-combat reset instead.
     if unit then
         local guid
         if self._nameplateUnits then
             guid = self._nameplateUnits[unit]
             self._nameplateUnits[unit] = nil
         end
-        if guid then
-            self:RemoveEngagedMobByGUID(guid)
-        end
+        -- Intentionally not calling RemoveEngagedMobByGUID(guid) to avoid Pull% oscillation.
     end
     self:UpdatePercentageText()
 end
