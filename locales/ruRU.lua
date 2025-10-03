@@ -5,7 +5,7 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0");
 local L = AceLocale:NewLocale(AddonName, "ruRU", false, false);
 if not L then return end
 
--- Last translated September 27th, 2025.
+-- Last translated October 3rd, 2025.
 -- Translation by Hollicsh (https://github.com/Hollicsh)
 
 -- Dungeons Group
@@ -224,6 +224,8 @@ L["SHOW_CURRENT_PULL_PERCENT_DESC"] = "Отображение реального
 L["PULL_LABEL_DESC"] = "Метка, отображаемая перед текущим значением процента извлечения.\n\nОчистите поле, чтобы сбросить значение по умолчанию."
 L["USE_MULTI_LINE_LAYOUT"] = "Использовать многострочное расположение"
 L["USE_MULTI_LINE_LAYOUT_DESC"] = "Показывать каждое выбранное значение в новой строке."
+L["SHOW_PROJECTED"] = "Показывать прогнозируемые значения"
+L["SHOW_PROJECTED_DESC"] = "Добавить прогнозируемые значения: Текущие отображения (Текущий + Пулл). Требуемые отображения (Требуется - Пулл)."
 L["SINGLE_LINE_SEPARATOR"] = "Однострочный разделитель"
 L["SINGLE_LINE_SEPARATOR_DESC"] = "Разделитель, используемый между элементами, если не используется многострочное расположение."
 L["FONT_ALIGN"] = "Выравнивание шрифта"
@@ -235,6 +237,12 @@ L["MAX_WIDTH_DESC"] = "Максимальная ширина в пикселях
 L["REQUIRED_DEFAULT"] = "Требуется:"
 L["CURRENT_DEFAULT"] = "Текущий:"
 L["PULL_DEFAULT"] = "Пулл:"
+
+-- Section required prefix
+L["SHOW_SECTION_REQUIRED_PREFIX"] = "Показать требуемый префикс раздела"
+L["SHOW_SECTION_REQUIRED_PREFIX_DESC"] = "Отобразить текущий процент общих сил противника, необходимых для текущего раздела."
+L["SECTION_REQUIRED_LABEL_DESC"] = "Метка отображается перед требуемым значением раздела.\n\nОчистите поле, чтобы сбросить значения по умолчанию."
+L["SECTION_REQUIRED_DEFAULT"] = "Требуемый раздел:"
 
 L["FORMAT_MODE"] = "Формат текста"
 L["FORMAT_MODE_DESC"] = "Выберите способ отображения прогресса."
