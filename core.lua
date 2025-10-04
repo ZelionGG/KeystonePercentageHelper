@@ -150,7 +150,13 @@ function KeystonePercentageHelper:OnInitialize()
 
 -- Helpers to manage real pull set
 function KeystonePercentageHelper:AddEngagedMobByGUID(guid)
-    if not guid or self.realPull.mobs[guid] then return end
+    if not guid then return end
+    -- If already tracked, just refresh lastSeen and return
+    local existing = self.realPull.mobs[guid]
+    if existing then
+        existing.lastSeen = (GetTime and GetTime()) or existing.lastSeen or 0
+        return
+    end
     local DungeonTools = _G and (_G.MDT or _G.MethodDungeonTools)
     if not DungeonTools or not DungeonTools.GetEnemyForces then return end
 
@@ -171,7 +177,7 @@ function KeystonePercentageHelper:AddEngagedMobByGUID(guid)
     end
 
     if c > 0 then
-        self.realPull.mobs[guid] = { npcID = id, count = c }
+        self.realPull.mobs[guid] = { npcID = id, count = c, lastSeen = (GetTime and GetTime()) or 0 }
         self.realPull.sum = self.realPull.sum + c
     end
 end
@@ -779,7 +785,7 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
             table.insert(extras, baseStr)
         end
     end
-    if cfg.showCurrentPullPercent and (currentPullPercent ~= nil) then
+    if cfg.showCurrentPullPercent and (currentPullPercent ~= nil) and (UnitAffectingCombat and UnitAffectingCombat("player")) then
         -- Pull highlighting:
         -- If Pull >= section required (percent or count), color Pull in finished green. Not gated by combat.
         local label = colorizePrefix(cfg.pullLabel or L["PULL_DEFAULT"])
@@ -1008,6 +1014,7 @@ function KeystonePercentageHelper:OnEnable()
     self:RegisterEvent("NAME_PLATE_UNIT_ADDED")
     self:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
     self:RegisterEvent("UNIT_THREAT_LIST_UPDATE")
+    self:RegisterEvent("ENCOUNTER_END")
     self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self:RegisterEvent("PLAYER_REGEN_DISABLED")
     self:RegisterEvent("PLAYER_REGEN_ENABLED")
@@ -1056,8 +1063,29 @@ function KeystonePercentageHelper:NAME_PLATE_UNIT_REMOVED(event, unit)
 end
 
 -- Update when threat list changes (engagement state)
-function KeystonePercentageHelper:UNIT_THREAT_LIST_UPDATE()
-    self:UpdatePercentageText()
+function KeystonePercentageHelper:UNIT_THREAT_LIST_UPDATE(event, unit)
+    -- Add mobs to current pull based on threat updates (WarpDeplete-like)
+    if not C_ChallengeMode.IsChallengeModeActive() then return end
+    if not (UnitAffectingCombat and UnitAffectingCombat("player")) then return end
+    if not unit or not UnitExists(unit) then return end
+
+    local guid = UnitGUID(unit)
+    if not guid then return end
+
+    -- Prevent re-adding mobs that have been marked dead during this combat
+    self._deadGuids = self._deadGuids or {}
+    if self._deadGuids[guid] then return end
+
+    -- If already tracked, just refresh lastSeen
+    if self.realPull and self.realPull.mobs[guid] then
+        local existing = self.realPull.mobs[guid]
+        existing.lastSeen = (GetTime and GetTime()) or existing.lastSeen or 0
+        return
+    end
+
+    -- Use AddEngagedMobByGUID which pulls MDT count/denom and updates sums
+    self:AddEngagedMobByGUID(guid)
+    self:_QueuePullUpdate()
 end
 
 -- Start of combat: reset real pull state
@@ -1065,6 +1093,36 @@ function KeystonePercentageHelper:PLAYER_REGEN_DISABLED()
     self.realPull.mobs = {}
     self.realPull.sum = 0
     self.realPull.denom = 0
+    -- Start a lightweight watchdog ticker to clean stale GUIDs during combat
+    if self._pullWatchdogTicker then
+        self._pullWatchdogTicker:Cancel()
+        self._pullWatchdogTicker = nil
+    end
+    local TTL = 8 -- seconds without activity before considering GUID stale
+    self._pullWatchdogTicker = C_Timer.NewTicker(1, function()
+        if not C_ChallengeMode.IsChallengeModeActive() then return end
+        -- Build a quick lookup of currently visible nameplate GUIDs
+        local plateGuids = {}
+        if self._nameplateUnits then
+            for unit, g in pairs(self._nameplateUnits) do
+                if g then plateGuids[g] = true end
+            end
+        end
+        local now = (GetTime and GetTime()) or 0
+        for g, data in pairs(self.realPull.mobs) do
+            local last = tonumber(data and data.lastSeen) or now
+            if (now - last) >= TTL then
+                -- Skip removal if GUID is clearly still in view/target
+                local stillVisible = plateGuids[g]
+                    or (UnitGUID and (g == UnitGUID("target") or g == UnitGUID("focus") or g == UnitGUID("mouseover")
+                        or g == UnitGUID("boss1") or g == UnitGUID("boss2") or g == UnitGUID("boss3") or g == UnitGUID("boss4") or g == UnitGUID("boss5")))
+                if not stillVisible then
+                    self:RemoveEngagedMobByGUID(g)
+                    self:_QueuePullUpdate()
+                end
+            end
+        end
+    end)
 end
 
 -- End of combat: clear and refresh
@@ -1072,6 +1130,28 @@ function KeystonePercentageHelper:PLAYER_REGEN_ENABLED()
     self.realPull.mobs = {}
     self.realPull.sum = 0
     self.realPull.denom = 0
+    if self._deadGuids then
+        wipe(self._deadGuids)
+    end
+    if self._pullWatchdogTicker then
+        self._pullWatchdogTicker:Cancel()
+        self._pullWatchdogTicker = nil
+    end
+    self:UpdatePercentageText()
+end
+
+-- Reset pull state when an encounter ends (e.g., boss end), mirroring WarpDeplete behavior
+function KeystonePercentageHelper:ENCOUNTER_END()
+    self.realPull.mobs = {}
+    self.realPull.sum = 0
+    self.realPull.denom = 0
+    if self._deadGuids then
+        wipe(self._deadGuids)
+    end
+    if self._pullWatchdogTicker then
+        self._pullWatchdogTicker:Cancel()
+        self._pullWatchdogTicker = nil
+    end
     self:UpdatePercentageText()
 end
 
@@ -1107,8 +1187,10 @@ function KeystonePercentageHelper:COMBAT_LOG_EVENT_UNFILTERED()
         return type(guid) == "string" and (guid:find("^Creature%-") or guid:find("^Vehicle%-"))
     end
 
-    if subEvent == "UNIT_DIED" or subEvent == "UNIT_DESTROYED" then
+    if subEvent == "UNIT_DIED" or subEvent == "UNIT_DESTROYED" or subEvent == "UNIT_DISSIPATES" or subEvent == "SPELL_INSTAKILL" or subEvent == "PARTY_KILL" then
         if IsNPCGuid(destGUID) then
+            self._deadGuids = self._deadGuids or {}
+            self._deadGuids[destGUID] = true
             self:RemoveEngagedMobByGUID(destGUID)
             self:_QueuePullUpdate()
         end
@@ -1116,19 +1198,9 @@ function KeystonePercentageHelper:COMBAT_LOG_EVENT_UNFILTERED()
     end
 
     -- Detect engagement in both directions (group -> npc or npc -> group)
-    local isDamage = subEvent and (subEvent:find("_DAMAGE") or subEvent:find("_MISSED") or subEvent:find("AURA_APPLIED") or subEvent:find("AURA_REFRESH"))
-    if not isDamage then return end
-
-    if IsGroup(srcFlags) and IsNPCGuid(destGUID) then
-        self:AddEngagedMobByGUID(destGUID)
-        self:_QueuePullUpdate()
-        return
-    end
-    if IsGroup(destFlags) and IsNPCGuid(srcGUID) then
-        self:AddEngagedMobByGUID(srcGUID)
-        self:_QueuePullUpdate()
-        return
-    end
+    -- Do NOT treat aura applications (e.g., CC) as engagement. We no longer add via CLEU;
+    -- additions are handled by UNIT_THREAT_LIST_UPDATE to avoid false positives and match WarpDeplete behavior.
+    return
 end
 
 -- Event handler for starting a Mythic+ dungeon
