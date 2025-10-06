@@ -233,6 +233,12 @@ L["REQUIRED_DEFAULT"] = "Requis :"
 L["CURRENT_DEFAULT"] = "Actuel :"
 L["PULL_DEFAULT"] = "En cours :"
 
+-- Section required prefix
+L["SHOW_SECTION_REQUIRED_PREFIX"] = "Afficher le pourcentage total requis pour la section"
+L["SHOW_SECTION_REQUIRED_PREFIX_DESC"] = "Affiche le pourcentage total requis pour la section actuelle sans prendre en compte la progression déjà effectuée."
+L["SECTION_REQUIRED_LABEL_DESC"] = "Préfixe affiché avant la valeur requise pour la section.\n\nVider le champ pour remettre la valeur par défaut."
+L["SECTION_REQUIRED_DEFAULT"] = "Total requis pour la section :"
+
 L["FORMAT_MODE"] = "Format de texte"
 L["FORMAT_MODE_DESC"] = "Sélectionnez comment afficher la progression du donjon."
 L["COUNT"] = "Compte"
