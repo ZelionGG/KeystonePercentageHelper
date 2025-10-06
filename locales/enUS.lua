@@ -209,6 +209,11 @@ L["RESET_ALL"] = "Reset All Dungeons"
 L["RESET_CHANGED_ONLY"] = "Reset Changed Only"
 L["CHANGED_ROUTES_DUNGEONS_LIST"] = "The following dungeons have updated routes:"
 
+-- Test Mode
+L["TEST_MODE"] = "Test Mode"
+L["TEST_MODE_OVERLAY"] = "Keystone Percentage Helper: Test Mode active"
+L["TEST_MODE_OVERLAY_HINT"] = "Preview is simulated. Right-click this hint to exit Test Mode and reopen settings."
+
 -- Main Display
 L["MAIN_DISPLAY"] = "Main Display"
 L["SHOW_REQUIRED_PREFIX"] = "Show required text prefix"
