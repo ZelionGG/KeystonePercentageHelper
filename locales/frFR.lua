@@ -207,6 +207,16 @@ L["RESET_ALL"] = "Réinitialiser tous les donjons"
 L["RESET_CHANGED_ONLY"] = "Réinitialiser uniquement ces donjons"
 L["CHANGED_ROUTES_DUNGEONS_LIST"] = "Les donjons suivants ont des routes mises à jour :"
 
+-- Mode Test
+L["TEST_MODE"] = "Mode Test"
+L["TEST_MODE_OVERLAY"] = "Keystone Percentage Helper : Mode Test"
+L["TEST_MODE_OVERLAY_HINT"] = "Aperçu simulé. Clic droit sur cet encart pour quitter le mode test et rouvrir les options."
+L["TEST_MODE_DESC"] = "Affiche un aperçu en direct de votre configuration d'affichage sans être en donjon. Cela va :\n• Fermer le panneau d'options pour révéler l'aperçu\n• Afficher un voile et un encart d'aide au-dessus de l'affichage\n• Simuler l'entrée/sortie de combat toutes les 3 s pour afficher les valeurs projetées et le pourcentage du pull\nAstuce : Clic droit sur l'encart pour quitter le Mode Test et rouvrir les options."
+L["TEST_MODE_DISABLED"] = "Mode Test désactivé automatiquement%s"
+L["TEST_MODE_REASON_ENTERED_COMBAT"] = "entrée en combat"
+L["TEST_MODE_REASON_STARTED_DUNGEON"] = "début du donjon"
+L["TEST_MODE_REASON_CHANGED_ZONE"] = "changement de zone"
+
 -- Main Display
 L["MAIN_DISPLAY"] = "Affichage principal"
 L["SHOW_REQUIRED_PREFIX"] = "Afficher le préfixe devant le pourcentage requis"

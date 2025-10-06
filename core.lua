@@ -148,6 +148,39 @@ function KeystonePercentageHelper:OnInitialize()
         Settings.OpenToCategory("Keystone Percentage Helper")
     end
 
+-- Disable Test Mode programmatically with a reason and inform the player
+function KeystonePercentageHelper:DisableTestMode(reason)
+    if not self._testMode then return end
+    self._testMode = false
+    if self.HideTestOverlay then self:HideTestOverlay() end
+    if self.StopTestModeTicker then self:StopTestModeTicker() end
+    if self.UpdatePercentageText then self:UpdatePercentageText() end
+    if self.Refresh then self:Refresh() end
+    -- Localize reason if provided
+    local suffix = ""
+    if type(reason) == "string" and reason ~= "" then
+        local r = reason
+        local reasonKey
+        if r == "entered combat" or r == "entered_combat" then
+            reasonKey = "TEST_MODE_REASON_ENTERED_COMBAT"
+        elseif r == "started dungeon" or r == "started_dungeon" then
+            reasonKey = "TEST_MODE_REASON_STARTED_DUNGEON"
+        elseif r == "changed zone" or r == "changed_zone" then
+            reasonKey = "TEST_MODE_REASON_CHANGED_ZONE"
+        end
+        local RL = (self.L or L)
+        local localized = (reasonKey and RL and RL[reasonKey]) and RL[reasonKey] or r
+        suffix = " (" .. localized .. ")"
+    end
+    local loc = (self.L and self.L["TEST_MODE_DISABLED"]) or (L and L["TEST_MODE_DISABLED"]) or "Test Mode disabled automatically%s"
+    local msg = "|cffdb6233Keystone Percentage Helper:|r " .. string.format(loc, suffix)
+    if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
+        DEFAULT_CHAT_FRAME:AddMessage(msg)
+    else
+        print(msg)
+    end
+end
+
 -- Helpers to manage real pull set
 function KeystonePercentageHelper:AddEngagedMobByGUID(guid)
     if not guid then return end
@@ -273,8 +306,32 @@ end
                 type = "group",
                 order = 1,
                 args = {
-                    generalHeader = {
+                    testMode = {
                         order = 0,
+                        type = "toggle",
+                        name = L["TEST_MODE"] or "Test Mode",
+                        desc = L["TEST_MODE_DESC"],
+                        width = "full",
+                        get = function()
+                            return self._testMode or false
+                        end,
+                        set = function(_, value)
+                            self._testMode = not not value
+                            if self._testMode then
+                                -- Close settings so the user can see the preview behind
+                                if HideUIPanel and _G.SettingsPanel then HideUIPanel(_G.SettingsPanel) end
+                                if self.ShowTestOverlay then self:ShowTestOverlay() end
+                                if self.StartTestModeTicker then self:StartTestModeTicker() end
+                            else
+                                if self.HideTestOverlay then self:HideTestOverlay() end
+                                if self.StopTestModeTicker then self:StopTestModeTicker() end
+                            end
+                            if self.UpdatePercentageText then self:UpdatePercentageText() end
+                            if self.Refresh then self:Refresh() end
+                        end,
+                    },
+                    generalHeader = {
+                        order = 0.1,
                         type = "header",
                         name = L["GENERAL_SETTINGS"],
                     },
@@ -493,6 +550,12 @@ end
 -- Update the displayed percentage text based on dungeon progress
 function KeystonePercentageHelper:UpdatePercentageText()
     if not self.displayFrame then return end
+
+    -- Test Mode: render preview and bypass real dungeon state
+    if self._testMode then
+        if self.RenderTestText then self:RenderTestText() end
+        return
+    end
 
     -- Initialize dungeon tracking if needed
     self:InitiateDungeon()
@@ -716,7 +779,7 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
 
     if cfg.showCurrentPercent and (currentPercent ~= nil) then
         local label = colorizePrefix(cfg.currentLabel or L["CURRENT_DEFAULT"])
-        local inCombat = UnitAffectingCombat and UnitAffectingCombat("player")
+        local inCombat = self:IsCombatContext()
         local showProj = (cfg.showProjected and inCombat) and true or false
         if (cfg.formatMode == "count") and fmtData then
             -- Current (count) base highlighting:
@@ -785,7 +848,7 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
             table.insert(extras, baseStr)
         end
     end
-    if cfg.showCurrentPullPercent and (currentPullPercent ~= nil) and (UnitAffectingCombat and UnitAffectingCombat("player")) then
+    if cfg.showCurrentPullPercent and (currentPullPercent ~= nil) and self:IsCombatContext() then
         -- Pull highlighting:
         -- If Pull >= section required (percent or count), color Pull in finished green. Not gated by combat.
         local label = colorizePrefix(cfg.pullLabel or L["PULL_DEFAULT"])
@@ -850,7 +913,7 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
     -- The suffix is colored using the finished color.
     -- Note: projected values are hidden out of combat via the showProjected + UnitAffectingCombat gate.
     -- Optionally append projected value next to numeric Required base (do not replace base label)
-    if cfg.showProjected and UnitAffectingCombat and UnitAffectingCombat("player") then
+    if cfg.showProjected and self:IsCombatContext() then
         if isNumericPercent and (type(remainingNeeded) == "number") then
             local pull = tonumber(currentPullPercent) or 0
             local projReq = (tonumber(remainingNeeded) or 0) - pull
@@ -995,6 +1058,302 @@ function KeystonePercentageHelper:ApplyTextLayout()
     end
 end
 
+-- Simulated combat context for Test Mode
+function KeystonePercentageHelper:IsCombatContext()
+    if self._testMode then
+        if self._testCombatContext == nil then
+            return true -- default to "in combat" when starting test mode
+        end
+        return self._testCombatContext and true or false
+    end
+    return UnitAffectingCombat and UnitAffectingCombat("player")
+end
+
+-- Start ticker to alternate simulated combat context
+function KeystonePercentageHelper:StartTestModeTicker()
+    -- Cancel existing ticker if any
+    if self._testTicker then
+        self._testTicker:Cancel()
+        self._testTicker = nil
+    end
+    -- Begin with out-of-combat to show transitions clearly
+    self._testCombatContext = false
+    self._testScenario = 1
+    local period = 3 -- seconds; can be made configurable later
+    self._testTicker = C_Timer.NewTicker(period, function()
+        -- Alternate combat context
+        self._testCombatContext = not self._testCombatContext
+        -- Rotate scenarios (1..7)
+        self._testScenario = ((self._testScenario or 1) % 7) + 1
+        if self.UpdatePercentageText then self:UpdatePercentageText() end
+    end)
+end
+
+function KeystonePercentageHelper:StopTestModeTicker()
+    if self._testTicker then
+        self._testTicker:Cancel()
+        self._testTicker = nil
+    end
+    self._testCombatContext = nil
+    self._testScenario = nil
+end
+
+-- Lightweight overlay to indicate Test Mode is active
+function KeystonePercentageHelper:ShowTestOverlay()
+    if not self.testModeOverlay then
+        local f = CreateFrame("Frame", "KPH_TestModeOverlay", UIParent, "BackdropTemplate")
+        f:SetFrameStrata("FULLSCREEN_DIALOG")
+        f:SetSize(800, 56)
+        -- Anchor above the main display frame
+        if self.displayFrame then
+            f:SetPoint("BOTTOM", self.displayFrame, "TOP", 0, 8)
+        else
+            f:SetPoint("TOP", UIParent, "TOP", 0, -20)
+        end
+        -- Use the same simple border style as the KPH mover (anchorFrame)
+        f:SetBackdrop({ bgFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", tile = true, tileSize = 16, edgeSize = 1 })
+        f:SetBackdropColor(0, 0, 0, 0.35)
+        f:SetBackdropBorderColor(1, 0.82, 0, 1)
+        -- Ensure 1px border on all sides (some UI scales can hide the right edge with edgeFile-only)
+        if not f.border then f.border = {} end
+        local br, bgc, bb, ba = 1, 0.82, 0, 1
+        if not f.border.top then f.border.top = f:CreateTexture(nil, "BORDER") end
+        f.border.top:SetColorTexture(br, bgc, bb, ba)
+        f.border.top:ClearAllPoints()
+        f.border.top:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0)
+        f.border.top:SetPoint("TOPRIGHT", f, "TOPRIGHT", 0, 0)
+        f.border.top:SetHeight(1)
+
+        if not f.border.bottom then f.border.bottom = f:CreateTexture(nil, "BORDER") end
+        f.border.bottom:SetColorTexture(br, bgc, bb, ba)
+        f.border.bottom:ClearAllPoints()
+        f.border.bottom:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0)
+        f.border.bottom:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0)
+        f.border.bottom:SetHeight(1)
+
+        if not f.border.left then f.border.left = f:CreateTexture(nil, "BORDER") end
+        f.border.left:SetColorTexture(br, bgc, bb, ba)
+        f.border.left:ClearAllPoints()
+        f.border.left:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0)
+        f.border.left:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0)
+        f.border.left:SetWidth(1)
+
+        if not f.border.right then f.border.right = f:CreateTexture(nil, "BORDER") end
+        f.border.right:SetColorTexture(br, bgc, bb, ba)
+        f.border.right:ClearAllPoints()
+        f.border.right:SetPoint("TOPRIGHT", f, "TOPRIGHT", 0, 0)
+        f.border.right:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0)
+        f.border.right:SetWidth(1)
+
+        local title = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
+        -- Layout paddings
+        f._padLeft, f._padRight, f._padTop, f._padBottom = 16, 16, 12, 14
+        local padTop = f._padTop
+        local padLeft, padRight = f._padLeft, f._padRight
+        local gap = 4
+
+        title:SetPoint("TOP", f, "TOP", 0, -padTop)
+        title:SetText((self.L and self.L["TEST_MODE_OVERLAY"]) or (L and L["TEST_MODE_OVERLAY"]))
+        title:SetTextColor(1, 0.82, 0, 1)
+        local tf, ts, tflags = title:GetFont(); if tf then title:SetFont(tf, (ts or 14) + 4, tflags) end
+
+        local hint = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        hint:SetPoint("TOP", title, "BOTTOM", 0, -gap)
+        hint:SetText((self.L and self.L["TEST_MODE_OVERLAY_HINT"]) or (L and L["TEST_MODE_OVERLAY_HINT"]))
+        -- Apply configured font (LSM) for title and hint
+        local fontPath = self.LSM and self.LSM:Fetch('font', self.db and self.db.profile and self.db.profile.text and self.db.profile.text.font) or nil
+        local baseSize = (self.db and self.db.profile and self.db.profile.general and self.db.profile.general.fontSize) or 12
+        if fontPath then
+            local b = baseSize or 12
+            title:SetFont(fontPath, b + 2, "OUTLINE")
+            hint:SetFont(fontPath, math.max(8, b - 2), "OUTLINE")
+        else
+            local hf, hs, hflags = hint:GetFont(); if hf then hint:SetFont(hf, (hs or 12) + 3, hflags) end
+        end
+
+        -- Store refs for later width recalculation
+        f.title = title
+        f.hint = hint
+
+        -- Auto-size overlay width/height based on hint + title with paddings
+        local hintW = hint:GetStringWidth() or 0
+        local titleW = title:GetStringWidth() or 0
+        local contentW = math.max(hintW, titleW)
+        local width = math.max(240, math.floor(contentW + padLeft + padRight))
+        local height = (title:GetStringHeight() or 0) + gap + (hint:GetStringHeight() or 0) + f._padTop + f._padBottom
+        f:SetSize(width, math.max(40, math.floor(height)))
+
+        -- Right-click to cancel Test Mode and reopen settings
+        f:EnableMouse(true)
+        f:SetScript("OnMouseUp", function(_, btn)
+            if btn == "RightButton" then
+                self._testMode = false
+                if self.HideTestOverlay then self:HideTestOverlay() end
+                if self.StopTestModeTicker then self:StopTestModeTicker() end
+                if self.UpdatePercentageText then self:UpdatePercentageText() end
+                if self.Refresh then self:Refresh() end
+                if Settings and Settings.OpenToCategory then
+                    Settings.OpenToCategory("Keystone Percentage Helper")
+                end
+            end
+        end)
+
+        self.testModeOverlay = f
+    end
+    -- Create and show a dedicated full-screen dim overlay for Test Mode
+    if not self.testDimOverlay then
+        local dim = CreateFrame("Frame", "KPH_TestDimOverlay", UIParent, "BackdropTemplate")
+        dim:SetFrameStrata("FULLSCREEN_DIALOG")
+        dim:SetAllPoints(UIParent)
+        dim:SetBackdrop({ bgFile = "Interface\\ChatFrame\\ChatFrameBackground", tile = true, tileSize = 16 })
+        dim:SetBackdropColor(0, 0, 0, 0.7)
+        dim:EnableMouse(false)
+        self.testDimOverlay = dim
+    end
+    self.testDimOverlay:Show()
+
+    -- Ensure display text is drawn above the dim overlay
+    if self.displayFrame then
+        self._prevDisplayStrata = self.displayFrame:GetFrameStrata()
+        self.displayFrame:SetFrameStrata("TOOLTIP")
+    end
+    self.testModeOverlay:Show()
+end
+
+function KeystonePercentageHelper:HideTestOverlay()
+    if self.testModeOverlay then
+        self.testModeOverlay:Hide()
+    end
+    if self.testDimOverlay then self.testDimOverlay:Hide() end
+    -- Restore original strata for the display
+    if self.displayFrame and self._prevDisplayStrata then
+        self.displayFrame:SetFrameStrata(self._prevDisplayStrata)
+        self._prevDisplayStrata = nil
+    end
+end
+
+-- Render a configuration preview while Test Mode is enabled
+function KeystonePercentageHelper:RenderTestText()
+    if not (self.displayFrame and self.displayFrame.text and self.db and self.db.profile) then return end
+    local cfg = self.db.profile.general and self.db.profile.general.mainDisplay or nil
+    local formatMode = (cfg and cfg.formatMode) or "percent"
+    local scenario = self._testScenario or 1
+
+    -- Shared baseline
+    local totalCount = 220
+    local textColor = self.db.profile.color.inProgress
+
+    if scenario == 7 then
+        -- Scenario 7: Dungeon finished
+        self.displayFrame.text:SetText(L["DUNGEON_DONE"] or "Dungeon finished")
+        textColor = self.db.profile.color.finished
+    else
+        local currentPercent, neededPercent, pullPercent, isBossKilled
+        if scenario == 1 then
+            -- 1) Nominal out of combat (white)
+            currentPercent = 45.0
+            neededPercent = 50.0
+            pullPercent = 0.0
+            isBossKilled = false
+            textColor = self.db.profile.color.inProgress
+        elseif scenario == 2 then
+            -- 2) Nominal in combat (white), small pull
+            currentPercent = 45.0
+            neededPercent = 50.0
+            pullPercent = 3.0
+            isBossKilled = false
+            textColor = self.db.profile.color.inProgress
+        elseif scenario == 3 then
+            -- 3) Nominal: projected finishes the section (white)
+            currentPercent = 62.0
+            neededPercent = 68.0
+            pullPercent = 8.0
+            isBossKilled = false
+            textColor = self.db.profile.color.inProgress
+        elseif scenario == 4 then
+            -- 4) Nominal: section already done (green)
+            currentPercent = 74.0
+            neededPercent = 70.0
+            pullPercent = 0.0
+            isBossKilled = false
+            textColor = self.db.profile.color.finished
+        elseif scenario == 5 then
+            -- 5) Late: projected finishes the section (red Missing)
+            currentPercent = 62.0
+            neededPercent = 68.0
+            pullPercent = 8.0
+            isBossKilled = true -- simulate boss done context for missing state
+            textColor = self.db.profile.color.missing
+        elseif scenario == 6 then
+            -- 6) Nominal with projected Dungeon finished (white, IC)
+            currentPercent = 98.0
+            neededPercent = 100.0
+            pullPercent = 3.0
+            isBossKilled = false
+            textColor = self.db.profile.color.inProgress
+        end
+
+        local remainingPercent = math.max(0, neededPercent - currentPercent)
+        local currentCount = math.floor((currentPercent / 100) * totalCount + 0.5)
+        local pullCount = math.floor((pullPercent / 100) * totalCount + 0.5)
+        local sectionRequiredCount = math.ceil((neededPercent / 100) * totalCount)
+        local remainingCount = math.max(0, sectionRequiredCount - currentCount)
+
+        local fmtData = {
+            currentCount = currentCount,
+            totalCount = totalCount,
+            pullCount = pullCount,
+            remainingCount = remainingCount,
+            sectionRequiredPercent = neededPercent,
+            sectionRequiredCount = sectionRequiredCount,
+        }
+
+        local base
+        if scenario == 4 then
+            base = L["DONE"] or "Section percentage done"
+        else
+            if formatMode == "count" then
+                base = tostring(remainingCount)
+            else
+                base = string.format("%.2f%%", remainingPercent)
+            end
+        end
+
+        -- Force combat context per scenario when needed for projected display
+        local originalCtx = self._testCombatContext
+        -- Force combat per scenario for projected parts visibility
+        if scenario == 1 or scenario == 4 or scenario == 7 then
+            self._testCombatContext = false
+        elseif scenario == 2 or scenario == 3 or scenario == 5 or scenario == 6 then
+            self._testCombatContext = true
+        end
+        local text = self:FormatMainDisplayText(base, currentPercent, pullPercent, remainingPercent, fmtData, isBossKilled, false)
+        self._testCombatContext = originalCtx
+        self.displayFrame.text:SetText(text)
+    end
+
+    -- Apply chosen color and layout
+    self.displayFrame.text:SetTextColor(textColor.r, textColor.g, textColor.b, textColor.a)
+    if self.ApplyTextLayout then self:ApplyTextLayout() end
+    if self.AdjustDisplayFrameSize then self:AdjustDisplayFrameSize() end
+    -- Keep hint overlay positioned above display frame and auto-size to content
+    if self.testModeOverlay and self.displayFrame then
+        self.testModeOverlay:ClearAllPoints()
+        self.testModeOverlay:SetPoint("BOTTOM", self.displayFrame, "TOP", 0, 8)
+        local padLeft = self.testModeOverlay._padLeft or 16
+        local padRight = self.testModeOverlay._padRight or 16
+        local padTop = self.testModeOverlay._padTop or 12
+        local padBottom = self.testModeOverlay._padBottom or 10
+        local gap = 4
+        if self.testModeOverlay.hint and self.testModeOverlay.title then
+            local contentW = self.testModeOverlay.hint:GetStringWidth() or 0
+            local width = math.max(240, math.floor(contentW + padLeft + padRight))
+            local height = (self.testModeOverlay.title:GetStringHeight() or 0) + gap + (self.testModeOverlay.hint:GetStringHeight() or 0) + padTop + padBottom
+            self.testModeOverlay:SetSize(width, math.max(40, math.floor(height)))
+        end
+    end
+end
+
 -- Called when the addon is enabled
 function KeystonePercentageHelper:OnEnable()
     -- Ensure display exists and is visible
@@ -1090,6 +1449,7 @@ end
 
 -- Start of combat: reset real pull state
 function KeystonePercentageHelper:PLAYER_REGEN_DISABLED()
+    if self._testMode then self:DisableTestMode("entered combat") end
     self.realPull.mobs = {}
     self.realPull.sum = 0
     self.realPull.denom = 0
@@ -1205,6 +1565,7 @@ end
 
 -- Event handler for starting a Mythic+ dungeon
 function KeystonePercentageHelper:CHALLENGE_MODE_START()
+    if self._testMode then self:DisableTestMode("started dungeon") end
     self.currentDungeonID = nil
 
     self:InitiateDungeon()
@@ -1217,9 +1578,11 @@ end
 
 -- Event handler for entering the world or changing zones
 function KeystonePercentageHelper:PLAYER_ENTERING_WORLD()
+    if self._testMode then self:DisableTestMode("changed zone") end
     self:InitiateDungeon()
     self:UpdatePercentageText()
 end
+
 
 -- Refresh the display with current settings
 function KeystonePercentageHelper:Refresh()
@@ -1260,8 +1623,12 @@ function KeystonePercentageHelper:Refresh()
     local shouldShow = (leaderEnabled and isLeader) or roleEnabled or role == "NONE"
 
     if not shouldShow then
-        self.displayFrame:Hide()
-        return
+        if self._testMode then
+            self.displayFrame:Show()
+        else
+            self.displayFrame:Hide()
+            return
+        end
     end
     self.displayFrame:Show()
 end
