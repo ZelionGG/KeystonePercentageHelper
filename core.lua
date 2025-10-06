@@ -273,8 +273,27 @@ end
                 type = "group",
                 order = 1,
                 args = {
-                    generalHeader = {
+                    testMode = {
                         order = 0,
+                        type = "toggle",
+                        name = "Test Mode",
+                        width = "full",
+                        get = function()
+                            return self._testMode or false
+                        end,
+                        set = function(_, value)
+                            self._testMode = not not value
+                            if self._testMode then
+                                if self.StartTestModeTicker then self:StartTestModeTicker() end
+                            else
+                                if self.StopTestModeTicker then self:StopTestModeTicker() end
+                            end
+                            if self.UpdatePercentageText then self:UpdatePercentageText() end
+                            if self.Refresh then self:Refresh() end
+                        end,
+                    },
+                    generalHeader = {
+                        order = 0.1,
                         type = "header",
                         name = L["GENERAL_SETTINGS"],
                     },
@@ -493,6 +512,12 @@ end
 -- Update the displayed percentage text based on dungeon progress
 function KeystonePercentageHelper:UpdatePercentageText()
     if not self.displayFrame then return end
+
+    -- Test Mode: render preview and bypass real dungeon state
+    if self._testMode then
+        if self.RenderTestText then self:RenderTestText() end
+        return
+    end
 
     -- Initialize dungeon tracking if needed
     self:InitiateDungeon()
@@ -716,7 +741,7 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
 
     if cfg.showCurrentPercent and (currentPercent ~= nil) then
         local label = colorizePrefix(cfg.currentLabel or L["CURRENT_DEFAULT"])
-        local inCombat = UnitAffectingCombat and UnitAffectingCombat("player")
+        local inCombat = self:IsCombatContext()
         local showProj = (cfg.showProjected and inCombat) and true or false
         if (cfg.formatMode == "count") and fmtData then
             -- Current (count) base highlighting:
@@ -785,7 +810,7 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
             table.insert(extras, baseStr)
         end
     end
-    if cfg.showCurrentPullPercent and (currentPullPercent ~= nil) and (UnitAffectingCombat and UnitAffectingCombat("player")) then
+    if cfg.showCurrentPullPercent and (currentPullPercent ~= nil) and self:IsCombatContext() then
         -- Pull highlighting:
         -- If Pull >= section required (percent or count), color Pull in finished green. Not gated by combat.
         local label = colorizePrefix(cfg.pullLabel or L["PULL_DEFAULT"])
@@ -850,7 +875,7 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
     -- The suffix is colored using the finished color.
     -- Note: projected values are hidden out of combat via the showProjected + UnitAffectingCombat gate.
     -- Optionally append projected value next to numeric Required base (do not replace base label)
-    if cfg.showProjected and UnitAffectingCombat and UnitAffectingCombat("player") then
+    if cfg.showProjected and self:IsCombatContext() then
         if isNumericPercent and (type(remainingNeeded) == "number") then
             local pull = tonumber(currentPullPercent) or 0
             local projReq = (tonumber(remainingNeeded) or 0) - pull
@@ -993,6 +1018,83 @@ function KeystonePercentageHelper:ApplyTextLayout()
     if _cur ~= nil then
         self.displayFrame.text:SetText(_cur)
     end
+end
+
+-- Simulated combat context for Test Mode
+function KeystonePercentageHelper:IsCombatContext()
+    if self._testMode then
+        if self._testCombatContext == nil then
+            return true -- default to "in combat" when starting test mode
+        end
+        return self._testCombatContext and true or false
+    end
+    return UnitAffectingCombat and UnitAffectingCombat("player")
+end
+
+-- Start ticker to alternate simulated combat context
+function KeystonePercentageHelper:StartTestModeTicker()
+    -- Cancel existing ticker if any
+    if self._testTicker then
+        self._testTicker:Cancel()
+        self._testTicker = nil
+    end
+    -- Begin with out-of-combat to show transitions clearly
+    self._testCombatContext = false
+    local period = 3 -- seconds; can be made configurable later
+    self._testTicker = C_Timer.NewTicker(period, function()
+        self._testCombatContext = not self._testCombatContext
+        if self.UpdatePercentageText then self:UpdatePercentageText() end
+    end)
+end
+
+function KeystonePercentageHelper:StopTestModeTicker()
+    if self._testTicker then
+        self._testTicker:Cancel()
+        self._testTicker = nil
+    end
+    self._testCombatContext = nil
+end
+
+-- Render a configuration preview while Test Mode is enabled
+function KeystonePercentageHelper:RenderTestText()
+    if not (self.displayFrame and self.displayFrame.text and self.db and self.db.profile) then return end
+    local cfg = self.db.profile.general and self.db.profile.general.mainDisplay or nil
+    local formatMode = (cfg and cfg.formatMode) or "percent"
+
+    -- Example values to reflect a mid-dungeon situation
+    local totalCount = 220
+    local currentPercent = 62.5
+    local neededPercent = 70.0
+    local remainingPercent = math.max(0, neededPercent - currentPercent)
+    local pullPercent = 8.5
+
+    local currentCount = math.floor((currentPercent / 100) * totalCount + 0.5)
+    local pullCount = math.floor((pullPercent / 100) * totalCount + 0.5)
+    local sectionRequiredCount = math.ceil((neededPercent / 100) * totalCount)
+    local remainingCount = math.max(0, sectionRequiredCount - currentCount)
+
+    local fmtData = {
+        currentCount = currentCount,
+        totalCount = totalCount,
+        pullCount = pullCount,
+        remainingCount = remainingCount,
+        sectionRequiredPercent = neededPercent,
+        sectionRequiredCount = sectionRequiredCount,
+    }
+
+    local base
+    if formatMode == "count" then
+        base = tostring(remainingCount)
+    else
+        base = string.format("%.2f%%", remainingPercent)
+    end
+
+    local text = self:FormatMainDisplayText(base, currentPercent, pullPercent, remainingPercent, fmtData, false, false)
+    self.displayFrame.text:SetText(text)
+    local color = self.db.profile.color.inProgress
+    self.displayFrame.text:SetTextColor(color.r, color.g, color.b, color.a)
+    if self.ApplyTextLayout then self:ApplyTextLayout() end
+    if self.AdjustDisplayFrameSize then self:AdjustDisplayFrameSize() end
 end
 
 -- Called when the addon is enabled
@@ -1260,8 +1362,12 @@ function KeystonePercentageHelper:Refresh()
     local shouldShow = (leaderEnabled and isLeader) or roleEnabled or role == "NONE"
 
     if not shouldShow then
-        self.displayFrame:Hide()
-        return
+        if self._testMode then
+            self.displayFrame:Show()
+        else
+            self.displayFrame:Hide()
+            return
+        end
     end
     self.displayFrame:Show()
 end
