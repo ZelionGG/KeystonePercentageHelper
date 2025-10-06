@@ -71,17 +71,17 @@ KeystonePercentageHelper.defaults = {
             },
             -- Main display content options
             mainDisplay = {
-                showCurrentPercent = false,            -- Show overall current enemy forces percent
-                showCurrentPullPercent = false,        -- Show current MDT pull percent (if MDT is available)
-                multiLine = false,                     -- Display extras on new lines instead of a single line
-                showRequiredText = false,              -- Show the required/remaining text base
+                showCurrentPercent = true,            -- Show overall current enemy forces percent
+                showCurrentPullPercent = true,        -- Show current MDT pull percent (if MDT is available)
+                multiLine = true,                     -- Display extras on new lines instead of a single line
+                showRequiredText = true,              -- Show the required/remaining text base
                 requiredLabel = L["REQUIRED_DEFAULT"], -- Label for the required base value when numeric
                 showSectionRequiredText = false,       -- Show the required/remaining text base
                 sectionRequiredLabel = L["REQUIRED_DEFAULT"], -- Label for the required base value when numeric
                 currentLabel = L["CURRENT_DEFAULT"],   -- Label for current percent
                 pullLabel = L["PULL_DEFAULT"],         -- Label for current pull percent
                 formatMode = "percent",               -- Display format: "percent" or "count"
-                prefixColor = { r = 0.8, g = 0.8, b = 0.8, a = 1 }, -- Color for prefixes (labels)
+                prefixColor = { r = 1, g = 0.7960784, b = 0.2, a = 1 }, -- Color for prefixes (labels) (default: #ffcb33)
                 singleLineSeparator = " | ",           -- Separator for single-line layout
                 textAlign = "CENTER",                  -- Horizontal font alignment: LEFT, CENTER, RIGHT
                 showProjected = false                   -- Append projected values next to Current/Required
@@ -476,7 +476,7 @@ function KeystonePercentageHelper:GetMainDisplayOptions()
                 width = "full",
                 hasAlpha = false,
                 get = function()
-                    local c = self.db.profile.general.mainDisplay.prefixColor or {r=0.8,g=0.8,b=0.8,a=1}
+                    local c = self.db.profile.general.mainDisplay.prefixColor or (self.defaults and self.defaults.profile.general.mainDisplay.prefixColor) or {r=1,g=0.7960784,b=0.2,a=1}
                     return c.r, c.g, c.b, c.a
                 end,
                 set = function(_, r, g, b, a)
