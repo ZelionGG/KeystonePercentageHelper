@@ -1083,7 +1083,7 @@ function KeystonePercentageHelper:ShowTestOverlay()
 
         local title = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
         -- Layout paddings
-        f._padLeft, f._padRight, f._padTop, f._padBottom = 16, 16, 12, 10
+        f._padLeft, f._padRight, f._padTop, f._padBottom = 16, 16, 12, 14
         local padTop = f._padTop
         local padLeft, padRight = f._padLeft, f._padRight
         local gap = 4
