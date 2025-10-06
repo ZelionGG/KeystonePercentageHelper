@@ -10,6 +10,7 @@
 ## Notes-ruRU: Дополнение, которое поможет Вам отслеживать проценты, которые нужно набрать в каждой части подземелья M+.
 
 ## SavedVariables: KeystonePercentageHelperDB, KeystonePolarisDB
+## OptionalDeps: KeystonePercentageHelper
 
 ## X-Website: https://github.com/ZelionGG/KeystonePolaris
 ## X-Issues: https://github.com/ZelionGG/KeystonePolaris/issues
