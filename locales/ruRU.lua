@@ -210,6 +210,16 @@ L["RESET_ALL"] = "Сбросить все подземелья"
 L["RESET_CHANGED_ONLY"] = "Сбросить только измененные"
 L["CHANGED_ROUTES_DUNGEONS_LIST"] = "Обновлены маршруты следующих подземелий:"
 
+-- Test Mode (To Translate)
+L["TEST_MODE"] = "Test Mode"
+L["TEST_MODE_OVERLAY"] = "Keystone Percentage Helper: Test Mode"
+L["TEST_MODE_OVERLAY_HINT"] = "Preview is simulated. Right-click this hint to exit test mode and reopen settings."
+L["TEST_MODE_DESC"] = "Show a live preview of your display configuration without being in a dungeon. This will:\n• Close the settings panel to reveal the preview\n• Show a dim overlay and a hint above the display\n• Simulate combat/out-of-combat every 3s to reveal projected values and pull%\nTip: Right-click the hint to exit Test Mode and reopen settings."
+L["TEST_MODE_DISABLED"] = "Test Mode disabled automatically%s"
+L["TEST_MODE_REASON_ENTERED_COMBAT"] = "entered combat"
+L["TEST_MODE_REASON_STARTED_DUNGEON"] = "started dungeon"
+L["TEST_MODE_REASON_CHANGED_ZONE"] = "changed zone"
+
 -- Main Display
 L["MAIN_DISPLAY"] = "Основное отображение"
 L["SHOW_REQUIRED_PREFIX"] = "Показать требуемый текстовый префикс"
