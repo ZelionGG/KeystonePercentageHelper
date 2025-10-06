@@ -1,7 +1,7 @@
-local AddOnName, KeystonePercentageHelper = ...
+local AddOnName, KeystonePolaris = ...
 
 -- Define a single source of truth for dungeon data
-KeystonePercentageHelper.TWW_DUNGEON_DATA = {
+KeystonePolaris.TWW_DUNGEON_DATA = {
     -- Format: [shortName] = {id = dungeonID, bosses = {{bossID, percent, shouldInform}, ...}}
     AKCE = { -- Ara-Kara, City of Echoes
         id = 503,

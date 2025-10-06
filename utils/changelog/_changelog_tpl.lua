@@ -1,6 +1,6 @@
-local AddOnName, XIVBar = ...;
+local AddOnName, KeystonePolaris = ...;
 
-XIVBar.Changelog[9999] = {
+KeystonePolaris.Changelog[9999] = {
     version_string = "TBD",
     release_date = "TBD",
     important = {

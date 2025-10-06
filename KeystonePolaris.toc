@@ -1,18 +1,18 @@
 ## Interface: 110200
-## Title: Keystone Percentage Helper
+## Title: Keystone Polaris
 ## Author: ZelionGG
 ## Version: @project-version@
-## IconTexture: Interface\Addons\KeyStonePercentageHelper\icon.png
-## AddonCompartmentFunc: KeystonePercentageHelper_OnAddonCompartmentClick
+## IconTexture: Interface\Addons\KeystonePolaris\icon.png
+## AddonCompartmentFunc: KeystonePolaris_OnAddonCompartmentClick
 
 ## Notes: Addon designed to help you keep track of the percentage to make in each M+ dungeon section.
 ## Notes-frFR: Addon conçu pour vous aider à savoir le pourcentage requis avant chaque boss en Mythique+.
 ## Notes-ruRU: Дополнение, которое поможет Вам отслеживать проценты, которые нужно набрать в каждой части подземелья M+.
 
-## SavedVariables: KeystonePercentageHelperDB
+## SavedVariables: KeystonePercentageHelperDB, KeystonePolarisDB
 
-## X-Website: https://github.com/ZelionGG/KeystonePercentageHelper
-## X-Issues: https://github.com/ZelionGG/KeystonePercentageHelper/issues
+## X-Website: https://github.com/ZelionGG/KeystonePolaris
+## X-Issues: https://github.com/ZelionGG/KeystonePolaris/issues
 
 ## X-Curse-Project-ID: 1175416
 ## X-Wago-ID: b6XVj1Gp

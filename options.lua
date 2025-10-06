@@ -1,4 +1,4 @@
-local AddOnName, KeystonePercentageHelper = ...;
+local AddOnName, KeystonePolaris = ...;
 
 local _G = _G;
 local pairs, unpack, select = pairs, unpack, select
@@ -27,7 +27,7 @@ end
 -- order. Every option is cloned from `sharedOptions[key]`, placed after the
 -- section headers (offset with `baseOrder`), and assigned its own `order` so
 -- AceConfig displays them deterministically.
---   addon        : reference to KeystonePercentageHelper for helper calls
+--   addon        : reference to KeystonePolaris for helper calls
 --   dungeonKeys  : array of dungeon string keys (short names)
 --   sharedOptions: table containing pre-built option groups for each dungeon
 --   targetArgs   : the args table we are populating (e.g., dungeonArgs)
@@ -49,9 +49,9 @@ local function InsertSortedDungeonOptions(addon, dungeonKeys, sharedOptions, tar
 end
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddOnName, true);
-KeystonePercentageHelper.L = L
+KeystonePolaris.L = L
 
-KeystonePercentageHelper.defaults = {
+KeystonePolaris.defaults = {
     profile = {
         general = {
             fontSize = 12,
@@ -113,19 +113,19 @@ local expansions = {
 
 local portal = C_CVar.GetCVar("portal")
 if portal == "US" then
-    KeystonePercentageHelper.SEASON_START_DATES = {
+    KeystonePolaris.SEASON_START_DATES = {
         ["2024-09-10"] = "TWW_1", -- TWW Season 1 start date
         ["2025-03-04"] = "TWW_2", -- TWW Season 2 start date
         ["2025-08-12"] = "TWW_3"  -- TWW Season 3 start date
     }
 elseif portal == "EU" then
-    KeystonePercentageHelper.SEASON_START_DATES = {
+    KeystonePolaris.SEASON_START_DATES = {
         ["2024-09-10"] = "TWW_1", -- TWW Season 1 start date
         ["2025-03-05"] = "TWW_2", -- TWW Season 2 start date
         ["2025-08-13"] = "TWW_3"  -- TWW Season 3 start date
     }
 else
-    KeystonePercentageHelper.SEASON_START_DATES = {
+    KeystonePolaris.SEASON_START_DATES = {
         ["2024-09-10"] = "TWW_1", -- TWW Season 1 start date
         ["2025-03-05"] = "TWW_2", -- TWW Season 2 start date
         ["2025-08-13"] = "TWW_3"  -- TWW Season 3 start date
@@ -134,15 +134,15 @@ end
 
 -- Load defaults from all expansions
 for _, expansion in ipairs(expansions) do
-    local defaults = KeystonePercentageHelper[expansion.id .. "_DEFAULTS"]
+    local defaults = KeystonePolaris[expansion.id .. "_DEFAULTS"]
     if defaults then
         for k, v in pairs(defaults) do
-            KeystonePercentageHelper.defaults.profile.advanced[k] = v
+            KeystonePolaris.defaults.profile.advanced[k] = v
         end
     end
 end
 
-function KeystonePercentageHelper:LoadExpansionDungeons()
+function KeystonePolaris:LoadExpansionDungeons()
     -- Process dungeon data and generate tables for all expansions
     for _, expansion in ipairs(expansions) do
         local dungeonData = self[expansion.id .. "_DUNGEON_DATA"]
@@ -179,7 +179,7 @@ function KeystonePercentageHelper:LoadExpansionDungeons()
     end
 end
 
-function KeystonePercentageHelper:GetDungeonIdByKey(dungeonKey)
+function KeystonePolaris:GetDungeonIdByKey(dungeonKey)
     -- Check each expansion's dungeon IDs table
     for _, expansion in ipairs(expansions) do
         local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
@@ -190,7 +190,7 @@ function KeystonePercentageHelper:GetDungeonIdByKey(dungeonKey)
     return nil
 end
 
-function KeystonePercentageHelper:GetDungeonKeyById(dungeonId)
+function KeystonePolaris:GetDungeonKeyById(dungeonId)
     -- Check each expansion's dungeon IDs table
     for _, expansion in ipairs(expansions) do
         local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
@@ -203,7 +203,7 @@ function KeystonePercentageHelper:GetDungeonKeyById(dungeonId)
     return nil
 end
 
-function KeystonePercentageHelper:IsCurrentSeasonDungeon(dungeonId)
+function KeystonePolaris:IsCurrentSeasonDungeon(dungeonId)
     -- Get the current date
     local currentDate = date("%Y-%m-%d")
 
@@ -229,7 +229,7 @@ function KeystonePercentageHelper:IsCurrentSeasonDungeon(dungeonId)
     return false
 end
 
-function KeystonePercentageHelper:IsNextSeasonDungeon(dungeonId)
+function KeystonePolaris:IsNextSeasonDungeon(dungeonId)
     -- Get the current date
     local currentDate = date("%Y-%m-%d")
 
@@ -257,8 +257,8 @@ function KeystonePercentageHelper:IsNextSeasonDungeon(dungeonId)
     return false
 end
 
-function KeystonePercentageHelper:GetPositioningOptions()
-    local self = KeystonePercentageHelper
+function KeystonePolaris:GetPositioningOptions()
+    local self = KeystonePolaris
     return {
         name = L["POSITIONING"],
         type = "group",
@@ -329,8 +329,8 @@ function KeystonePercentageHelper:GetPositioningOptions()
     }
 end
 
-function KeystonePercentageHelper:GetFontOptions()
-    local self = KeystonePercentageHelper
+function KeystonePolaris:GetFontOptions()
+    local self = KeystonePolaris
     return {
         name = L["FONT"],
         type = "group",
@@ -370,8 +370,8 @@ function KeystonePercentageHelper:GetFontOptions()
     }
 end
 
-function KeystonePercentageHelper:GetColorOptions()
-    local self = KeystonePercentageHelper
+function KeystonePolaris:GetColorOptions()
+    local self = KeystonePolaris
     return {
         name = L["COLORS"],
         type = "group",
@@ -428,8 +428,8 @@ function KeystonePercentageHelper:GetColorOptions()
 end
 
 -- Main display options: control which values to show and layout
-function KeystonePercentageHelper:GetMainDisplayOptions()
-    local self = KeystonePercentageHelper
+function KeystonePolaris:GetMainDisplayOptions()
+    local self = KeystonePolaris
     -- Local helper for MDT availability
     local function IsMDTAvailable()
         if C_AddOns and C_AddOns.IsAddOnLoaded then
@@ -733,7 +733,7 @@ function KeystonePercentageHelper:GetMainDisplayOptions()
     }
 end
 
-function KeystonePercentageHelper:GetOtherOptions()
+function KeystonePolaris:GetOtherOptions()
     return {
         name = L["OPTIONS"],
         type = "group",
@@ -809,8 +809,8 @@ function KeystonePercentageHelper:GetOtherOptions()
     }
 end
 
-function KeystonePercentageHelper:GetAdvancedOptions()
-    local self = KeystonePercentageHelper
+function KeystonePolaris:GetAdvancedOptions()
+    local self = KeystonePolaris
     -- Helper function to get dungeon name with icon
     local function GetDungeonNameWithIcon(dungeonKey)
         local mapId = self:GetDungeonIdByKey(dungeonKey)
@@ -880,7 +880,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
                 name = L["EXPORT_SECTION"],
                 desc = (L["EXPORT_SECTION_DESC"]):format(sectionLabel),
                 func = function()
-                    local addon = KeystonePercentageHelper
+                    local addon = KeystonePolaris
                     local sectionData = {}
                     for _, dungeonKey in ipairs(dungeonKeys) do
                         if addon.db and addon.db.profile and addon.db.profile.advanced and addon.db.profile.advanced[dungeonKey] then
@@ -896,7 +896,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
                 name = L["IMPORT_SECTION"],
                 desc = (L["IMPORT_SECTION_DESC"]):format(sectionLabel),
                 func = function()
-                    KeystonePercentageHelper:ShowImportDialog(sectionLabel, dungeonFilter)
+                    KeystonePolaris:ShowImportDialog(sectionLabel, dungeonFilter)
                 end
             },
             separatorDefaultPercentages = {
@@ -1121,7 +1121,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             name = L["EXPORT_ALL_DUNGEONS"],
             desc = L["EXPORT_ALL_DUNGEONS_DESC"],
             func = function()
-                local addon = KeystonePercentageHelper
+                local addon = KeystonePolaris
 
                 -- Collect all dungeon data
                 local allDungeonData = {}
@@ -1142,7 +1142,7 @@ function KeystonePercentageHelper:GetAdvancedOptions()
             name = L["IMPORT_ALL_DUNGEONS"],
             desc = L["IMPORT_ALL_DUNGEONS_DESC"],
             func = function()
-                local addon = KeystonePercentageHelper
+                local addon = KeystonePolaris
                 addon:ShowImportDialog()
             end
         },
@@ -1201,8 +1201,8 @@ function KeystonePercentageHelper:GetAdvancedOptions()
     }
 end
 
-function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
-    local self = KeystonePercentageHelper
+function KeystonePolaris:CreateDungeonOptions(dungeonKey, order)
+    local self = KeystonePolaris
     local numBosses = #self.DUNGEONS[self:GetDungeonIdByKey(dungeonKey)]
 
     -- Ensure the advanced settings table exists for this dungeon
@@ -1289,7 +1289,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                         -- Update the display
                         self:UpdateDungeonData()
                         LibStub("AceConfigRegistry-3.0"):NotifyChange(
-                            "KeystonePercentageHelper")
+                            "KeystonePolaris")
                     end
                 end,
                 confirm = true,
@@ -1301,7 +1301,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                 name = L["EXPORT_DUNGEON"],
                 desc = L["EXPORT_DUNGEON_DESC"],
                 func = function()
-                    local addon = KeystonePercentageHelper
+                    local addon = KeystonePolaris
                     local dungeonId = addon:GetDungeonIdByKey(dungeonKey)
                     if dungeonId and addon.DUNGEONS[dungeonId] and
                         addon.db.profile.advanced[dungeonKey] then
@@ -1318,7 +1318,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                                             compressed)
 
                         -- Show export dialog
-                        StaticPopupDialogs["KPH_EXPORT_DIALOG"] = {
+                        StaticPopupDialogs["KPL_EXPORT_DIALOG"] = {
                             text = L["EXPORT_DIALOG_TEXT"],
                             button1 = OKAY,
                             hasEditBox = true,
@@ -1336,7 +1336,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                             whileDead = true,
                             hideOnEscape = true
                         }
-                        StaticPopup_Show("KPH_EXPORT_DIALOG")
+                        StaticPopup_Show("KPL_EXPORT_DIALOG")
                     end
                 end
             },
@@ -1346,13 +1346,13 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                 name = L["IMPORT_DUNGEON"],
                 desc = L["IMPORT_DUNGEON_DESC"],
                 func = function()
-                    local addon = KeystonePercentageHelper
+                    local addon = KeystonePolaris
 
                     -- Create filter for this specific dungeon
                     local dungeonFilter = {}
                     dungeonFilter[dungeonKey] = true
 
-                    StaticPopupDialogs["KPH_IMPORT_DIALOG"] = {
+                    StaticPopupDialogs["KPL_IMPORT_DIALOG"] = {
                         text = L["IMPORT_DIALOG_TEXT"],
                         button1 = OKAY,
                         button2 = CANCEL,
@@ -1371,7 +1371,7 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
                         whileDead = true,
                         hideOnEscape = true
                     }
-                    StaticPopup_Show("KPH_IMPORT_DIALOG")
+                    StaticPopup_Show("KPL_IMPORT_DIALOG")
                 end
             },
             header = {order = 4, type = "header", name = L["TANK_GROUP_HEADER"]}
@@ -1428,11 +1428,11 @@ function KeystonePercentageHelper:CreateDungeonOptions(dungeonKey, order)
     return options
 end
 
-function KeystonePercentageHelper:ToggleConfig()
-    Settings.OpenToCategory("Keystone Percentage Helper")
+function KeystonePolaris:ToggleConfig()
+    Settings.OpenToCategory("Keystone Polaris")
 end
 
-function KeystonePercentageHelper:CreateColorString(text, db)
+function KeystonePolaris:CreateColorString(text, db)
     local hex = db.r and db.g and db.b and self:RGBToHex(db.r, db.g, db.b) or
                     "|cffffffff"
 
@@ -1440,7 +1440,7 @@ function KeystonePercentageHelper:CreateColorString(text, db)
     return string
 end
 
-function KeystonePercentageHelper:RGBToHex(r, g, b, header, ending)
+function KeystonePolaris:RGBToHex(r, g, b, header, ending)
     r = r <= 1 and r >= 0 and r or 1
     g = g <= 1 and g >= 0 and g or 1
     b = b <= 1 and b >= 0 and b or 1
@@ -1450,7 +1450,7 @@ function KeystonePercentageHelper:RGBToHex(r, g, b, header, ending)
     return hex
 end
 
-function KeystonePercentageHelper:GenerateChangelog()
+function KeystonePolaris:GenerateChangelog()
     self.changelogOptions = {
         type = "group",
         childGroups = "select",
@@ -1627,7 +1627,7 @@ function KeystonePercentageHelper:GenerateChangelog()
     end
 end
 
-function KeystonePercentageHelper:GetBossNumberString(num)
+function KeystonePolaris:GetBossNumberString(num)
     local numbers = {
         [1] = "One",
         [2] = "Two",
@@ -1643,8 +1643,8 @@ function KeystonePercentageHelper:GetBossNumberString(num)
     return numbers[num] or tostring(num)
 end
 
-function KeystonePercentageHelper:ResetAllDungeons()
-    local self = KeystonePercentageHelper
+function KeystonePolaris:ResetAllDungeons()
+    local self = KeystonePolaris
     -- Reset all dungeons to their defaults
     for _, expansion in ipairs(expansions) do
         local dungeonIds = self[expansion.id .. "_DUNGEON_IDS"]
@@ -1674,11 +1674,11 @@ function KeystonePercentageHelper:ResetAllDungeons()
 
     -- Update the display
     self:UpdateDungeonData()
-    LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePercentageHelper")
+    LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePolaris")
 end
 
-function KeystonePercentageHelper:ResetCurrentSeasonDungeons(specificDungeons)
-    local self = KeystonePercentageHelper
+function KeystonePolaris:ResetCurrentSeasonDungeons(specificDungeons)
+    local self = KeystonePolaris
 
     -- Get the current date
     local currentDate = date("%Y-%m-%d")
@@ -1736,11 +1736,11 @@ function KeystonePercentageHelper:ResetCurrentSeasonDungeons(specificDungeons)
 
     -- Update the display
     self:UpdateDungeonData()
-    LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePercentageHelper")
+    LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePolaris")
 end
 
-function KeystonePercentageHelper:CheckForNewSeason()
-    local self = KeystonePercentageHelper
+function KeystonePolaris:CheckForNewSeason()
+    local self = KeystonePolaris
     local currentDate = date("%Y-%m-%d")
 
     -- If this is first load (lastSeasonCheck is empty), just set the date and don't show popup
@@ -1765,8 +1765,8 @@ function KeystonePercentageHelper:CheckForNewSeason()
     -- If last check was before the most recent season start, show popup
     if mostRecentSeasonDate and self.db.profile.lastSeasonCheck <
         mostRecentSeasonDate and not InCombatLockdown() then
-        StaticPopupDialogs["KPH_NEW_SEASON"] = {
-            text = "|cffffd100Keystone Percentage Helper|r\n\n" ..
+        StaticPopupDialogs["KPL_NEW_SEASON"] = {
+            text = "|cffffd100Keystone Polaris|r\n\n" ..
                 L["NEW_SEASON_RESET_PROMPT"] .. "\n\n",
             button1 = YES,
             button2 = NO,
@@ -1783,14 +1783,14 @@ function KeystonePercentageHelper:CheckForNewSeason()
             hideOnEscape = true,
             preferredIndex = 3,
             showAlert = true,
-            title = "Keystone Percentage Helper"
+            title = "Keystone Polaris"
         }
-        StaticPopup_Show("KPH_NEW_SEASON")
+        StaticPopup_Show("KPL_NEW_SEASON")
     end
 end
 
-function KeystonePercentageHelper:CheckForNewRoutes()
-    local currentVersion = C_AddOns.GetAddOnMetadata("KeystonePercentageHelper",
+function KeystonePolaris:CheckForNewRoutes()
+    local currentVersion = C_AddOns.GetAddOnMetadata("KeystonePolaris",
                                                      "Version")
     local lastVersionCheck = self.db.profile.general.lastVersionCheck or ""
     local lastSeasonCheck = self.db.profile.lastSeasonCheck or ""
@@ -1805,8 +1805,8 @@ function KeystonePercentageHelper:CheckForNewRoutes()
         currentDate > lastSeasonCheck and not InCombatLockdown() then
         local changedDungeonsText = self:GetChangedDungeonsText()
 
-        StaticPopupDialogs["KPH_NEW_ROUTES"] = {
-            text = "|cffffd100Keystone Percentage Helper|r\n\n" ..
+        StaticPopupDialogs["KPL_NEW_ROUTES"] = {
+            text = "|cffffd100Keystone Polaris|r\n\n" ..
                 L["NEW_ROUTES_RESET_PROMPT"] .. "\n\n" .. changedDungeonsText,
             button1 = L["RESET_ALL"],
             button2 = L["NO"],
@@ -1831,9 +1831,9 @@ function KeystonePercentageHelper:CheckForNewRoutes()
             hideOnEscape = true,
             preferredIndex = 3,
             showAlert = true,
-            title = "Keystone Percentage Helper"
+            title = "Keystone Polaris"
         }
-        StaticPopup_Show("KPH_NEW_ROUTES")
+        StaticPopup_Show("KPL_NEW_ROUTES")
         return
         -- If it's the first initialization of the addon (both checks are empty), just store the current version
     elseif lastVersionCheck == "" and lastSeasonCheck == "" then
@@ -1851,8 +1851,8 @@ function KeystonePercentageHelper:CheckForNewRoutes()
 
         local changedDungeonsText = self:GetChangedDungeonsText()
 
-        StaticPopupDialogs["KPH_NEW_ROUTES"] = {
-            text = "|cffffd100Keystone Percentage Helper|r\n\n" ..
+        StaticPopupDialogs["KPL_NEW_ROUTES"] = {
+            text = "|cffffd100Keystone Polaris|r\n\n" ..
                 L["NEW_ROUTES_RESET_PROMPT"] .. "\n\n" .. changedDungeonsText,
             button1 = L["RESET_ALL"],
             button2 = L["NO"],
@@ -1877,17 +1877,17 @@ function KeystonePercentageHelper:CheckForNewRoutes()
             hideOnEscape = true,
             preferredIndex = 3,
             showAlert = true,
-            title = "Keystone Percentage Helper"
+            title = "Keystone Polaris"
         }
-        StaticPopup_Show("KPH_NEW_ROUTES")
+        StaticPopup_Show("KPL_NEW_ROUTES")
     else
         -- Update the version check without prompting
         self.db.profile.general.lastVersionCheck = currentVersion
     end
 end
 
-function KeystonePercentageHelper:GetChangedDungeonsText()
-    local self = KeystonePercentageHelper
+function KeystonePolaris:GetChangedDungeonsText()
+    local self = KeystonePolaris
     local changedDungeonsText = ""
 
     -- Vérifier si la table CHANGED_ROUTES_DUNGEONS existe et n'est pas vide
@@ -1906,7 +1906,7 @@ function KeystonePercentageHelper:GetChangedDungeonsText()
     return changedDungeonsText
 end
 
-function KeystonePercentageHelper:GetDungeonDisplayName(dungeonKey)
+function KeystonePolaris:GetDungeonDisplayName(dungeonKey)
     if not dungeonKey then return "Unknown Dungeon" end
 
     local mapId = self:GetDungeonIdByKey(dungeonKey)
@@ -1925,7 +1925,7 @@ function KeystonePercentageHelper:GetDungeonDisplayName(dungeonKey)
 end
 
 -- Global export function for dungeon settings
-function KeystonePercentageHelper:ExportDungeonSettings(dungeonData, exportType,
+function KeystonePolaris:ExportDungeonSettings(dungeonData, exportType,
                                                         sectionName)
     -- Create export string
     local exportData = {
@@ -1948,7 +1948,7 @@ function KeystonePercentageHelper:ExportDungeonSettings(dungeonData, exportType,
     end
 
     -- Show export dialog
-    StaticPopupDialogs["KPH_EXPORT_DIALOG"] = {
+    StaticPopupDialogs["KPL_EXPORT_DIALOG"] = {
         text = dialogText,
         button1 = OKAY,
         hasEditBox = true,
@@ -1966,30 +1966,30 @@ function KeystonePercentageHelper:ExportDungeonSettings(dungeonData, exportType,
         whileDead = true,
         hideOnEscape = true
     }
-    StaticPopup_Show("KPH_EXPORT_DIALOG")
+    StaticPopup_Show("KPL_EXPORT_DIALOG")
 end
 
 -- Global import function for dungeon settings
-function KeystonePercentageHelper:ImportDungeonSettings(importString,
+function KeystonePolaris:ImportDungeonSettings(importString,
                                                         sectionName,
                                                         dungeonFilter)
     local addon = self
     local decoded = LibStub("LibDeflate"):DecodeForPrint(importString)
     if not decoded then
-        print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
+        print("|cffdb6233Keystone Polaris:|r " .. L["IMPORT_ERROR"])
         return false
     end
 
     local decompressed = LibStub("LibDeflate"):DecompressDeflate(decoded)
     if not decompressed then
-        print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
+        print("|cffdb6233Keystone Polaris:|r " .. L["IMPORT_ERROR"])
         return false
     end
 
     local success, importData = LibStub("AceSerializer-3.0"):Deserialize(
                                     decompressed)
     if not success then
-        print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
+        print("|cffdb6233Keystone Polaris:|r " .. L["IMPORT_ERROR"])
         return false
     end
 
@@ -2042,42 +2042,42 @@ function KeystonePercentageHelper:ImportDungeonSettings(importString,
                 end
                 addon:UpdateDungeonData()
                 LibStub("AceConfigRegistry-3.0"):NotifyChange(
-                    "KeystonePercentageHelper")
-                print("|cffdb6233Keystone Percentage Helper:|r " ..
+                    "KeystonePolaris")
+                print("|cffdb6233Keystone Polaris:|r " ..
                           L["IMPORT_SUCCESS"]:format(
                               addon:GetDungeonDisplayName(dungeonKey)))
                 return true
             end
         end
-        print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
+        print("|cffdb6233Keystone Polaris:|r " .. L["IMPORT_ERROR"])
         return false
     else
-        print("|cffdb6233Keystone Percentage Helper:|r " .. L["IMPORT_ERROR"])
+        print("|cffdb6233Keystone Polaris:|r " .. L["IMPORT_ERROR"])
         return false
     end
 
     -- Update data and notify of changes
     if importCount > 0 then
         addon:UpdateDungeonData()
-        LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePercentageHelper")
+        LibStub("AceConfigRegistry-3.0"):NotifyChange("KeystonePolaris")
 
         -- Determine success message based on import type
         if importData.type == "all_dungeons" then
-            print("|cffdb6233Keystone Percentage Helper:|r " ..
+            print("|cffdb6233Keystone Polaris:|r " ..
                       (L["IMPORT_ALL_SUCCESS"]))
         elseif importData.type == "section" then
-            print("|cffdb6233Keystone Percentage Helper:|r " ..
+            print("|cffdb6233Keystone Polaris:|r " ..
                       (L["IMPORT_SUCCESS"]):format(sectionName))
         end
         return true
     else
-        print("|cffdb6233Keystone Percentage Helper:|r " .. (L["IMPORT_ERROR"]))
+        print("|cffdb6233Keystone Polaris:|r " .. (L["IMPORT_ERROR"]))
         return false
     end
 end
 
 -- Global function to create import dialog
-function KeystonePercentageHelper:ShowImportDialog(sectionName, dungeonFilter)
+function KeystonePolaris:ShowImportDialog(sectionName, dungeonFilter)
     local addon = self
     local dialogText
 
@@ -2087,7 +2087,7 @@ function KeystonePercentageHelper:ShowImportDialog(sectionName, dungeonFilter)
         dialogText = (L["IMPORT_SECTION_DIALOG_TEXT"]):format(sectionName)
     end
 
-    StaticPopupDialogs["KPH_IMPORT_DIALOG"] = {
+    StaticPopupDialogs["KPL_IMPORT_DIALOG"] = {
         text = dialogText,
         button1 = OKAY,
         button2 = CANCEL,
@@ -2105,10 +2105,10 @@ function KeystonePercentageHelper:ShowImportDialog(sectionName, dungeonFilter)
         whileDead = true,
         hideOnEscape = true
     }
-    StaticPopup_Show("KPH_IMPORT_DIALOG")
+    StaticPopup_Show("KPL_IMPORT_DIALOG")
 end
 
-function KeystonePercentageHelper:GenerateExpansionTables(expansionId,
+function KeystonePolaris:GenerateExpansionTables(expansionId,
                                                           dungeonData)
     -- Initialize the tables if they don't exist
     self[expansionId .. "_DUNGEONS"] = self[expansionId .. "_DUNGEONS"] or {}

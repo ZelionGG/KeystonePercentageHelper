@@ -1,7 +1,7 @@
-local AddOnName, KeystonePercentageHelper = ...
+local AddOnName, KeystonePolaris = ...
 
 -- Define which dungeons are in the current season
-KeystonePercentageHelper.TWW_1_DUNGEONS = {
+KeystonePolaris.TWW_1_DUNGEONS = {
     -- War Within dungeons
     [503] = true, -- AKCE (Ara-Kara, City of Echoes)
     [502] = true, -- CoT (City of Threads)

@@ -1,9 +1,9 @@
-local AddOnName, KeystonePercentageHelper = ...
+local AddOnName, KeystonePolaris = ...
 local _G = _G
 local pairs, select, strsplit, format = pairs, select, strsplit, string.format
 
 -- Get localization table
-local L = KeystonePercentageHelper.L
+local L = KeystonePolaris.L
 
 -- Quiet MDT presence check for UI gating (no prints, no side-effects)
 local function IsMDTAvailable()
@@ -20,7 +20,7 @@ local function IsMDTAvailable()
 end
 
 -- Initialize the mob percentages module
-function KeystonePercentageHelper:InitializeMobPercentages()
+function KeystonePolaris:InitializeMobPercentages()
     -- Create a frame for nameplate hooks
     self.mobPercentFrame = CreateFrame("Frame")
 
@@ -56,7 +56,7 @@ function KeystonePercentageHelper:InitializeMobPercentages()
 end
 
 -- Update all existing nameplates
-function KeystonePercentageHelper:UpdateAllNameplates()
+function KeystonePolaris:UpdateAllNameplates()
     -- Only proceed if the feature is enabled
     if not self.db.profile.mobPercentages.enabled then return end
 
@@ -70,7 +70,7 @@ function KeystonePercentageHelper:UpdateAllNameplates()
 end
 
 -- Update a nameplate with percentage text
-function KeystonePercentageHelper:UpdateNameplate(unit)
+function KeystonePolaris:UpdateNameplate(unit)
     -- Only process hostile nameplates in Mythic+ dungeons
     if not C_ChallengeMode.IsChallengeModeActive() then
         return
@@ -105,7 +105,7 @@ function KeystonePercentageHelper:UpdateNameplate(unit)
         end
 
         -- Create the frame parented to UIParent (not the nameplate) to avoid clipping/occlusion when plates stack
-        textFrame = CreateFrame("Frame", "KPH_PercentFrame_"..unit, UIParent)
+        textFrame = CreateFrame("Frame", "KPL_PercentFrame_"..unit, UIParent)
         textFrame:SetSize(80, 30) -- Larger size to ensure visibility
         textFrame:SetFrameStrata("MEDIUM") -- Use high strata to be above stacked nameplates
         textFrame:SetIgnoreParentAlpha(true) -- Prevent parent alpha fading from hiding the text
@@ -231,7 +231,7 @@ function KeystonePercentageHelper:UpdateNameplate(unit)
 end
 
 -- Helper: cleanup orphan separators/spaces in formatted mob percentage text
-function KeystonePercentageHelper:CleanupMobPercentFormat(s)
+function KeystonePolaris:CleanupMobPercentFormat(s)
     if not s or s == "" then return "" end
 
     -- Remove combos like " - /", " | /" or "/ |"
@@ -259,7 +259,7 @@ function KeystonePercentageHelper:CleanupMobPercentFormat(s)
 end
 
 -- Remove nameplate text when nameplate is removed
-function KeystonePercentageHelper:RemoveNameplate(unit)
+function KeystonePolaris:RemoveNameplate(unit)
     local textFrame = self.nameplateTextFrames[unit]
     if textFrame then
         textFrame:Hide()
@@ -268,7 +268,7 @@ function KeystonePercentageHelper:RemoveNameplate(unit)
 end
 
 -- Get options for mob percentages display
-function KeystonePercentageHelper:GetMobPercentagesOptions()
+function KeystonePolaris:GetMobPercentagesOptions()
     return {
         name = L["MOB_PERCENTAGES"],
         type = "group",
@@ -537,7 +537,7 @@ function KeystonePercentageHelper:GetMobPercentagesOptions()
 end
 
 -- Update the position of a nameplate text frame
-function KeystonePercentageHelper:UpdateNameplatePosition(unit)
+function KeystonePolaris:UpdateNameplatePosition(unit)
     local frame = self.nameplateTextFrames[unit]
     if not frame then return end
 
@@ -583,7 +583,7 @@ function KeystonePercentageHelper:UpdateNameplatePosition(unit)
 end
 
 -- Check if Mythic Dungeon Tools is loaded and available
-function KeystonePercentageHelper:CheckForMDT()
+function KeystonePolaris:CheckForMDT()
     -- Clear any existing nameplate texts when checking
     for unit, frame in pairs(self.nameplateTextFrames) do
         frame:Hide()
@@ -600,7 +600,7 @@ function KeystonePercentageHelper:CheckForMDT()
 end
 
 -- Check if the current affix is Teeming
-function KeystonePercentageHelper:IsTeeming()
+function KeystonePolaris:IsTeeming()
     local _, affixes = C_ChallengeMode.GetActiveKeystoneInfo()
     if not affixes then return false end
 
@@ -613,7 +613,7 @@ function KeystonePercentageHelper:IsTeeming()
 end
 
 -- Add default settings for mob percentages
-KeystonePercentageHelper.defaults.profile.mobPercentages = {
+KeystonePolaris.defaults.profile.mobPercentages = {
     enabled = false,
     fontSize = 8,
     textColor = { r = 1, g = 1, b = 1, a = 1 },

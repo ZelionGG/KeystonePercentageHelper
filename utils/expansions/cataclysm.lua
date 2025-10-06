@@ -1,7 +1,7 @@
-local AddOnName, KeystonePercentageHelper = ...
+local AddOnName, KeystonePolaris = ...
 
 -- Define a single source of truth for dungeon data
-KeystonePercentageHelper.CATACLYSM_DUNGEON_DATA = {
+KeystonePolaris.CATACLYSM_DUNGEON_DATA = {
     -- Format: [shortName] = {id = dungeonID, bosses = {{bossID, percent, shouldInform}, ...}}
     GB = {
         id = 507,

@@ -1,6 +1,6 @@
-local AddOnName, KeystonePercentageHelper = ...;
+local AddOnName, KeystonePolaris = ...;
 
-KeystonePercentageHelper.Changelog[1200] = {
+KeystonePolaris.Changelog[1200] = {
     version_string = "1.2",
     release_date = "2025/01/14",
     important = {

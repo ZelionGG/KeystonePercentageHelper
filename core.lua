@@ -1,4 +1,4 @@
-local AddOnName, KeystonePercentageHelper = ...;
+local AddOnName, KeystonePolaris = ...;
 
 local _G = _G;
 -- Cache frequently used global functions for better performance
@@ -6,21 +6,21 @@ local pairs, unpack, select = pairs, unpack, select
 
 -- Initialize Ace3 libraries
 local AceAddon = LibStub("AceAddon-3.0")
-KeystonePercentageHelper = AceAddon:NewAddon(KeystonePercentageHelper, AddOnName, "AceConsole-3.0", "AceEvent-3.0");
+KeystonePolaris = AceAddon:NewAddon(KeystonePolaris, AddOnName, "AceConsole-3.0", "AceEvent-3.0");
 
 -- Initialize changelog
-KeystonePercentageHelper.Changelog = {}
+KeystonePolaris.Changelog = {}
 
 -- Define constants
-KeystonePercentageHelper.constants = {
+KeystonePolaris.constants = {
     mediaPath = "Interface\\AddOns\\" .. AddOnName .. "\\media\\"
 }
 
 -- Track the last routes update version for prompting users
-KeystonePercentageHelper.lastRoutesUpdate = "2.0.1" -- Set to true when routes have been updated
+KeystonePolaris.lastRoutesUpdate = "2.0.1" -- Set to true when routes have been updated
 
 -- Table to store dungeons with changed routes
-KeystonePercentageHelper.CHANGED_ROUTES_DUNGEONS = {
+KeystonePolaris.CHANGED_ROUTES_DUNGEONS = {
     ["HoA"] = true,
 }
 
@@ -29,29 +29,35 @@ local AceConfig = LibStub("AceConfig-3.0")
 local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
 -- Initialize LibSharedMedia for font and texture support
-KeystonePercentageHelper.LSM = LibStub('LibSharedMedia-3.0');
+KeystonePolaris.LSM = LibStub('LibSharedMedia-3.0');
 
 -- Get localization table
-local L = KeystonePercentageHelper.L;
+local L = KeystonePolaris.L;
 
 -- Initialize dungeons table to store all dungeon data
-KeystonePercentageHelper.DUNGEONS = {}
+KeystonePolaris.DUNGEONS = {}
 
 -- Track currently engaged mobs for real pull percent
-KeystonePercentageHelper.realPull = {
+KeystonePolaris.realPull = {
     mobs = {},    -- [guid] = { npcID = number, count = number }
     sum = 0,      -- total count across engaged GUIDs
     denom = 0,    -- MDT total required count for 100%
 }
 
 -- Track current dungeon and section
-KeystonePercentageHelper.currentDungeonID = 0
-KeystonePercentageHelper.currentSection = 1
+KeystonePolaris.currentDungeonID = 0
+KeystonePolaris.currentSection = 1
 
 -- Called when the addon is first loaded
-function KeystonePercentageHelper:OnInitialize()
+function KeystonePolaris:OnInitialize()
+    if not _G.KeystonePolarisDB and _G.KeystonePercentageHelperDB then
+        _G.KeystonePolarisDB = _G.KeystonePercentageHelperDB
+        -- Optional: keep a backup for a few versions before deletion
+        -- _G.KeystonePercentageHelperDB = nil
+    end
+
     -- Initialize the database first with AceDB
-    self.db = LibStub("AceDB-3.0"):New("KeystonePercentageHelperDB", self.defaults, "Default")
+    self.db = LibStub("AceDB-3.0"):New("KeystonePolarisDB", self.defaults, "Default")
 
     -- Load dungeon data from expansion modules
     self:LoadExpansionDungeons()
@@ -66,7 +72,7 @@ function KeystonePercentageHelper:OnInitialize()
     self:CheckForNewRoutes()
 
     -- Create overlay frame for positioning UI
-    self.overlayFrame = CreateFrame("Frame", "KeystonePercentageHelperOverlay", UIParent, "BackdropTemplate")
+    self.overlayFrame = CreateFrame("Frame", "KeystonePolarisOverlay", UIParent, "BackdropTemplate")
     self.overlayFrame:SetFrameStrata("FULLSCREEN_DIALOG")
     self.overlayFrame:SetAllPoints()
     self.overlayFrame:SetBackdrop({
@@ -95,7 +101,7 @@ function KeystonePercentageHelper:OnInitialize()
     self.overlayFrame:Hide()
 
     -- Create main display frame that shows percentage
-    self.displayFrame = CreateFrame("Frame", "KeystonePercentageHelperFrame", UIParent)
+    self.displayFrame = CreateFrame("Frame", "KeystonePolarisFrame", UIParent)
     self.displayFrame:SetSize(200, 20)
     self.displayFrame:SetPoint(self.db.profile.general.position, UIParent, self.db.profile.general.position, self.db.profile.general.xOffset, self.db.profile.general.yOffset)
 
@@ -105,7 +111,7 @@ function KeystonePercentageHelper:OnInitialize()
     self.displayFrame.text:SetFont(self.LSM:Fetch('font', self.db.profile.text.font), self.db.profile.general.fontSize, "OUTLINE")
 
     -- Create anchor frame for moving the display
-    self.anchorFrame = CreateFrame("Frame", "KeystonePercentageHelperAnchorFrame", self.overlayFrame, "BackdropTemplate")
+    self.anchorFrame = CreateFrame("Frame", "KeystonePolarisAnchorFrame", self.overlayFrame, "BackdropTemplate")
     self.anchorFrame:SetFrameStrata("TOOLTIP")
     self.anchorFrame:SetSize(200, 30)
     self.anchorFrame:SetPoint("CENTER", self.displayFrame, "CENTER", 0, 0)
@@ -131,7 +137,7 @@ function KeystonePercentageHelper:OnInitialize()
         self.anchorFrame:Hide()
         self.overlayFrame:Hide()
         -- Show the settings panel and navigate to our addon
-        Settings.OpenToCategory("Keystone Percentage Helper")
+        Settings.OpenToCategory("Keystone Polaris")
     end)
 
     -- Create cancel button to abort positioning
@@ -145,11 +151,11 @@ function KeystonePercentageHelper:OnInitialize()
         self.anchorFrame:Hide()
         self.overlayFrame:Hide()
         -- Show the settings panel and navigate to our addon
-        Settings.OpenToCategory("Keystone Percentage Helper")
+        Settings.OpenToCategory("Keystone Polaris")
     end
 
 -- Disable Test Mode programmatically with a reason and inform the player
-function KeystonePercentageHelper:DisableTestMode(reason)
+function KeystonePolaris:DisableTestMode(reason)
     if not self._testMode then return end
     self._testMode = false
     if self.HideTestOverlay then self:HideTestOverlay() end
@@ -173,7 +179,7 @@ function KeystonePercentageHelper:DisableTestMode(reason)
         suffix = " (" .. localized .. ")"
     end
     local loc = (self.L and self.L["TEST_MODE_DISABLED"]) or (L and L["TEST_MODE_DISABLED"]) or "Test Mode disabled automatically%s"
-    local msg = "|cffdb6233Keystone Percentage Helper:|r " .. string.format(loc, suffix)
+    local msg = "|cffdb6233Keystone Polaris:|r " .. string.format(loc, suffix)
     if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
         DEFAULT_CHAT_FRAME:AddMessage(msg)
     else
@@ -182,7 +188,7 @@ function KeystonePercentageHelper:DisableTestMode(reason)
 end
 
 -- Helpers to manage real pull set
-function KeystonePercentageHelper:AddEngagedMobByGUID(guid)
+function KeystonePolaris:AddEngagedMobByGUID(guid)
     if not guid then return end
     -- If already tracked, just refresh lastSeen and return
     local existing = self.realPull.mobs[guid]
@@ -215,7 +221,7 @@ function KeystonePercentageHelper:AddEngagedMobByGUID(guid)
     end
 end
 
-function KeystonePercentageHelper:RemoveEngagedMobByGUID(guid)
+function KeystonePolaris:RemoveEngagedMobByGUID(guid)
     local data = guid and self.realPull.mobs[guid]
     if not data then return end
     self.realPull.sum = math.max(0, self.realPull.sum - (data.count or 0))
@@ -223,7 +229,7 @@ function KeystonePercentageHelper:RemoveEngagedMobByGUID(guid)
 end
 
 -- Resize the display frame to fit multi-line content when enabled
-function KeystonePercentageHelper:AdjustDisplayFrameSize()
+function KeystonePolaris:AdjustDisplayFrameSize()
     if not self.displayFrame or not self.db or not self.db.profile then return end
     local cfg = self.db.profile.general.mainDisplay
     if not (cfg and cfg.multiLine) then
@@ -298,7 +304,7 @@ end
 
     -- Register options with Ace3 config system
     AceConfig:RegisterOptionsTable(AddOnName, {
-        name = "Keystone Percentage Helper",
+        name = "Keystone Polaris",
         type = "group",
         args = {
             general = {
@@ -393,8 +399,8 @@ end
     })
     AceConfig:RegisterOptionsTable(AddOnName .. "_Changelog", self.changelogOptions)
 
-    AceConfigDialog:AddToBlizOptions(AddOnName, "Keystone Percentage Helper")
-    AceConfigDialog:AddToBlizOptions(AddOnName .. "_Changelog", L['Changelog'], "Keystone Percentage Helper")
+    AceConfigDialog:AddToBlizOptions(AddOnName, "Keystone Polaris")
+    AceConfigDialog:AddToBlizOptions(AddOnName .. "_Changelog", L['Changelog'], "Keystone Polaris")
 
 
     -- Register chat command and events
@@ -415,19 +421,19 @@ end
 end
 
 -- Open configuration panel when command is used
-function KeystonePercentageHelper:ToggleConfig()
-    Settings.OpenToCategory("Keystone Percentage Helper")
+function KeystonePolaris:ToggleConfig()
+    Settings.OpenToCategory("Keystone Polaris")
 end
 
 -- Handler for addon compartment button click
-_G.KeystonePercentageHelper_OnAddonCompartmentClick = function()
-    KeystonePercentageHelper:ToggleConfig()
+_G.KeystonePolaris_OnAddonCompartmentClick = function()
+    KeystonePolaris:ToggleConfig()
 end
 
 -- Create or recreate the main display frame
-function KeystonePercentageHelper:CreateDisplay()
+function KeystonePolaris:CreateDisplay()
     if not self.displayFrame then
-        self.displayFrame = CreateFrame("Frame", "KeystonePercentageHelperDisplay", UIParent)
+        self.displayFrame = CreateFrame("Frame", "KeystonePolarisDisplay", UIParent)
         self.displayFrame:SetSize(200, 30)
 
         -- Create percentage text
@@ -453,7 +459,7 @@ function KeystonePercentageHelper:CreateDisplay()
 end
 
 -- Initialize dungeon tracking when entering a dungeon
-function KeystonePercentageHelper:InitiateDungeon()
+function KeystonePolaris:InitiateDungeon()
     local currentDungeonId = C_ChallengeMode.GetActiveChallengeMapID()
     -- Return if not in a dungeon or already tracking this dungeon
     if currentDungeonId == nil or currentDungeonId == self.currentDungeonID then return end
@@ -471,7 +477,7 @@ function KeystonePercentageHelper:InitiateDungeon()
 end
 
 -- Get the current enemy forces percentage from the scenario UI
-function KeystonePercentageHelper:GetCurrentPercentage()
+function KeystonePolaris:GetCurrentPercentage()
     -- Mirror WarpDeplete logic: scan criteria and use weighted progress with the
     local stepCount = select(3, C_Scenario.GetStepInfo())
     if not stepCount or stepCount <= 0 then return 0 end
@@ -501,7 +507,7 @@ function KeystonePercentageHelper:GetCurrentPercentage()
 end
 
 -- Retrieve raw Enemy Forces counts: current and total. Returns 0,0 if unavailable.
-function KeystonePercentageHelper:GetCurrentForcesInfo()
+function KeystonePolaris:GetCurrentForcesInfo()
     local stepCount = select(3, C_Scenario.GetStepInfo())
     if not stepCount or stepCount <= 0 then return 0, 0 end
 
@@ -527,7 +533,7 @@ function KeystonePercentageHelper:GetCurrentForcesInfo()
 end
 
 -- Get data for the current section of the dungeon
-function KeystonePercentageHelper:GetDungeonData()
+function KeystonePolaris:GetDungeonData()
     if not self.DUNGEONS[self.currentDungeonID] or not self.DUNGEONS[self.currentDungeonID][self.currentSection] then
         return nil
     end
@@ -537,18 +543,18 @@ function KeystonePercentageHelper:GetDungeonData()
 end
 
 -- Send a chat message to inform the group about missing percentage
-function KeystonePercentageHelper:InformGroup(percentage)
+function KeystonePolaris:InformGroup(percentage)
     if not self.db.profile.general.informGroup then return end
 
     local channel = self.db.profile.general.informChannel
     local percentageStr = string.format("%.2f%%", percentage)
     -- Don't send message if percentage is 0
     if percentageStr == "0.00%" then return end
-    SendChatMessage("[KPH]: " .. L["WE_STILL_NEED"] .. " " .. percentageStr, channel)
+    SendChatMessage("[Keystone Polaris]: " .. L["WE_STILL_NEED"] .. " " .. percentageStr, channel)
 end
 
 -- Update the displayed percentage text based on dungeon progress
-function KeystonePercentageHelper:UpdatePercentageText()
+function KeystonePolaris:UpdatePercentageText()
     if not self.displayFrame then return end
 
     -- Test Mode: render preview and bypass real dungeon state
@@ -713,7 +719,7 @@ function KeystonePercentageHelper:UpdatePercentageText()
 end
 
 -- Compute current planned pull percent via MDT (if available)
-function KeystonePercentageHelper:GetCurrentPullPercent()
+function KeystonePolaris:GetCurrentPullPercent()
     if not C_ChallengeMode.IsChallengeModeActive() then return 0 end
     local denom = tonumber(self.realPull.denom) or 0
     local sum = tonumber(self.realPull.sum) or 0
@@ -722,7 +728,7 @@ function KeystonePercentageHelper:GetCurrentPullPercent()
 end
 
 -- Determine if all non-weighted (boss) criteria are completed
-function KeystonePercentageHelper:AreAllBossesKilled()
+function KeystonePolaris:AreAllBossesKilled()
     local stepInfo = C_ScenarioInfo and C_ScenarioInfo.GetStepInfo and C_ScenarioInfo.GetStepInfo()
     local numCriteria = stepInfo and stepInfo.numCriteria or 0
     if numCriteria == 0 then return false end
@@ -752,7 +758,7 @@ end
 --   - Required (projected):
 --       * Last section: (FINISHED) only if projected total >= 100 and all bosses are killed; else (DONE).
 --       * Other sections: (DONE). Otherwise, show numeric projected value.
-function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent, currentPullPercent, remainingNeeded, fmtData, isBossKilled, allBossesKilled)
+function KeystonePolaris:FormatMainDisplayText(baseText, currentPercent, currentPullPercent, remainingNeeded, fmtData, isBossKilled, allBossesKilled)
     local cfg = self.db and self.db.profile and self.db.profile.general and self.db.profile.general.mainDisplay or nil
     if not cfg then return baseText end
 
@@ -1011,7 +1017,7 @@ function KeystonePercentageHelper:FormatMainDisplayText(baseText, currentPercent
 end
 
 -- Apply text layout to support configurable text alignment (LEFT/CENTER/RIGHT)
-function KeystonePercentageHelper:ApplyTextLayout()
+function KeystonePolaris:ApplyTextLayout()
     if not (self.displayFrame and self.displayFrame.text and self.db and self.db.profile) then return end
     local cfg = self.db.profile.general.mainDisplay
     if not cfg then return end
@@ -1059,7 +1065,7 @@ function KeystonePercentageHelper:ApplyTextLayout()
 end
 
 -- Simulated combat context for Test Mode
-function KeystonePercentageHelper:IsCombatContext()
+function KeystonePolaris:IsCombatContext()
     if self._testMode then
         if self._testCombatContext == nil then
             return true -- default to "in combat" when starting test mode
@@ -1070,7 +1076,7 @@ function KeystonePercentageHelper:IsCombatContext()
 end
 
 -- Start ticker to alternate simulated combat context
-function KeystonePercentageHelper:StartTestModeTicker()
+function KeystonePolaris:StartTestModeTicker()
     -- Cancel existing ticker if any
     if self._testTicker then
         self._testTicker:Cancel()
@@ -1089,7 +1095,7 @@ function KeystonePercentageHelper:StartTestModeTicker()
     end)
 end
 
-function KeystonePercentageHelper:StopTestModeTicker()
+function KeystonePolaris:StopTestModeTicker()
     if self._testTicker then
         self._testTicker:Cancel()
         self._testTicker = nil
@@ -1099,9 +1105,9 @@ function KeystonePercentageHelper:StopTestModeTicker()
 end
 
 -- Lightweight overlay to indicate Test Mode is active
-function KeystonePercentageHelper:ShowTestOverlay()
+function KeystonePolaris:ShowTestOverlay()
     if not self.testModeOverlay then
-        local f = CreateFrame("Frame", "KPH_TestModeOverlay", UIParent, "BackdropTemplate")
+        local f = CreateFrame("Frame", "KPL_TestModeOverlay", UIParent, "BackdropTemplate")
         f:SetFrameStrata("FULLSCREEN_DIALOG")
         f:SetSize(800, 56)
         -- Anchor above the main display frame
@@ -1110,7 +1116,7 @@ function KeystonePercentageHelper:ShowTestOverlay()
         else
             f:SetPoint("TOP", UIParent, "TOP", 0, -20)
         end
-        -- Use the same simple border style as the KPH mover (anchorFrame)
+        -- Use the same simple border style as the KPL mover (anchorFrame)
         f:SetBackdrop({ bgFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", tile = true, tileSize = 16, edgeSize = 1 })
         f:SetBackdropColor(0, 0, 0, 0.35)
         f:SetBackdropBorderColor(1, 0.82, 0, 1)
@@ -1193,7 +1199,7 @@ function KeystonePercentageHelper:ShowTestOverlay()
                 if self.UpdatePercentageText then self:UpdatePercentageText() end
                 if self.Refresh then self:Refresh() end
                 if Settings and Settings.OpenToCategory then
-                    Settings.OpenToCategory("Keystone Percentage Helper")
+                    Settings.OpenToCategory("Keystone Polaris")
                 end
             end
         end)
@@ -1202,7 +1208,7 @@ function KeystonePercentageHelper:ShowTestOverlay()
     end
     -- Create and show a dedicated full-screen dim overlay for Test Mode
     if not self.testDimOverlay then
-        local dim = CreateFrame("Frame", "KPH_TestDimOverlay", UIParent, "BackdropTemplate")
+        local dim = CreateFrame("Frame", "KPL_TestDimOverlay", UIParent, "BackdropTemplate")
         dim:SetFrameStrata("FULLSCREEN_DIALOG")
         dim:SetAllPoints(UIParent)
         dim:SetBackdrop({ bgFile = "Interface\\ChatFrame\\ChatFrameBackground", tile = true, tileSize = 16 })
@@ -1220,7 +1226,7 @@ function KeystonePercentageHelper:ShowTestOverlay()
     self.testModeOverlay:Show()
 end
 
-function KeystonePercentageHelper:HideTestOverlay()
+function KeystonePolaris:HideTestOverlay()
     if self.testModeOverlay then
         self.testModeOverlay:Hide()
     end
@@ -1233,7 +1239,7 @@ function KeystonePercentageHelper:HideTestOverlay()
 end
 
 -- Render a configuration preview while Test Mode is enabled
-function KeystonePercentageHelper:RenderTestText()
+function KeystonePolaris:RenderTestText()
     if not (self.displayFrame and self.displayFrame.text and self.db and self.db.profile) then return end
     local cfg = self.db.profile.general and self.db.profile.general.mainDisplay or nil
     local formatMode = (cfg and cfg.formatMode) or "percent"
@@ -1355,7 +1361,7 @@ function KeystonePercentageHelper:RenderTestText()
 end
 
 -- Called when the addon is enabled
-function KeystonePercentageHelper:OnEnable()
+function KeystonePolaris:OnEnable()
     -- Ensure display exists and is visible
     self:CreateDisplay()
 
@@ -1383,17 +1389,17 @@ function KeystonePercentageHelper:OnEnable()
 end
 
 -- Event handler for POI updates (boss positions)
-function KeystonePercentageHelper:SCENARIO_POI_UPDATE()
+function KeystonePolaris:SCENARIO_POI_UPDATE()
     self:UpdatePercentageText()
 end
 
 -- Event handler for criteria updates (enemy forces percentage changes)
-function KeystonePercentageHelper:SCENARIO_CRITERIA_UPDATE()
+function KeystonePolaris:SCENARIO_CRITERIA_UPDATE()
     self:UpdatePercentageText()
 end
 
 -- React to nameplate additions/removals to refresh dynamic pull percent
-function KeystonePercentageHelper:NAME_PLATE_UNIT_ADDED(event, unit)
+function KeystonePolaris:NAME_PLATE_UNIT_ADDED(event, unit)
     -- Maintain a map of nameplate unit -> GUID so we can cleanly remove on REMOVED
     self._nameplateUnits = self._nameplateUnits or {}
     if unit then
@@ -1406,7 +1412,7 @@ function KeystonePercentageHelper:NAME_PLATE_UNIT_ADDED(event, unit)
     self:UpdatePercentageText()
 end
 
-function KeystonePercentageHelper:NAME_PLATE_UNIT_REMOVED(event, unit)
+function KeystonePolaris:NAME_PLATE_UNIT_REMOVED(event, unit)
     -- Use stored GUID (UnitGUID may be nil after removal)
     -- Do not remove engaged mobs here: nameplates can disappear when rotating camera;
     -- rely on COMBAT_LOG (UNIT_DIED/UNIT_DESTROYED) and end-of-combat reset instead.
@@ -1422,7 +1428,7 @@ function KeystonePercentageHelper:NAME_PLATE_UNIT_REMOVED(event, unit)
 end
 
 -- Update when threat list changes (engagement state)
-function KeystonePercentageHelper:UNIT_THREAT_LIST_UPDATE(event, unit)
+function KeystonePolaris:UNIT_THREAT_LIST_UPDATE(event, unit)
     -- Add mobs to current pull based on threat updates (WarpDeplete-like)
     if not C_ChallengeMode.IsChallengeModeActive() then return end
     if not (UnitAffectingCombat and UnitAffectingCombat("player")) then return end
@@ -1448,7 +1454,7 @@ function KeystonePercentageHelper:UNIT_THREAT_LIST_UPDATE(event, unit)
 end
 
 -- Start of combat: reset real pull state
-function KeystonePercentageHelper:PLAYER_REGEN_DISABLED()
+function KeystonePolaris:PLAYER_REGEN_DISABLED()
     if self._testMode then self:DisableTestMode("entered combat") end
     self.realPull.mobs = {}
     self.realPull.sum = 0
@@ -1486,7 +1492,7 @@ function KeystonePercentageHelper:PLAYER_REGEN_DISABLED()
 end
 
 -- End of combat: clear and refresh
-function KeystonePercentageHelper:PLAYER_REGEN_ENABLED()
+function KeystonePolaris:PLAYER_REGEN_ENABLED()
     self.realPull.mobs = {}
     self.realPull.sum = 0
     self.realPull.denom = 0
@@ -1501,7 +1507,7 @@ function KeystonePercentageHelper:PLAYER_REGEN_ENABLED()
 end
 
 -- Reset pull state when an encounter ends (e.g., boss end), mirroring WarpDeplete behavior
-function KeystonePercentageHelper:ENCOUNTER_END()
+function KeystonePolaris:ENCOUNTER_END()
     self.realPull.mobs = {}
     self.realPull.sum = 0
     self.realPull.denom = 0
@@ -1516,7 +1522,7 @@ function KeystonePercentageHelper:ENCOUNTER_END()
 end
 
 -- Throttled updater for combat log bursts
-function KeystonePercentageHelper:_QueuePullUpdate()
+function KeystonePolaris:_QueuePullUpdate()
     if self._pullUpdateQueued then return end
     self._pullUpdateQueued = true
     C_Timer.After(0.1, function()
@@ -1526,7 +1532,7 @@ function KeystonePercentageHelper:_QueuePullUpdate()
 end
 
 -- Listen to combat log to track engaged NPCs even when nameplates are not visible
-function KeystonePercentageHelper:COMBAT_LOG_EVENT_UNFILTERED()
+function KeystonePolaris:COMBAT_LOG_EVENT_UNFILTERED()
     if not C_ChallengeMode.IsChallengeModeActive() then return end
     local info = { CombatLogGetCurrentEventInfo() }
     local subEvent = info[2]
@@ -1564,7 +1570,7 @@ function KeystonePercentageHelper:COMBAT_LOG_EVENT_UNFILTERED()
 end
 
 -- Event handler for starting a Mythic+ dungeon
-function KeystonePercentageHelper:CHALLENGE_MODE_START()
+function KeystonePolaris:CHALLENGE_MODE_START()
     if self._testMode then self:DisableTestMode("started dungeon") end
     self.currentDungeonID = nil
 
@@ -1572,12 +1578,12 @@ function KeystonePercentageHelper:CHALLENGE_MODE_START()
     self:UpdatePercentageText()
 end
 
-function KeystonePercentageHelper:CHALLENGE_MODE_COMPLETED()
+function KeystonePolaris:CHALLENGE_MODE_COMPLETED()
     self.currentDungeonID = nil
 end
 
 -- Event handler for entering the world or changing zones
-function KeystonePercentageHelper:PLAYER_ENTERING_WORLD()
+function KeystonePolaris:PLAYER_ENTERING_WORLD()
     if self._testMode then self:DisableTestMode("changed zone") end
     self:InitiateDungeon()
     self:UpdatePercentageText()
@@ -1585,7 +1591,7 @@ end
 
 
 -- Refresh the display with current settings
-function KeystonePercentageHelper:Refresh()
+function KeystonePolaris:Refresh()
     if not self.displayFrame then return end
 
     -- Update frame position
@@ -1634,7 +1640,7 @@ function KeystonePercentageHelper:Refresh()
 end
 
 -- Update dungeon data with advanced options if enabled
-function KeystonePercentageHelper:UpdateDungeonData()
+function KeystonePolaris:UpdateDungeonData()
     if self.db.profile.general.advancedOptionsEnabled then
         for dungeonId, dungeonData in pairs(self.DUNGEONS) do
             local dungeonKey = self:GetDungeonKeyById(dungeonId)

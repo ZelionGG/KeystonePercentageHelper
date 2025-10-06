@@ -1,4 +1,4 @@
-package-as: KeystonePercentageHelper
+package-as: KeystonePolaris
 
 enable-nolib-creation: no
 

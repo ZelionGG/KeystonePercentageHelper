@@ -159,7 +159,7 @@ L["Improvment"] = "改进"
 L["%month%-%day%-%year%"] = "%年%-%月%-%日%"
 L["DEFAULT_PERCENTAGES"] = "默认进度百分比"
 L["DEFAULT_PERCENTAGES_DESC"] = "This view shows the addon's built-in defaults and does not reflect your custom routes configuration." -- To Translate
-L["ROUTES_DISCLAIMER"] = "By default, Keystone Percentage Helper uses Raider.IO Weekly Routes (Beginner). Custom routes let you define your own different routes. To enable these routes, make sure to enable \"Custom routes\" in the addon's General Settings." -- To Translate
+L["ROUTES_DISCLAIMER"] = "By default, Keystone Polaris uses Raider.IO Weekly Routes (Beginner). Custom routes let you define your own different routes. To enable these routes, make sure to enable \"Custom routes\" in the addon's General Settings." -- To Translate
 L["ADVANCED_SETTINGS"] = "自定义路线"
 L["TANK_GROUP_HEADER"] = "首领进度百分比"
 L["ROLES_ENABLED"] = "启用角色"
@@ -196,7 +196,7 @@ L["BOTTOM"] = "下"
 L["X_OFFSET"] = "水平位置"
 L["Y_OFFSET"] = "垂直位置"
 L["SHOW_ANCHOR"] = "显示定位锚点"
-L["ANCHOR_TEXT"] = "< KPH 移动锚点 >"
+L["ANCHOR_TEXT"] = "< KPL 移动锚点 >"
 L["RESET_DUNGEON"] = "重置为默认"
 L["RESET_DUNGEON_DESC"] = "将此地下城中所有首领的进度百分比重置为其默认"
 L["RESET_DUNGEON_CONFIRM"] = "你确定要将此地下城中所有首领的进度百分比重置为默认吗？"
@@ -214,7 +214,7 @@ L["CHANGED_ROUTES_DUNGEONS_LIST"] = "以下地下城有更新的路线："
 
 -- Test Mode
 L["TEST_MODE"] = "Test Mode"
-L["TEST_MODE_OVERLAY"] = "Keystone Percentage Helper: Test Mode"
+L["TEST_MODE_OVERLAY"] = "Keystone Polaris: Test Mode"
 L["TEST_MODE_OVERLAY_HINT"] = "Preview is simulated. Right-click this hint to exit test mode and reopen settings."
 L["TEST_MODE_DESC"] = "Show a live preview of your display configuration without being in a dungeon. This will:\n• Close the settings panel to reveal the preview\n• Show a dim overlay and a hint above the display\n• Simulate combat/out-of-combat every 3s to reveal projected values and pull%\nTip: Right-click the hint to exit Test Mode and reopen settings."
 L["TEST_MODE_DISABLED"] = "Test Mode disabled automatically%s"

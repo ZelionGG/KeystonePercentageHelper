@@ -1,15 +1,15 @@
-local AddOnName, KeystonePercentageHelper = ...
+local AddOnName, KeystonePolaris = ...
 local _G = _G
 local pairs, ipairs, select, strsplit = pairs, ipairs, select, strsplit
 
 -- Localization
-local L = KeystonePercentageHelper.L
+local L = KeystonePolaris.L
 
 -- ===============================
 -- Defaults
 -- ===============================
-KeystonePercentageHelper.defaults = KeystonePercentageHelper.defaults or { profile = {} }
-KeystonePercentageHelper.defaults.profile.mobIndicator = {
+KeystonePolaris.defaults = KeystonePolaris.defaults or { profile = {} }
+KeystonePolaris.defaults.profile.mobIndicator = {
     enabled      = false,
     texture      = "Azerite-PointingArrow", -- Provided by user
     size         = 24,                      -- Default suggestion
@@ -25,13 +25,13 @@ KeystonePercentageHelper.defaults.profile.mobIndicator = {
 -- Internal state
 -- ===============================
 -- Cache of marker frames by unit token
-KeystonePercentageHelper.nameplateMarkerFrames = KeystonePercentageHelper.nameplateMarkerFrames or {}
+KeystonePolaris.nameplateMarkerFrames = KeystonePolaris.nameplateMarkerFrames or {}
 
 -- Ticker for periodic updates during M+
-KeystonePercentageHelper.mobIndicatorTicker = KeystonePercentageHelper.mobIndicatorTicker or nil
+KeystonePolaris.mobIndicatorTicker = KeystonePolaris.mobIndicatorTicker or nil
 
 -- MDT route/pull state for indicators
-KeystonePercentageHelper.mdtIndicator = KeystonePercentageHelper.mdtIndicator or {
+KeystonePolaris.mdtIndicator = KeystonePolaris.mdtIndicator or {
     loaded = false,
     pulls = nil,                 -- array of pulls (from MDT preset.value.pulls)
     currentPullIndex = 1,        -- managed locally (auto-advance togglable)
@@ -51,7 +51,7 @@ KeystonePercentageHelper.mdtIndicator = KeystonePercentageHelper.mdtIndicator or
 -- ===============================
 -- MDT Presence Check
 -- ===============================
-function KeystonePercentageHelper:CheckForMDTForIndicators()
+function KeystonePolaris:CheckForMDTForIndicators()
     local loaded = false
     if C_AddOns and C_AddOns.IsAddOnLoaded then
         loaded = C_AddOns.IsAddOnLoaded("MythicDungeonTools")
@@ -70,7 +70,7 @@ end
 -- ===============================
 -- Nameplate iteration
 -- ===============================
-function KeystonePercentageHelper:UpdateAllNameplateMarkers()
+function KeystonePolaris:UpdateAllNameplateMarkers()
     if not (self.db and self.db.profile and self.db.profile.mobIndicator.enabled) then return end
     for i = 1, 40 do
         local unit = "nameplate" .. i
@@ -83,7 +83,7 @@ end
 -- ===============================
 -- Frame creation and positioning
 -- ===============================
-function KeystonePercentageHelper:UpdateMarkerPosition(unit)
+function KeystonePolaris:UpdateMarkerPosition(unit)
     local frame = self.nameplateMarkerFrames[unit]
     if not frame then return end
 
@@ -139,7 +139,7 @@ local function ensureMarkerFrame(self, unit)
     local db = self.db.profile.mobIndicator
 
     -- Reuse existing named frame if present to avoid CreateFrame name conflicts
-    local globalName = "KPH_MDTMarker_" .. unit
+    local globalName = "KPL_MDTMarker_" .. unit
     if not frame then
         frame = _G[globalName]
         if frame then
@@ -199,7 +199,7 @@ end
 -- ===============================
 -- Update/Hiding logic
 -- ===============================
-function KeystonePercentageHelper:UpdateNameplateMarker(unit)
+function KeystonePolaris:UpdateNameplateMarker(unit)
     -- Only in active M+
     if not C_ChallengeMode.IsChallengeModeActive() then return end
 
@@ -230,7 +230,7 @@ function KeystonePercentageHelper:UpdateNameplateMarker(unit)
     end
 end
 
-function KeystonePercentageHelper:RemoveNameplateMarker(unit)
+function KeystonePolaris:RemoveNameplateMarker(unit)
     local frame = self.nameplateMarkerFrames[unit]
     if frame then
         frame:Hide()
@@ -316,7 +316,7 @@ local function collectNpcIdsFromPull(pull, outSet, dungeonEnemies)
     end
 end
 
-function KeystonePercentageHelper:RebuildIndicatorTargetSet()
+function KeystonePolaris:RebuildIndicatorTargetSet()
     local DungeonTools = _G.MDT
     local m = self.mdtIndicator
     m.allNpcIds = {}
@@ -417,7 +417,7 @@ function KeystonePercentageHelper:RebuildIndicatorTargetSet()
 end
 
 -- Build per-NPC required counts for the CURRENT pull, based on MDT enemy indices and clone tables
-function KeystonePercentageHelper:BuildCurrentPullNpcCounts()
+function KeystonePolaris:BuildCurrentPullNpcCounts()
     local m = self.mdtIndicator
     wipe(m.requiredCounts)
     local pull = m.pulls and m.pulls[m.currentPullIndex]
@@ -440,7 +440,7 @@ function KeystonePercentageHelper:BuildCurrentPullNpcCounts()
 end
 
 -- Choose which nameplates to highlight: prefer engaged units first; then fill remaining up to required count per NPC
-function KeystonePercentageHelper:ComputeSelectedUnits()
+function KeystonePolaris:ComputeSelectedUnits()
     local m = self.mdtIndicator
     wipe(m.selectedUnits)
     if not (m.requiredCounts and next(m.requiredCounts)) then return end
@@ -481,7 +481,7 @@ end
 -- ===============================
 -- Auto-advance logic
 -- ===============================
-function KeystonePercentageHelper:TryAutoAdvancePull()
+function KeystonePolaris:TryAutoAdvancePull()
     local db = self.db.profile.mobIndicator
     local m = self.mdtIndicator
     if not (db.autoAdvance and m.pulls and m.maxPulls and m.maxPulls > 0) then return end
@@ -546,7 +546,7 @@ end
 -- ===============================
 -- Ticker tick
 -- ===============================
-function KeystonePercentageHelper:OnMobIndicatorTick()
+function KeystonePolaris:OnMobIndicatorTick()
     local enabled = self.db and self.db.profile and self.db.profile.mobIndicator.enabled
     if not enabled then return end
 
@@ -587,7 +587,7 @@ end
 -- ===============================
 -- Event bootstrap
 -- ===============================
-function KeystonePercentageHelper:InitializeMobIndicator()
+function KeystonePolaris:InitializeMobIndicator()
     if self.mobIndicatorFrame then
         -- reinitialize: clear and re-register
         self.mobIndicatorFrame:UnregisterAllEvents()
@@ -639,7 +639,7 @@ end
 -- ===============================
 -- AceConfig Options Group
 -- ===============================
-function KeystonePercentageHelper:GetMobIndicatorOptions()
+function KeystonePolaris:GetMobIndicatorOptions()
     return {
         name = L["MOB_INDICATOR"],
         type = "group",
@@ -763,7 +763,7 @@ function KeystonePercentageHelper:GetMobIndicatorOptions()
                         order = 1.5,
                         width = 0.6,
                         func = function()
-                            local def = (KeystonePercentageHelper.defaults and KeystonePercentageHelper.defaults.profile and KeystonePercentageHelper.defaults.profile.mobIndicator and KeystonePercentageHelper.defaults.profile.mobIndicator.texture) or 450928
+                            local def = (KeystonePolaris.defaults and KeystonePolaris.defaults.profile and KeystonePolaris.defaults.profile.mobIndicator and KeystonePolaris.defaults.profile.mobIndicator.texture) or 450928
                             self.db.profile.mobIndicator.texture = def
                             for _, frame in pairs(self.nameplateMarkerFrames) do
                                 if frame and frame.tex then

@@ -1,7 +1,7 @@
-local AddOnName, KeystonePercentageHelper = ...
+local AddOnName, KeystonePolaris = ...
 
 -- Define which dungeons are in the current season
-KeystonePercentageHelper.TWW_2_DUNGEONS = {
+KeystonePolaris.TWW_2_DUNGEONS = {
     -- War Within dungeons
     [506] = true, -- CBM (Cinderbrew Meadery)
     [504] = true, -- DFC (Darkflame Cleft)

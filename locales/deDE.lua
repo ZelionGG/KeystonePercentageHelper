@@ -157,7 +157,7 @@ L["Improvment"] = "Verbesserungen"
 L["%month%-%day%-%year%"] = "%day%.%month%.%year%"   -- deutsches Datumsformat
 L["DEFAULT_PERCENTAGES"] = "Standard-Prozentsätze"
 L["DEFAULT_PERCENTAGES_DESC"] = "This view shows the addon's built-in defaults and does not reflect your custom routes configuration." -- To Translate
-L["ROUTES_DISCLAIMER"] = "By default, Keystone Percentage Helper uses Raider.IO Weekly Routes (Beginner). Custom routes let you define your own different routes. To enable these routes, make sure to enable \"Custom routes\" in the addon's General Settings." -- To Translate
+L["ROUTES_DISCLAIMER"] = "By default, Keystone Polaris uses Raider.IO Weekly Routes (Beginner). Custom routes let you define your own different routes. To enable these routes, make sure to enable \"Custom routes\" in the addon's General Settings." -- To Translate
 L["ADVANCED_SETTINGS"] = "Benutzerdefinierte Routen"
 L["TANK_GROUP_HEADER"] = "Boss-Prozentsätze"
 L["ROLES_ENABLED"] = "Benötigte Rolle(n)"
@@ -194,7 +194,7 @@ L["BOTTOM"] = "Unten"
 L["X_OFFSET"] = "X-Versatz"
 L["Y_OFFSET"] = "Y-Versatz"
 L["SHOW_ANCHOR"] = "Anker zur Positionierung anzeigen"
-L["ANCHOR_TEXT"] = "< KPH Anker >"
+L["ANCHOR_TEXT"] = "< KPL Anker >"
 L["RESET_DUNGEON"] = "Auf Standard zurücksetzen"
 L["RESET_DUNGEON_DESC"] = "Setzt alle Boss-Prozentsätze in diesem Dungeon auf ihre Standardwerte zurück"
 L["RESET_DUNGEON_CONFIRM"] = "Bist du sicher, dass du alle Boss-Prozentsätze in diesem Dungeon auf die Standardwerte zurücksetzen möchtest?"
@@ -212,7 +212,7 @@ L["CHANGED_ROUTES_DUNGEONS_LIST"] = "Folgende Dungeons haben aktualisierte Route
 
 -- Test Mode (TO TRANSLATE)
 L["TEST_MODE"] = "Test Mode"
-L["TEST_MODE_OVERLAY"] = "Keystone Percentage Helper: Test Mode"
+L["TEST_MODE_OVERLAY"] = "Keystone Polaris: Test Mode"
 L["TEST_MODE_OVERLAY_HINT"] = "Preview is simulated. Right-click this hint to exit test mode and reopen settings."
 L["TEST_MODE_DESC"] = "Show a live preview of your display configuration without being in a dungeon. This will:\n• Close the settings panel to reveal the preview\n• Show a dim overlay and a hint above the display\n• Simulate combat/out-of-combat every 3s to reveal projected values and pull%\nTip: Right-click the hint to exit Test Mode and reopen settings."
 L["TEST_MODE_DISABLED"] = "Test Mode disabled automatically%s"

@@ -1,13 +1,23 @@
-local AddOnName, KeystonePercentageHelper = ...;
+local AddOnName, KeystonePolaris = ...;
 
-KeystonePercentageHelper.Changelog[2100] = {
-    version_string = "2.1",
-    release_date = "2025/09/18",
+KeystonePolaris.Changelog[3000] = {
+    version_string = "3.0",
+    release_date = "2025/10/06",
     important = {
         ["zhCN"] = {},
         ["zhTW"] = {},
-        ["enUS"] = {},
-        ["frFR"] = {},
+        ["enUS"] = {
+            "A NEW NAME FOR A BIGGER VISION",
+            "[Keystone Percentage Helper] becomes [Keystone Polaris] — a bold step that reflects our Mythic+ swiss‑army‑knife DNA, imagined and built with the community.",
+            "Your settings are migrated automatically (no action needed).",
+            "New name. Same speed. Bigger ambitions. Follow the star — Polaris."
+        },
+        ["frFR"] = {
+            "UN NOUVEAU NOM POUR UNE PLUS GRANDE VISION",
+            "[Keystone Percentage Helper] devient [Keystone Polaris] — une étape audacieuse qui reflète notre ADN de couteau suisse Mythique+, imaginé et construit avec la communauté.",
+            "Vos paramètres sont migrés automatiquement (aucune action requise).",
+            "Nouveau nom. Même énergie. Plus d’ambition. Suivez l’étoile — Polaris."
+        },
         ["koKR"] = {},
         ["ruRU"] = {},
         ["deDE"] = {},

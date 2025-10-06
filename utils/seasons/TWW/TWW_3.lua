@@ -1,7 +1,7 @@
-local AddOnName, KeystonePercentageHelper = ...
+local AddOnName, KeystonePolaris = ...
 
 -- Define which dungeons are in the current season
-KeystonePercentageHelper.TWW_3_DUNGEONS = {
+KeystonePolaris.TWW_3_DUNGEONS = {
     -- War Within dungeons
     [503] = true, -- AKCE (Ara-Kara, City of Echoes)
     [499] = true, -- PotSF (Priory of the Sacred Flame)

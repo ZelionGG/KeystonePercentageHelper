@@ -158,7 +158,7 @@ L["Improvment"] = "개선 사항"
 L["%month%-%day%-%year%"] = "%year%-%month%-%day%"
 L["DEFAULT_PERCENTAGES"] = "기본 퍼센트"
 L["DEFAULT_PERCENTAGES_DESC"] = "This view shows the addon's built-in defaults and does not reflect your custom routes configuration." -- To Translate
-L["ROUTES_DISCLAIMER"] = "By default, Keystone Percentage Helper uses Raider.IO Weekly Routes (Beginner). Custom routes let you define your own different routes. To enable these routes, make sure to enable \"Custom routes\" in the addon's General Settings." -- To Translate
+L["ROUTES_DISCLAIMER"] = "By default, Keystone Polaris uses Raider.IO Weekly Routes (Beginner). Custom routes let you define your own different routes. To enable these routes, make sure to enable \"Custom routes\" in the addon's General Settings." -- To Translate
 L["ADVANCED_SETTINGS"] = "커스텀 루트"
 L["TANK_GROUP_HEADER"] = "보스 퍼센트"
 L["ROLES_ENABLED"] = "조건 설정"
@@ -195,7 +195,7 @@ L["BOTTOM"] = "아래"
 L["X_OFFSET"] = "X 오프셋"
 L["Y_OFFSET"] = "Y 오프셋"
 L["SHOW_ANCHOR"] = "표시 위치 확인"
-L["ANCHOR_TEXT"] = "< KPH 표시 >"
+L["ANCHOR_TEXT"] = "< KPL 표시 >"
 L["RESET_DUNGEON"] = "기본값으로 재설정"
 L["RESET_DUNGEON_DESC"] = "이 던전의 모든 보스 진행도를 기본값으로 재설정 합니다"
 L["RESET_DUNGEON_CONFIRM"] = "이 던전의 모든 보스 진행도를 기본값으로 재설정 하시겠습니까?"
@@ -213,7 +213,7 @@ L["CHANGED_ROUTES_DUNGEONS_LIST"] = "다음 던전의 경로가 업데이트 되
 
 -- Test Mode
 L["TEST_MODE"] = "Test Mode"
-L["TEST_MODE_OVERLAY"] = "Keystone Percentage Helper: Test Mode"
+L["TEST_MODE_OVERLAY"] = "Keystone Polaris: Test Mode"
 L["TEST_MODE_OVERLAY_HINT"] = "Preview is simulated. Right-click this hint to exit test mode and reopen settings."
 L["TEST_MODE_DESC"] = "Show a live preview of your display configuration without being in a dungeon. This will:\n• Close the settings panel to reveal the preview\n• Show a dim overlay and a hint above the display\n• Simulate combat/out-of-combat every 3s to reveal projected values and pull%\nTip: Right-click the hint to exit Test Mode and reopen settings."
 L["TEST_MODE_DISABLED"] = "Test Mode disabled automatically%s"
