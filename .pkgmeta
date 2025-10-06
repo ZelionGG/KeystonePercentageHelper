@@ -21,5 +21,5 @@ externals:
   Libs/LibSharedMedia-3.0: https://repos.curseforge.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
 
 manual-changelog:
-  filename: CHANGELOG.md
+  filename: KeystonePolaris/CHANGELOG.md
   markup-type: markdown
