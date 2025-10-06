@@ -277,6 +277,7 @@ end
                         order = 0,
                         type = "toggle",
                         name = L["TEST_MODE"] or "Test Mode",
+                        desc = L["TEST_MODE_DESC"],
                         width = "full",
                         get = function()
                             return self._testMode or false
@@ -1049,8 +1050,8 @@ function KeystonePercentageHelper:StartTestModeTicker()
     self._testTicker = C_Timer.NewTicker(period, function()
         -- Alternate combat context
         self._testCombatContext = not self._testCombatContext
-        -- Rotate scenarios (1..3)
-        self._testScenario = ((self._testScenario or 1) % 3) + 1
+        -- Rotate scenarios (1..7)
+        self._testScenario = ((self._testScenario or 1) % 7) + 1
         if self.UpdatePercentageText then self:UpdatePercentageText() end
     end)
 end
@@ -1081,15 +1082,33 @@ function KeystonePercentageHelper:ShowTestOverlay()
         f:SetBackdropBorderColor(1, 0.82, 0, 0.8)
 
         local title = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
-        title:SetPoint("TOP", f, "TOP", 0, -6)
-        title:SetText((self.L and self.L["TEST_MODE"]) or (L and L["TEST_MODE"]) or "Test Mode")
+        -- Layout paddings
+        f._padLeft, f._padRight, f._padTop, f._padBottom = 16, 16, 12, 10
+        local padTop = f._padTop
+        local padLeft, padRight = f._padLeft, f._padRight
+        local gap = 4
+
+        title:SetPoint("TOP", f, "TOP", 0, -padTop)
+        title:SetText((self.L and self.L["TEST_MODE_OVERLAY"]) or (L and L["TEST_MODE_OVERLAY"]))
         title:SetTextColor(1, 0.82, 0, 1)
         local tf, ts, tflags = title:GetFont(); if tf then title:SetFont(tf, (ts or 14) + 4, tflags) end
 
         local hint = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        hint:SetPoint("TOP", title, "BOTTOM", 0, -2)
-        hint:SetText((self.L and self.L["TEST_MODE_OVERLAY_HINT"]) or (L and L["TEST_MODE_OVERLAY_HINT"]) or "Preview is simulated. Toggle Test Mode to exit.")
+        hint:SetPoint("TOP", title, "BOTTOM", 0, -gap)
+        hint:SetText((self.L and self.L["TEST_MODE_OVERLAY_HINT"]) or (L and L["TEST_MODE_OVERLAY_HINT"]))
         local hf, hs, hflags = hint:GetFont(); if hf then hint:SetFont(hf, (hs or 12) + 3, hflags) end
+
+        -- Store refs for later width recalculation
+        f.title = title
+        f.hint = hint
+
+        -- Auto-size overlay width/height based on hint + title with paddings
+        local hintW = hint:GetStringWidth() or 0
+        local titleW = title:GetStringWidth() or 0
+        local contentW = math.max(hintW, titleW)
+        local width = math.max(240, math.floor(contentW + padLeft + padRight))
+        local height = (title:GetStringHeight() or 0) + gap + (hint:GetStringHeight() or 0) + f._padTop + f._padBottom
+        f:SetSize(width, math.max(40, math.floor(height)))
 
         -- Right-click to cancel Test Mode and reopen settings
         f:EnableMouse(true)
@@ -1151,26 +1170,54 @@ function KeystonePercentageHelper:RenderTestText()
     local totalCount = 220
     local textColor = self.db.profile.color.inProgress
 
-    if scenario == 2 then
-        -- Scenario 2: Dungeon percentage done
+    if scenario == 7 then
+        -- Scenario 7: Dungeon finished
         self.displayFrame.text:SetText(L["DUNGEON_DONE"] or "Dungeon finished")
         textColor = self.db.profile.color.finished
     else
         local currentPercent, neededPercent, pullPercent, isBossKilled
         if scenario == 1 then
-            -- Scenario 1: Late for section (Missing color) but current pull will finish it
+            -- 1) Nominal out of combat (white)
+            currentPercent = 45.0
+            neededPercent = 50.0
+            pullPercent = 0.0
+            isBossKilled = false
+            textColor = self.db.profile.color.inProgress
+        elseif scenario == 2 then
+            -- 2) Nominal in combat (white), small pull
+            currentPercent = 45.0
+            neededPercent = 50.0
+            pullPercent = 3.0
+            isBossKilled = false
+            textColor = self.db.profile.color.inProgress
+        elseif scenario == 3 then
+            -- 3) Nominal: projected finishes the section (white)
             currentPercent = 62.0
             neededPercent = 68.0
             pullPercent = 8.0
-            isBossKilled = true -- triggers Missing context in real flow; here we color manually below
-            textColor = self.db.profile.color.missing
-        else
-            -- Scenario 3: Section percentage done (before boss kill)
+            isBossKilled = false
+            textColor = self.db.profile.color.inProgress
+        elseif scenario == 4 then
+            -- 4) Nominal: section already done (green)
             currentPercent = 74.0
             neededPercent = 70.0
             pullPercent = 0.0
             isBossKilled = false
             textColor = self.db.profile.color.finished
+        elseif scenario == 5 then
+            -- 5) Late: projected finishes the section (red Missing)
+            currentPercent = 62.0
+            neededPercent = 68.0
+            pullPercent = 8.0
+            isBossKilled = true -- simulate boss done context for missing state
+            textColor = self.db.profile.color.missing
+        elseif scenario == 6 then
+            -- 6) Nominal with projected Dungeon finished (white, IC)
+            currentPercent = 98.0
+            neededPercent = 100.0
+            pullPercent = 3.0
+            isBossKilled = false
+            textColor = self.db.profile.color.inProgress
         end
 
         local remainingPercent = math.max(0, neededPercent - currentPercent)
@@ -1189,7 +1236,7 @@ function KeystonePercentageHelper:RenderTestText()
         }
 
         local base
-        if scenario == 3 then
+        if scenario == 4 then
             base = L["DONE"] or "Section percentage done"
         else
             if formatMode == "count" then
@@ -1199,7 +1246,16 @@ function KeystonePercentageHelper:RenderTestText()
             end
         end
 
+        -- Force combat context per scenario when needed for projected display
+        local originalCtx = self._testCombatContext
+        -- Force combat per scenario for projected parts visibility
+        if scenario == 1 or scenario == 4 or scenario == 7 then
+            self._testCombatContext = false
+        elseif scenario == 2 or scenario == 3 or scenario == 5 or scenario == 6 then
+            self._testCombatContext = true
+        end
         local text = self:FormatMainDisplayText(base, currentPercent, pullPercent, remainingPercent, fmtData, isBossKilled, false)
+        self._testCombatContext = originalCtx
         self.displayFrame.text:SetText(text)
     end
 
@@ -1207,12 +1263,21 @@ function KeystonePercentageHelper:RenderTestText()
     self.displayFrame.text:SetTextColor(textColor.r, textColor.g, textColor.b, textColor.a)
     if self.ApplyTextLayout then self:ApplyTextLayout() end
     if self.AdjustDisplayFrameSize then self:AdjustDisplayFrameSize() end
-    -- Keep hint overlay positioned/sized relative to display frame
+    -- Keep hint overlay positioned above display frame and auto-size to content
     if self.testModeOverlay and self.displayFrame then
-        local w = self.displayFrame:GetWidth() or 200
         self.testModeOverlay:ClearAllPoints()
         self.testModeOverlay:SetPoint("BOTTOM", self.displayFrame, "TOP", 0, 8)
-        self.testModeOverlay:SetWidth(math.max(240, w + 40))
+        local padLeft = self.testModeOverlay._padLeft or 16
+        local padRight = self.testModeOverlay._padRight or 16
+        local padTop = self.testModeOverlay._padTop or 12
+        local padBottom = self.testModeOverlay._padBottom or 10
+        local gap = 4
+        if self.testModeOverlay.hint and self.testModeOverlay.title then
+            local contentW = self.testModeOverlay.hint:GetStringWidth() or 0
+            local width = math.max(240, math.floor(contentW + padLeft + padRight))
+            local height = (self.testModeOverlay.title:GetStringHeight() or 0) + gap + (self.testModeOverlay.hint:GetStringHeight() or 0) + padTop + padBottom
+            self.testModeOverlay:SetSize(width, math.max(40, math.floor(height)))
+        end
     end
 end
 

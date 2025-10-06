@@ -211,8 +211,9 @@ L["CHANGED_ROUTES_DUNGEONS_LIST"] = "The following dungeons have updated routes:
 
 -- Test Mode
 L["TEST_MODE"] = "Test Mode"
-L["TEST_MODE_OVERLAY"] = "Keystone Percentage Helper: Test Mode active"
-L["TEST_MODE_OVERLAY_HINT"] = "Preview is simulated. Right-click this hint to exit Test Mode and reopen settings."
+L["TEST_MODE_OVERLAY"] = "Keystone Percentage Helper: Test Mode"
+L["TEST_MODE_OVERLAY_HINT"] = "Preview is simulated. Right-click this hint to exit test mode and reopen settings."
+L["TEST_MODE_DESC"] = "Show a live preview of your display configuration without being in a dungeon. This will:\n• Close the settings panel to reveal the preview\n• Show a dim overlay and a hint above the display\n• Simulate combat/out-of-combat every 3s to reveal projected values and pull%\nTip: Right-click the hint to exit Test Mode and reopen settings."
 
 -- Main Display
 L["MAIN_DISPLAY"] = "Main Display"
