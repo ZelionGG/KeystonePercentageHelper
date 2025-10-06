@@ -394,7 +394,7 @@ function KeystonePercentageHelper:GetColorOptions()
                 end
             },
             finished = {
-                name = L["FINISHED"],
+                name = L["FINISHED_COLOR"],
                 type = "color",
                 order = 2,
                 hasAlpha = true,

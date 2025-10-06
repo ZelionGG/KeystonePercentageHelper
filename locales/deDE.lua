@@ -184,6 +184,7 @@ L["POSITIONING"] = "Positionierung"
 L["COLORS"] = "Farben"
 L["IN_PROGRESS"] = "In Arbeit"
 L["MISSING"] = "Fehlend"
+L["FINISHED_COLOR"] = "Done" -- To Translate
 L["VALIDATE"] = "Bestätigen"
 L["CANCEL"] = "Abbrechen"
 L["POSITION"] = "Position"

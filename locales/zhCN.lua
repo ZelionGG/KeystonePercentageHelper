@@ -186,6 +186,7 @@ L["POSITIONING"] = "位置调整"
 L["COLORS"] = "颜色"
 L["IN_PROGRESS"] = "进行中"
 L["MISSING"] = "缺少"
+L["FINISHED_COLOR"] = "Done" -- To Translate
 L["VALIDATE"] = "确定"
 L["CANCEL"] = "取消"
 L["POSITION"] = "位置"

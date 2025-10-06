@@ -185,6 +185,7 @@ L["POSITIONING"] = "위치"
 L["COLORS"] = "색상"
 L["IN_PROGRESS"] = "진행중"
 L["MISSING"] = "모자람"
+L["FINISHED_COLOR"] = "Done" -- To Translate
 L["VALIDATE"] = "확인"
 L["CANCEL"] = "취소"
 L["POSITION"] = "정렬"

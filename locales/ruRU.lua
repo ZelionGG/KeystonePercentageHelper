@@ -185,6 +185,7 @@ L["POSITIONING"] = "Позиционирование"
 L["COLORS"] = "Цвета"
 L["IN_PROGRESS"] = "В процессе"
 L["MISSING"] = "Не хватает"
+L["FINISHED_COLOR"] = "Done" -- To Translate
 L["VALIDATE"] = "Подтвердить"
 L["CANCEL"] = "Отмена"
 L["POSITION"] = "Положение"
