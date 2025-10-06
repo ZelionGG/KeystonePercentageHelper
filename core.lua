@@ -148,6 +148,39 @@ function KeystonePercentageHelper:OnInitialize()
         Settings.OpenToCategory("Keystone Percentage Helper")
     end
 
+-- Disable Test Mode programmatically with a reason and inform the player
+function KeystonePercentageHelper:DisableTestMode(reason)
+    if not self._testMode then return end
+    self._testMode = false
+    if self.HideTestOverlay then self:HideTestOverlay() end
+    if self.StopTestModeTicker then self:StopTestModeTicker() end
+    if self.UpdatePercentageText then self:UpdatePercentageText() end
+    if self.Refresh then self:Refresh() end
+    -- Localize reason if provided
+    local suffix = ""
+    if type(reason) == "string" and reason ~= "" then
+        local r = reason
+        local reasonKey
+        if r == "entered combat" or r == "entered_combat" then
+            reasonKey = "TEST_MODE_REASON_ENTERED_COMBAT"
+        elseif r == "started dungeon" or r == "started_dungeon" then
+            reasonKey = "TEST_MODE_REASON_STARTED_DUNGEON"
+        elseif r == "changed zone" or r == "changed_zone" then
+            reasonKey = "TEST_MODE_REASON_CHANGED_ZONE"
+        end
+        local RL = (self.L or L)
+        local localized = (reasonKey and RL and RL[reasonKey]) and RL[reasonKey] or r
+        suffix = " (" .. localized .. ")"
+    end
+    local loc = (self.L and self.L["TEST_MODE_DISABLED"]) or (L and L["TEST_MODE_DISABLED"]) or "Test Mode disabled automatically%s"
+    local msg = "|cffdb6233Keystone Percentage Helper:|r " .. string.format(loc, suffix)
+    if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
+        DEFAULT_CHAT_FRAME:AddMessage(msg)
+    else
+        print(msg)
+    end
+end
+
 -- Helpers to manage real pull set
 function KeystonePercentageHelper:AddEngagedMobByGUID(guid)
     if not guid then return end
@@ -1077,9 +1110,40 @@ function KeystonePercentageHelper:ShowTestOverlay()
         else
             f:SetPoint("TOP", UIParent, "TOP", 0, -20)
         end
-        f:SetBackdrop({ bgFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile = true, tileSize = 16, edgeSize = 12 })
+        -- Use the same simple border style as the KPH mover (anchorFrame)
+        f:SetBackdrop({ bgFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", tile = true, tileSize = 16, edgeSize = 1 })
         f:SetBackdropColor(0, 0, 0, 0.35)
-        f:SetBackdropBorderColor(1, 0.82, 0, 0.8)
+        f:SetBackdropBorderColor(1, 0.82, 0, 1)
+        -- Ensure 1px border on all sides (some UI scales can hide the right edge with edgeFile-only)
+        if not f.border then f.border = {} end
+        local br, bgc, bb, ba = 1, 0.82, 0, 1
+        if not f.border.top then f.border.top = f:CreateTexture(nil, "BORDER") end
+        f.border.top:SetColorTexture(br, bgc, bb, ba)
+        f.border.top:ClearAllPoints()
+        f.border.top:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0)
+        f.border.top:SetPoint("TOPRIGHT", f, "TOPRIGHT", 0, 0)
+        f.border.top:SetHeight(1)
+
+        if not f.border.bottom then f.border.bottom = f:CreateTexture(nil, "BORDER") end
+        f.border.bottom:SetColorTexture(br, bgc, bb, ba)
+        f.border.bottom:ClearAllPoints()
+        f.border.bottom:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0)
+        f.border.bottom:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0)
+        f.border.bottom:SetHeight(1)
+
+        if not f.border.left then f.border.left = f:CreateTexture(nil, "BORDER") end
+        f.border.left:SetColorTexture(br, bgc, bb, ba)
+        f.border.left:ClearAllPoints()
+        f.border.left:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0)
+        f.border.left:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0)
+        f.border.left:SetWidth(1)
+
+        if not f.border.right then f.border.right = f:CreateTexture(nil, "BORDER") end
+        f.border.right:SetColorTexture(br, bgc, bb, ba)
+        f.border.right:ClearAllPoints()
+        f.border.right:SetPoint("TOPRIGHT", f, "TOPRIGHT", 0, 0)
+        f.border.right:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0)
+        f.border.right:SetWidth(1)
 
         local title = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
         -- Layout paddings
@@ -1096,7 +1160,16 @@ function KeystonePercentageHelper:ShowTestOverlay()
         local hint = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         hint:SetPoint("TOP", title, "BOTTOM", 0, -gap)
         hint:SetText((self.L and self.L["TEST_MODE_OVERLAY_HINT"]) or (L and L["TEST_MODE_OVERLAY_HINT"]))
-        local hf, hs, hflags = hint:GetFont(); if hf then hint:SetFont(hf, (hs or 12) + 3, hflags) end
+        -- Apply configured font (LSM) for title and hint
+        local fontPath = self.LSM and self.LSM:Fetch('font', self.db and self.db.profile and self.db.profile.text and self.db.profile.text.font) or nil
+        local baseSize = (self.db and self.db.profile and self.db.profile.general and self.db.profile.general.fontSize) or 12
+        if fontPath then
+            local b = baseSize or 12
+            title:SetFont(fontPath, b + 2, "OUTLINE")
+            hint:SetFont(fontPath, math.max(8, b - 2), "OUTLINE")
+        else
+            local hf, hs, hflags = hint:GetFont(); if hf then hint:SetFont(hf, (hs or 12) + 3, hflags) end
+        end
 
         -- Store refs for later width recalculation
         f.title = title
@@ -1376,6 +1449,7 @@ end
 
 -- Start of combat: reset real pull state
 function KeystonePercentageHelper:PLAYER_REGEN_DISABLED()
+    if self._testMode then self:DisableTestMode("entered combat") end
     self.realPull.mobs = {}
     self.realPull.sum = 0
     self.realPull.denom = 0
@@ -1491,6 +1565,7 @@ end
 
 -- Event handler for starting a Mythic+ dungeon
 function KeystonePercentageHelper:CHALLENGE_MODE_START()
+    if self._testMode then self:DisableTestMode("started dungeon") end
     self.currentDungeonID = nil
 
     self:InitiateDungeon()
@@ -1503,9 +1578,11 @@ end
 
 -- Event handler for entering the world or changing zones
 function KeystonePercentageHelper:PLAYER_ENTERING_WORLD()
+    if self._testMode then self:DisableTestMode("changed zone") end
     self:InitiateDungeon()
     self:UpdatePercentageText()
 end
+
 
 -- Refresh the display with current settings
 function KeystonePercentageHelper:Refresh()
