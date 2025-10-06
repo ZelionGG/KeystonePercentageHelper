@@ -2,7 +2,6 @@ package-as: KeystonePolaris
 enable-nolib-creation: no
 
 move-folders:
-  KeystonePolaris: KeystonePolaris
   stub_sv: KeystonePercentageHelper
 
 externals:
