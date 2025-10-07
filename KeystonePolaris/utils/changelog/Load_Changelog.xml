@@ -21,5 +21,5 @@
 	<Script file='Old/v2/2.0.lua'/>
 	<Script file='Old/v2/2.0.1.lua'/>
 	<!-- LIVE -->
-	<Script file='2.1.lua'/>
+	<Script file='3.0.lua'/>
 </Ui>
