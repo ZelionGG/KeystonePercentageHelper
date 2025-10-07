@@ -32,5 +32,4 @@ Once again, thanks a lot for the support!
 
 ## IMPROVEMENT
 
-- 
 - Russian translation updated, thank you **Hollicsh**.
