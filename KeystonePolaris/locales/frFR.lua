@@ -248,6 +248,7 @@ L["MAX_WIDTH"] = "Largeur maximale (une ligne)"
 L["MAX_WIDTH_DESC"] = "Largeur maximale en pixels pour l'affichage sur une ligne. 0 = automatique (sans retour à la ligne)."
 L["REQUIRED_DEFAULT"] = "Requis :"
 L["CURRENT_DEFAULT"] = "Actuel :"
+L["SECTION_REQUIRED_DEFAULT"] = "Total requis pour la section:"
 L["PULL_DEFAULT"] = "En cours :"
 
 -- Section required prefix

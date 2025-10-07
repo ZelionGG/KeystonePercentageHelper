@@ -252,6 +252,7 @@ L["MAX_WIDTH"] = "Max width (single-line)"
 L["MAX_WIDTH_DESC"] = "Maximum width in pixels for single-line layout. 0 = automatic (no wrapping)."
 L["REQUIRED_DEFAULT"] = "Required:"
 L["CURRENT_DEFAULT"] = "Current:"
+L["SECTION_REQUIRED_DEFAULT"] = "Total required for section:"
 L["PULL_DEFAULT"] = "Pull:"
 
 -- Section required prefix
