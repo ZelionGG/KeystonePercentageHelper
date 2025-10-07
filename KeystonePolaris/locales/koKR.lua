@@ -211,6 +211,12 @@ L["RESET_ALL"] = "모든 던전 초기화"
 L["RESET_CHANGED_ONLY"] = "변경 사항만 초기화"
 L["CHANGED_ROUTES_DUNGEONS_LIST"] = "다음 던전의 경로가 업데이트 되었습니다.:"
 
+-- Changelog
+L["COPY_INSTRUCTIONS"] = "Select All, then Ctrl+C to copy. Optional: DeepL https://www.deepl.com/translator"
+L["SELECT_ALL"] = "Select All"
+L["TRANSLATE"] = "Translate"
+L["TRANSLATE_DESC"] = "Copy this changelog in a popup to paste into your translator."
+
 -- Test Mode
 L["TEST_MODE"] = "Test Mode"
 L["TEST_MODE_OVERLAY"] = "Keystone Polaris: Test Mode"

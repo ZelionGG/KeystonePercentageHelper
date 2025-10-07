@@ -5,7 +5,7 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0");
 local L = AceLocale:NewLocale(AddonName, "ruRU", false, false);
 if not L then return end
 
--- Last translated October 3rd, 2025.
+-- Last translated October 7th, 2025.
 -- Translation by Hollicsh (https://github.com/Hollicsh)
 
 -- Dungeons Group
@@ -185,7 +185,7 @@ L["POSITIONING"] = "Позиционирование"
 L["COLORS"] = "Цвета"
 L["IN_PROGRESS"] = "В процессе"
 L["MISSING"] = "Не хватает"
-L["FINISHED_COLOR"] = "Done" -- To Translate
+L["FINISHED_COLOR"] = "Готово"
 L["VALIDATE"] = "Подтвердить"
 L["CANCEL"] = "Отмена"
 L["POSITION"] = "Положение"
@@ -211,15 +211,21 @@ L["RESET_ALL"] = "Сбросить все подземелья"
 L["RESET_CHANGED_ONLY"] = "Сбросить только измененные"
 L["CHANGED_ROUTES_DUNGEONS_LIST"] = "Обновлены маршруты следующих подземелий:"
 
--- Test Mode (To Translate)
-L["TEST_MODE"] = "Test Mode"
-L["TEST_MODE_OVERLAY"] = "Keystone Polaris: Test Mode"
-L["TEST_MODE_OVERLAY_HINT"] = "Preview is simulated. Right-click this hint to exit test mode and reopen settings."
-L["TEST_MODE_DESC"] = "Show a live preview of your display configuration without being in a dungeon. This will:\n• Close the settings panel to reveal the preview\n• Show a dim overlay and a hint above the display\n• Simulate combat/out-of-combat every 3s to reveal projected values and pull%\nTip: Right-click the hint to exit Test Mode and reopen settings."
-L["TEST_MODE_DISABLED"] = "Test Mode disabled automatically%s"
-L["TEST_MODE_REASON_ENTERED_COMBAT"] = "entered combat"
-L["TEST_MODE_REASON_STARTED_DUNGEON"] = "started dungeon"
-L["TEST_MODE_REASON_CHANGED_ZONE"] = "changed zone"
+-- Changelog (To Translate)
+L["COPY_INSTRUCTIONS"] = "Select All, then Ctrl+C to copy. Optional: DeepL https://www.deepl.com/translator"
+L["SELECT_ALL"] = "Select All"
+L["TRANSLATE"] = "Translate"
+L["TRANSLATE_DESC"] = "Copy this changelog in a popup to paste into your translator."
+
+-- Test Mode
+L["TEST_MODE"] = "Тестовый режим"
+L["TEST_MODE_OVERLAY"] = "Keystone Percentage Helper: Тестовый режим"
+L["TEST_MODE_OVERLAY_HINT"] = "Предварительный просмотр имитируется. Щелкните ПКМ по этой подсказке, чтобы выйти из тестового режима и снова открыть настройки."
+L["TEST_MODE_DESC"] = "Показать предварительный просмотр конфигурации Вашего дисплея в реальном времени, не находясь в подземелье. Это позволит:\n• Закрыть панель настроек, чтобы открыть предварительный просмотр\n• Показать затемнённое наложение и подсказку над дисплеем\n• Симулировать бой/вне боя каждые 3 сек., чтобы выявить прогнозируемые значения и процент пулла\nСовет: щелкните ПКМ по подсказке, чтобы выйти из тестового режима и заново открыть настройки."
+L["TEST_MODE_DISABLED"] = "Тестовый режим отключен автоматически%s"
+L["TEST_MODE_REASON_ENTERED_COMBAT"] = "вступил в бой"
+L["TEST_MODE_REASON_STARTED_DUNGEON"] = "запущенное подземелье"
+L["TEST_MODE_REASON_CHANGED_ZONE"] = "измененная зона"
 
 -- Main Display
 L["MAIN_DISPLAY"] = "Основное отображение"

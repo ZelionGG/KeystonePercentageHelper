@@ -212,6 +212,12 @@ L["RESET_ALL"] = "重置所有地下城"
 L["RESET_CHANGED_ONLY"] = "仅重置有变化的"
 L["CHANGED_ROUTES_DUNGEONS_LIST"] = "以下地下城有更新的路线："
 
+-- Changelog
+L["COPY_INSTRUCTIONS"] = "Select All, then Ctrl+C to copy. Optional: DeepL https://www.deepl.com/translator"
+L["SELECT_ALL"] = "Select All"
+L["TRANSLATE"] = "Translate"
+L["TRANSLATE_DESC"] = "Copy this changelog in a popup to paste into your translator."
+
 -- Test Mode
 L["TEST_MODE"] = "Test Mode"
 L["TEST_MODE_OVERLAY"] = "Keystone Polaris: Test Mode"

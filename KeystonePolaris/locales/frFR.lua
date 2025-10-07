@@ -208,6 +208,12 @@ L["RESET_ALL"] = "Réinitialiser tous les donjons"
 L["RESET_CHANGED_ONLY"] = "Réinitialiser uniquement ces donjons"
 L["CHANGED_ROUTES_DUNGEONS_LIST"] = "Les donjons suivants ont des routes mises à jour :"
 
+-- Changelog
+L["COPY_INSTRUCTIONS"] = "Sélectionner tout, puis Ctrl+C pour copier. Optionnel : DeepL https://www.deepl.com/translator"
+L["SELECT_ALL"] = "Sélectionner tout"
+L["TRANSLATE"] = "Traduire"
+L["TRANSLATE_DESC"] = "Copier les notes de version qui vont apparaître dans une fenêtre popup pour les coller dans votre traducteur."
+
 -- Mode Test
 L["TEST_MODE"] = "Mode Test"
 L["TEST_MODE_OVERLAY"] = "Keystone Polaris : Mode Test"

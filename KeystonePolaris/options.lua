@@ -1450,6 +1450,121 @@ function KeystonePolaris:RGBToHex(r, g, b, header, ending)
     return hex
 end
 
+-- Dedicated copy window for long texts (multi-line, scrollable)
+function KeystonePolaris:ShowCopyPopup(text)
+    if not self.copyPopup then
+        local f = CreateFrame("Frame", "KeystonePolarisCopyPopup", UIParent, "BackdropTemplate")
+        f:SetFrameStrata("FULLSCREEN_DIALOG")
+        f:SetSize(700, 500)
+        f:SetPoint("CENTER")
+        -- Style aligné sur l'overlay Test Mode: fond sombre + bordure 1px or
+        f:SetBackdrop({ bgFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", tile = true, tileSize = 16, edgeSize = 1 })
+        f:SetBackdropColor(0, 0, 0, 1)
+        f:SetBackdropBorderColor(1, 0.82, 0, 1)
+        -- Renforcer la bordure 1px sur tous les côtés (comme Test Mode)
+        if not f.border then f.border = {} end
+        local br, bgc, bb, ba = 1, 0.82, 0, 1
+        if not f.border.top then f.border.top = f:CreateTexture(nil, "BORDER") end
+        f.border.top:SetColorTexture(br, bgc, bb, ba)
+        f.border.top:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0)
+        f.border.top:SetPoint("TOPRIGHT", f, "TOPRIGHT", 0, 0)
+        f.border.top:SetHeight(1)
+
+        if not f.border.bottom then f.border.bottom = f:CreateTexture(nil, "BORDER") end
+        f.border.bottom:SetColorTexture(br, bgc, bb, ba)
+        f.border.bottom:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0)
+        f.border.bottom:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0)
+        f.border.bottom:SetHeight(1)
+
+        if not f.border.left then f.border.left = f:CreateTexture(nil, "BORDER") end
+        f.border.left:SetColorTexture(br, bgc, bb, ba)
+        f.border.left:SetPoint("TOPLEFT", f, "TOPLEFT", 0, 0)
+        f.border.left:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 0, 0)
+        f.border.left:SetWidth(1)
+
+        if not f.border.right then f.border.right = f:CreateTexture(nil, "BORDER") end
+        f.border.right:SetColorTexture(br, bgc, bb, ba)
+        f.border.right:SetPoint("TOPRIGHT", f, "TOPRIGHT", 0, 0)
+        f.border.right:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 0, 0)
+        f.border.right:SetWidth(1)
+
+        local title = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
+        title:SetPoint("TOP", 0, -12)
+        title:SetText("Keystone Polaris — " .. L["Changelog"])
+        title:SetTextColor(1, 0.82, 0, 1)
+
+        local instr = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        instr:SetPoint("TOPLEFT", 12, -40)
+        instr:SetPoint("RIGHT", -12, 0)
+        instr:SetJustifyH("LEFT")
+        instr:SetText(L["COPY_INSTRUCTIONS"])
+        -- Appliquer la police LSM si dispo, cohérente avec Test Mode
+        local fontPath = self.LSM and self.LSM:Fetch('font', self.db and self.db.profile and self.db.profile.text and self.db.profile.text.font) or nil
+        local baseSize = (self.db and self.db.profile and self.db.profile.general and self.db.profile.general.fontSize) or 12
+        if fontPath then
+            title:SetFont(fontPath, (baseSize or 12), "OUTLINE")
+            instr:SetFont(fontPath, math.max(10, (baseSize or 12) - 6), "OUTLINE")
+        end
+
+        -- Séparateur sous le texte d'instruction
+        local sep = f:CreateTexture(nil, "BORDER")
+        sep:SetColorTexture(1, 0.82, 0, 0.25)
+        sep:ClearAllPoints()
+        sep:SetPoint("TOPLEFT", instr, "BOTTOMLEFT", 0, -10)
+        sep:SetPoint("TOPRIGHT", instr, "BOTTOMRIGHT", 0, -10)
+        sep:SetHeight(1)
+
+        local scroll = CreateFrame("ScrollFrame", "KeystonePolarisCopyScroll", f, "UIPanelScrollFrameTemplate")
+        scroll:SetPoint("TOPLEFT", sep, "BOTTOMLEFT", 0, -10)
+        scroll:SetPoint("BOTTOMRIGHT", -32, 44)
+
+        local edit = CreateFrame("EditBox", "KeystonePolarisCopyEditBox", scroll)
+        edit:SetMultiLine(true)
+        edit:SetFontObject(ChatFontNormal)
+        edit:SetAutoFocus(true)
+        edit:SetWidth(scroll:GetWidth())
+        edit:SetText("")
+        scroll:SetScrollChild(edit)
+
+        scroll:HookScript("OnSizeChanged", function(self, w)
+            edit:SetWidth(w)
+        end)
+
+        local selectBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+        selectBtn:SetSize(100, 22)
+        selectBtn:SetPoint("BOTTOMLEFT", 12, 12)
+        selectBtn:SetText(L["SELECT_ALL"])
+        selectBtn:SetScript("OnClick", function()
+            edit:SetFocus()
+            edit:HighlightText()
+        end)
+
+        local closeBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+        closeBtn:SetSize(80, 22)
+        closeBtn:SetPoint("BOTTOMRIGHT", -12, 12)
+        closeBtn:SetText(OKAY or "OK")
+        closeBtn:SetScript("OnClick", function() f:Hide() end)
+
+        f:SetScript("OnShow", function()
+            edit:SetFocus()
+            edit:HighlightText()
+        end)
+        f:SetScript("OnKeyDown", function(_, key)
+            if key == "ESCAPE" then f:Hide() end
+        end)
+        f:EnableKeyboard(true)
+
+        f.editBox = edit
+        self.copyPopup = f
+    end
+
+    local f = self.copyPopup
+    if f and f.editBox then
+        f.editBox:SetText(text or "")
+        f:Show()
+    end
+end
+
 function KeystonePolaris:GenerateChangelog()
     self.changelogOptions = {
         type = "group",
@@ -1472,6 +1587,49 @@ function KeystonePolaris:GenerateChangelog()
         return line
     end
 
+    -- Build a plain, colorless text block for a changelog entry (current locale with enUS fallback)
+    local function buildPlainText(data)
+        local function stripColors(s)
+            if type(s) ~= "string" then s = tostring(s) end
+            s = s:gsub("|c%x%x%x%x%x%x%x%x", "")
+            s = s:gsub("|r", "")
+            return s
+        end
+        local function resolve(list)
+            if not list then return {} end
+            if list[GetLocale()] and next(list[GetLocale()]) then
+                return list[GetLocale()]
+            end
+            return list["enUS"] or {}
+        end
+
+        local chunks = {}
+        local function appendSection(titleKey, list)
+            local items = resolve(list)
+            if items and #items > 0 then
+                table.insert(chunks, (L and L[titleKey]) or titleKey)
+                for _, line in ipairs(items) do
+                    table.insert(chunks, "- " .. stripColors(line))
+                end
+                table.insert(chunks, "")
+            end
+        end
+
+        if data and type(data) == "table" then
+            if data.version_string and data.release_date then
+                table.insert(chunks, (L and L["Version"] or "Version") .. ": " .. data.version_string ..
+                    " (" .. data.release_date .. ")")
+                table.insert(chunks, "")
+            end
+            appendSection("Important", data.important)
+            appendSection("New", data.new)
+            appendSection("Bugfixes", data.bugfix)
+            appendSection("Improvment", data.improvment)
+        end
+
+        return table.concat(chunks, "\n")
+    end
+
     -- Remove the "no changelog" entry if we have actual entries
     self.changelogOptions.args.noChangelog = nil
 
@@ -1492,6 +1650,18 @@ function KeystonePolaris:GenerateChangelog()
                 name = versionString,
                 type = "group",
                 args = {
+                    translate = {
+                        order = 1,
+                        type = "execute",
+                        name = L["TRANSLATE"],
+                        desc = L["TRANSLATE_DESC"],
+                        func = function()
+                            local plain = buildPlainText(data)
+                            if KeystonePolaris and KeystonePolaris.ShowCopyPopup then
+                                KeystonePolaris:ShowCopyPopup(plain)
+                            end
+                        end,
+                    },
                     version = {
                         order = 2,
                         type = "description",
