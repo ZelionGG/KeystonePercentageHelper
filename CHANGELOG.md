@@ -3,7 +3,7 @@
 [Full Changelog](https://github.com/ZelionGG/KeystonePolaris/compare/2.0.1...3.0) [Previous Releases](https://github.com/ZelionGG/KeystonePolaris/releases)
 
 ## IMPORTANT
- **Keystone Percentage Helper** is now **Keystone Polaris**, aligning with the Mythic+ Swiss‑army‑knife vision built with the community.<br>
+ **Keystone Percentage Helper** is now **Keystone Polaris**, aligning with the Mythic+ Swiss‑army‑knife vision built with the community. **(#68)**<br>
 
 ### Why Keystone Polaris?
 - **Keystone** → keeps the strong link to Mythic+ dungeons
@@ -21,8 +21,8 @@ Once again, thanks a lot for the support!
 
 ## NEW
 
- - Introducing a unified display with optional **Total required for section**, **Current percentage** and **Pull percentage** (Requires MDT), projected values (parentheses) in combat for Required/Current, per-line completion suffixes, configurable layout (single-line or multi-line), and a switch between **percentage** and **count-based** modes.
- - Introducing **Test Mode**, a new feature that allows you to simulate multiple Mythic+ situations (out-of-fight section in progress, pull in progress with a section in progress, section percentage done, ...).
+ - Introducing a unified display with optional **Total required for section**, **Current percentage** and **Pull percentage** (Requires MDT), projected values (parentheses) in combat for Required/Current, per-line completion suffixes, configurable layout (single-line or multi-line), and a switch between **percentage** and **count-based** modes. **(#40, #69)**
+ - Introducing **Test Mode**, a new feature that allows you to simulate multiple Mythic+ situations (out-of-fight section in progress, pull in progress with a section in progress, section percentage done, ...). **(#71)**
  - Introducing **Changelog Translation**, a new feature that allows you to translate the changelog into your language by copying it from a popup and pasting it into your translator tool.
 
 ## IMPROVEMENT
