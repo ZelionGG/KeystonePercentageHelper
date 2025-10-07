@@ -11,19 +11,19 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/ZelionGG/KeystonePercentageHelper">
+  <a href="https://github.com/ZelionGG/KeystonePolaris">
     <kbd><img src="icon.png" alt="Logo" width="130" height="130"></kbd>
   </a>
 
-  <h3 align="center">Keystone Percentage Helper</h3>
+  <h3 align="center">Keystone Polaris</h3>
 
   <p align="center">
     A percentage helper for World of Warcraft mythic+ dungeons.
     <br />
     <br />
-    <a href="https://github.com/ZelionGG/KeystonePercentageHelper/issues">Report Bug</a>
+    <a href="https://github.com/ZelionGG/KeystonePolaris/issues">Report Bug</a>
     ·
-    <a href="https://github.com/ZelionGG/KeystonePercentageHelper/issues">Request Feature</a>
+    <a href="https://github.com/ZelionGG/KeystonePolaris/issues">Request Feature</a>
   </p>
 </div>
 
@@ -45,14 +45,14 @@
 ## Download
 
 [![CurseForge](https://cf.way2muchnoise.eu/title/1175416.svg?badge_style=for_the_badge)](https://www.curseforge.com/wow/addons/keystone-percentage-helper) [![Wago](https://tinyurl.com/WagoBadge)](https://addons.wago.io/addons/keystonepercentagehelper)
-[![WowInterface](https://tinyurl.com/WoWInterfaceBadge)](https://www.wowinterface.com/downloads/info26913-KeystonePercentageHelper.html) [![Github Releases](https://img.shields.io/badge/GitHub%20Releases-121013?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ZelionGG/KeystonePercentageHelper/releases)
+[![WowInterface](https://tinyurl.com/WoWInterfaceBadge)](https://www.wowinterface.com/downloads/info26913-KeystonePolaris.html) [![Github Releases](https://img.shields.io/badge/GitHub%20Releases-121013?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ZelionGG/KeystonePolaris/releases)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Keystone Percentage Helper is an addon designed to assist players in tracking enemy forces percentage during Mythic+ dungeon runs. Originally inspired by the WeakAura [WA RM+](https://wago.io/4pHPrk9NM), this WeakAura has been rewritten as a standalone addon to provide better performance and reliability.
+Keystone Polaris is an addon designed to assist players in tracking enemy forces percentage during Mythic+ dungeon runs. Originally inspired by the WeakAura [WA RM+](https://wago.io/4pHPrk9NM), this WeakAura has been rewritten as a standalone addon to provide better performance and reliability.
 
 The addon helps you optimize your routes by:
 - Displaying the current enemy forces percentage
@@ -113,7 +113,7 @@ While the original WeakAura served its purpose well, converting it to a standalo
 - [nanjuekaien1](https://github.com/nanjuekaien1) - Chinese-PRC Localization
 - [KazumaKuma](https://github.com/KazumaKuma) - German Localization
 
-__I am actually looking for people that want to help with localization of Keystone Percentage Helper, don't hesitate to contact me on [X (Twitter)](https://twitter.com/ZelionGG)__ 
+__I am actually looking for people that want to help with localization of Keystone Polaris, don't hesitate to contact me on [X (Twitter)](https://twitter.com/ZelionGG)__ 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -142,20 +142,20 @@ Distributed under the All Rights Reserved License. See `LICENSE` for more inform
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Stars
-[![Stargazers over time](https://starchart.cc/ZelionGG/KeystonePercentageHelper.svg?variant=adaptive)](https://starchart.cc/ZelionGG/KeystonePercentageHelper)
+[![Stargazers over time](https://starchart.cc/ZelionGG/KeystonePolaris.svg?variant=adaptive)](https://starchart.cc/ZelionGG/KeystonePolaris)
 
 
-[contributors-shield]: https://img.shields.io/github/contributors/ZelionGG/KeystonePercentageHelper.svg?style=for-the-badge
-[contributors-url]: https://github.com/ZelionGG/KeystonePercentageHelper/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/ZelionGG/KeystonePercentageHelper.svg?style=for-the-badge
-[forks-url]: https://github.com/ZelionGG/KeystonePercentageHelper/network/members
-[stars-shield]: https://img.shields.io/github/stars/ZelionGG/KeystonePercentageHelper.svg?style=for-the-badge
-[stars-url]: https://github.com/ZelionGG/KeystonePercentageHelper/stargazers
-[issues-shield]: https://img.shields.io/github/issues/ZelionGG/KeystonePercentageHelper.svg?style=for-the-badge
-[issues-url]: https://github.com/ZelionGG/KeystonePercentageHelper/issues
+[contributors-shield]: https://img.shields.io/github/contributors/ZelionGG/KeystonePolaris.svg?style=for-the-badge
+[contributors-url]: https://github.com/ZelionGG/KeystonePolaris/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/ZelionGG/KeystonePolaris.svg?style=for-the-badge
+[forks-url]: https://github.com/ZelionGG/KeystonePolaris/network/members
+[stars-shield]: https://img.shields.io/github/stars/ZelionGG/KeystonePolaris.svg?style=for-the-badge
+[stars-url]: https://github.com/ZelionGG/KeystonePolaris/stargazers
+[issues-shield]: https://img.shields.io/github/issues/ZelionGG/KeystonePolaris.svg?style=for-the-badge
+[issues-url]: https://github.com/ZelionGG/KeystonePolaris/issues
 [discord-shield]: https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white
 [discord-url]: https://discord.gg/g7JZNGSU32
 [license-shield]: https://img.shields.io/badge/License-All%20Rights%20Reserved-red.svg?style=for-the-badge
-[license-url]: https://github.com/ZelionGG/KeystonePercentageHelper/blob/master/LICENSE.txt
+[license-url]: https://github.com/ZelionGG/KeystonePolaris/blob/master/LICENSE.txt
 [Lua]: https://img.shields.io/badge/lua-000000?style=for-the-badge&logo=lua&logoColor=white
 [Lua-url]: https://www.lua.org/

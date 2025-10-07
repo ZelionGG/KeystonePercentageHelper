@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for Keystone Percentage Helper
+about: Suggest an idea for Keystone Polaris
 title: "[Enhancement] "
 labels: ''
 assignees: ZelionGG

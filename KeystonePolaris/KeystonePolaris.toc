@@ -1,0 +1,45 @@
+## Interface: 110200, 110205, 120000
+## Title: Keystone Polaris
+## Author: ZelionGG
+## Version: @project-version@
+## IconTexture: Interface\Addons\KeystonePolaris\icon.png
+## AddonCompartmentFunc: KeystonePolaris_OnAddonCompartmentClick
+
+## Notes: Addon designed to help you keep track of the percentage to make in each M+ dungeon section.
+## Notes-frFR: Addon conçu pour vous aider à savoir le pourcentage requis avant chaque boss en Mythique+.
+## Notes-ruRU: Дополнение, которое поможет Вам отслеживать проценты, которые нужно набрать в каждой части подземелья M+.
+
+## SavedVariables: KeystonePercentageHelperDB, KeystonePolarisDB
+## OptionalDeps: KeystonePercentageHelper
+
+## X-Website: https://github.com/ZelionGG/KeystonePolaris
+## X-Issues: https://github.com/ZelionGG/KeystonePolaris/issues
+
+## X-Curse-Project-ID: 1175416
+## X-Wago-ID: b6XVj1Gp
+## X-WoWI-ID: 26913
+
+## Category-enUS: Mythic+ Dungeons
+## Category-deDE: Mythic+ Dungeons
+## Category-esES: Mythic+ Dungeons
+## Category-esMX: Mythic+ Dungeons
+## Category-frFR: Donjons Mythique+
+## Category-itIT: Mythic+ Dungeons
+## Category-koKR: Mythic+ Dungeons
+## Category-ptBR: Mythic+ Dungeons
+## Category-ruRU: Подземелья М+
+## Category-zhCN: Mythic+ Dungeons
+## Category-zhTW: Mythic+ Dungeons
+
+embeds.xml
+locales/locales.xml
+
+utils/expansions/expansions.xml
+utils/seasons/seasons.xml
+
+options.lua
+core.lua
+modules/mdt_integration/mobPercentages.lua
+modules/mdt_integration/mobIndicator.lua
+
+utils/changelog/Load_Changelog.xml

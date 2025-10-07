@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help me improve Keystone Percentage Helper
+about: Create a report to help me improve Keystone Polaris
 title: "[Bug] "
 labels: ''
 assignees: ZelionGG
@@ -26,8 +26,8 @@ A copy-paste of your Lua errors.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Keystone Percentage Helper Version**
-Which version of Keystone Percentage Helper are you using ?
+**Keystone Polaris Version**
+Which version of Keystone Polaris are you using ?
 
 **Additional context**
 Add any other context about the problem here.

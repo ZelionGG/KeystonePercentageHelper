@@ -1,6 +1,9 @@
-package-as: KeystonePercentageHelper
-
+package-as: KeystonePolaris
 enable-nolib-creation: no
+
+move-folders:
+  KeystonePolaris/KeystonePolaris: KeystonePolaris
+  KeystonePolaris/KeystonePercentageHelper: KeystonePercentageHelper
 
 externals:
   Libs/AceAddon-3.0: https://repos.curseforge.com/wow/ace3/trunk/AceAddon-3.0
