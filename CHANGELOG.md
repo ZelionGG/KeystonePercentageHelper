@@ -2,7 +2,8 @@
 
 [Full Changelog](https://github.com/ZelionGG/KeystonePolaris/compare/2.0.1...3.0) [Previous Releases](https://github.com/ZelionGG/KeystonePolaris/releases)
 
-## IMPORTANT
+---
+
  **Keystone Percentage Helper** is now **Keystone Polaris**, aligning with the Mythic+ Swiss‑army‑knife vision built with the community. **(#68)**<br>
 
 ### Why Keystone Polaris?
@@ -19,7 +20,7 @@ As I always say: **KPH is my baby, but it’s *our* addon.**
 Once again, thanks a lot for the support!  
 *Onward to greater challenges, guided by Polaris.*
 
----
+## IMPORTANT
 
 - TOC updated for patch **11.2.5**.
 
