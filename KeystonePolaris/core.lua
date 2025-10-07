@@ -52,7 +52,26 @@ KeystonePolaris.currentSection = 1
 -- Show a one-time migration popup for users coming from Keystone Percentage Helper
 function KeystonePolaris:ShowMigrationPopup()
     if self.db and self.db.global and self.db.global.migrationAck then return end
-    if InCombatLockdown and InCombatLockdown() then return end
+    -- If in combat, reprogram the popup right after combat ends
+    if InCombatLockdown and InCombatLockdown() then
+        -- Optional: tiny debug to chat
+        if DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.AddMessage then
+            DEFAULT_CHAT_FRAME:AddMessage("|cffdb6233Keystone Polaris:|r Delaying migration popup until out of combat…")
+        end
+        if not self._migEventHooked then
+            self._migEventHooked = true
+            self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
+                self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+                self._migEventHooked = nil
+                if C_Timer and C_Timer.After then
+                    C_Timer.After(0.5, function() self:ShowMigrationPopup() end)
+                else
+                    self:ShowMigrationPopup()
+                end
+            end)
+        end
+        return
+    end
 
     StaticPopupDialogs["KPL_MIGRATION"] = {
         text = "|cffffd100Keystone Polaris|r\n\n" ..
@@ -108,19 +127,31 @@ function KeystonePolaris:OnInitialize()
     -- Initialize the database first with AceDB
     self.db = LibStub("AceDB-3.0"):New("KeystonePolarisDB", self.defaults, "Default")
 
-    -- Initialize migration acknowledgement flag
+    -- Initialize migration flags
     self.db.global = self.db.global or {}
     if self.db.global.migrationAck == nil then
         self.db.global.migrationAck = false
     end
-    -- Show popup if migrating from KPH OR already had KP DB (alpha users), until a button is explicitly clicked
-    local shouldShowMigration = (migratedFromKPH or hadExistingKPDB) and (not self.db.global.migrationAck)
+    -- Montrer uniquement si l'utilisateur vient de KPH ou avait déjà une DB KP (alpha)
+    local shouldShowMigration = (not self.db.global.migrationAck) and (migratedFromKPH or hadExistingKPDB)
     if shouldShowMigration then
-        -- Defer popup slightly to ensure UI is ready
-        if C_Timer and C_Timer.After then
-            C_Timer.After(2, function() self:ShowMigrationPopup() end)
+        -- Garantir un affichage post-PLAYER_LOGIN
+        local needLogin = (type(IsLoggedIn) == "function" and not IsLoggedIn()) or (not UIParent or not UIParent:IsShown())
+        if needLogin then
+            self:RegisterEvent("PLAYER_LOGIN", function()
+                self:UnregisterEvent("PLAYER_LOGIN")
+                if C_Timer and C_Timer.After then
+                    C_Timer.After(0.5, function() self:ShowMigrationPopup() end)
+                else
+                    self:ShowMigrationPopup()
+                end
+            end)
         else
-            self:ShowMigrationPopup()
+            if C_Timer and C_Timer.After then
+                C_Timer.After(2, function() self:ShowMigrationPopup() end)
+            else
+                self:ShowMigrationPopup()
+            end
         end
     end
 
@@ -471,6 +502,8 @@ end
 
     -- Register chat command and events
     self:RegisterChatCommand('kph', 'ToggleConfig')
+    -- Quick test command to force migration popup
+    self:RegisterChatCommand('kpl_mig', 'ShowMigrationPopup')
 
     -- Create display after DB is initialized
     self:CreateDisplay()
