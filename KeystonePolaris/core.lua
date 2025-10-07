@@ -48,16 +48,77 @@ KeystonePolaris.realPull = {
 KeystonePolaris.currentDungeonID = 0
 KeystonePolaris.currentSection = 1
 
+-- Show a one-time migration popup for users coming from Keystone Percentage Helper
+function KeystonePolaris:ShowMigrationPopup()
+    if self.db and self.db.global and self.db.global.migrationAck then return end
+    if InCombatLockdown and InCombatLockdown() then return end
+
+    StaticPopupDialogs["KPL_MIGRATION"] = {
+        text = "|cffffd100Keystone Polaris|r\n\n" ..
+               "Keystone Percentage Helper is now |cff40e0d0Keystone Polaris|r.\n\n" ..
+               "Your settings were migrated automatically.\n" ..
+               "Open the changelog to see what's new.",
+        button1 = "View Changelog",
+        button2 = OKAY,
+        OnAccept = function()
+            --[[ if Settings and Settings.OpenToCategory then
+                Settings.OpenToCategory("Keystone Polaris")
+            end ]]
+            if AceConfigDialog and AceConfigDialog.Open then
+                AceConfigDialog:Open(AddOnName .. "_Changelog")
+            end
+            if KeystonePolaris and KeystonePolaris.db and KeystonePolaris.db.global then
+                KeystonePolaris.db.global.migrationAck = true
+            end
+        end,
+        OnCancel = function(_, _, reason)
+            -- Only ack if the user explicitly clicked the secondary button ("OK").
+            if reason == "clicked" then
+                if KeystonePolaris and KeystonePolaris.db and KeystonePolaris.db.global then
+                    KeystonePolaris.db.global.migrationAck = true
+                end
+            end
+        end,
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+        preferredIndex = 3,
+        showAlert = true,
+        title = "Keystone Polaris"
+    }
+
+    StaticPopup_Show("KPL_MIGRATION")
+end
+
 -- Called when the addon is first loaded
 function KeystonePolaris:OnInitialize()
-    if not _G.KeystonePolarisDB and _G.KeystonePercentageHelperDB then
+    local migratedFromKPH = false
+    local hadExistingKPDB = (_G.KeystonePolarisDB ~= nil) -- covers alpha users already on KP
+    if not hadExistingKPDB and _G.KeystonePercentageHelperDB then
         _G.KeystonePolarisDB = _G.KeystonePercentageHelperDB
+        migratedFromKPH = true
         -- Optional: keep a backup for a few versions before deletion
         -- _G.KeystonePercentageHelperDB = nil
     end
 
     -- Initialize the database first with AceDB
     self.db = LibStub("AceDB-3.0"):New("KeystonePolarisDB", self.defaults, "Default")
+
+    -- Initialize migration acknowledgement flag
+    self.db.global = self.db.global or {}
+    if self.db.global.migrationAck == nil then
+        self.db.global.migrationAck = false
+    end
+    -- Show popup if migrating from KPH OR already had KP DB (alpha users), until a button is explicitly clicked
+    local shouldShowMigration = (migratedFromKPH or hadExistingKPDB) and (not self.db.global.migrationAck)
+    if shouldShowMigration then
+        -- Defer popup slightly to ensure UI is ready
+        if C_Timer and C_Timer.After then
+            C_Timer.After(2, function() self:ShowMigrationPopup() end)
+        else
+            self:ShowMigrationPopup()
+        end
+    end
 
     -- Load dungeon data from expansion modules
     self:LoadExpansionDungeons()
