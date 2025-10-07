@@ -19,6 +19,10 @@ As I always say: **KPH is my baby, but it’s *our* addon.**
 Once again, thanks a lot for the support!  
 *Onward to greater challenges, guided by Polaris.*
 
+---
+
+- TOC updated for patch **11.2.5**.
+
 ## NEW
 
  - Introducing a unified display with optional **Total required for section**, **Current percentage** and **Pull percentage** (Requires MDT), projected values (parentheses) in combat for Required/Current, per-line completion suffixes, configurable layout (single-line or multi-line), and a switch between **percentage** and **count-based** modes. **(#40, #69)**
@@ -27,4 +31,5 @@ Once again, thanks a lot for the support!
 
 ## IMPROVEMENT
 
+- 
 - Russian translation updated, thank you **Hollicsh**.
