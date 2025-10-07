@@ -3,7 +3,7 @@ name: Update TOC Interface version(s)
 on:
   schedule:
     - cron: 0 3 * * *
-    
+
 jobs:
   run:
     runs-on: ubuntu-latest
