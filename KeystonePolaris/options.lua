@@ -1455,6 +1455,7 @@ function KeystonePolaris:ShowCopyPopup(text)
     if not self.copyPopup then
         local f = CreateFrame("Frame", "KeystonePolarisCopyPopup", UIParent, "BackdropTemplate")
         f:SetFrameStrata("FULLSCREEN_DIALOG")
+        f:SetToplevel(true)
         f:SetSize(700, 500)
         f:SetPoint("CENTER")
         -- Style aligné sur l'overlay Test Mode: fond sombre + bordure 1px or
@@ -1562,6 +1563,24 @@ function KeystonePolaris:ShowCopyPopup(text)
     if f and f.editBox then
         f.editBox:SetText(text or "")
         f:Show()
+        -- Assurer l'affichage au-dessus des StaticPopup (ex: KPL_MIGRATION)
+        local maxPopupLevel = 0
+        for i = 1, 4 do
+            local p = _G["StaticPopup" .. i]
+            if p and p:IsShown() then
+                local lvl = p:GetFrameLevel() or 0
+                if lvl > maxPopupLevel then maxPopupLevel = lvl end
+                -- Si une StaticPopup est en FULLSCREEN_DIALOG, garder la même strata
+                if p:GetFrameStrata() == "FULLSCREEN_DIALOG" then
+                    f:SetFrameStrata("FULLSCREEN_DIALOG")
+                end
+            end
+        end
+        local myLvl = f:GetFrameLevel() or 0
+        if maxPopupLevel >= myLvl then
+            f:SetFrameLevel(maxPopupLevel + 2)
+        end
+        f:Raise()
     end
 end
 
