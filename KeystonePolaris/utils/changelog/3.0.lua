@@ -31,11 +31,13 @@ KeystonePolaris.Changelog[3000] = {
         ["zhTW"] = {},
         ["enUS"] = {
             "Introducing a unified display with optional [Total required for section], [Current percentage] and [Pull percentage] (Requires MDT), projected values (parenthesis) in combat for Required/Current, suffixes per line, configurable layout (single-line or multi-line), and a switch between [percentage] and [count-based] modes.",
-            "Introducing [Test Mode], a new feature that allows you to simulate multiple Mythic+ situations (out-of-fight section in progress, pull in progress with a section in progress, section percentage done, ...)."
+            "Introducing [Test Mode], a new feature that allows you to simulate multiple Mythic+ situations (out-of-fight section in progress, pull in progress with a section in progress, section percentage done, ...).",
+            "Introducing [Changelog Translation], a new feature that allows you to translate the changelog into your language by copying it from a popup and pasting it into your translator tool."
         },
         ["frFR"] = {
             "Introduction d’un affichage unifié avec [Total requis pour la section], [Pourcentage actuel] et [Pourcentage du pull] (requiert MDT) en option, des valeurs prévisionnelles (entre parenthèses) en combat pour Required/Current, des suffixes par ligne, une mise en page configurable (une seule ligne ou multi‑lignes), et une bascule entre les modes [pourcentage] et [compte].",
-            "Introduction d’un nouveau [Mode test] qui permet de simuler plusieurs situations Mythique+ (section en cours hors combat, pull en cours avec une section en cours, pourcentage de la section terminée, ...)."
+            "Introduction d’un nouveau [Mode test] qui permet de simuler plusieurs situations Mythique+ (section en cours hors combat, pull en cours avec une section en cours, pourcentage de la section terminée, ...).",
+            "Introduction d’une fonctionnalité de [Traduction du changelog] qui permet de traduire le changelog dans votre langue en copiant le changelog dans une fenêtre popup et en le collant dans votre outil de traduction."
         },
         ["koKR"] = {},
         ["ruRU"] = {},

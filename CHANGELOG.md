@@ -21,8 +21,10 @@ Once again, thanks a lot for the support!
 
 ## NEW
 
- - Introducing a unified display with optional [Total required for section], [Current percentage] and [Pull percentage] (Requires MDT), projected values (parentheses) in combat for Required/Current, per-line completion suffixes, configurable layout (single-line or multi-line), and a switch between [percentage] and [count-based] modes.
- - Introducing [Test Mode], a new feature that allows you to simulate multiple Mythic+ situations (out-of-fight section in progress, pull in progress with a section in progress, section percentage done, ...).
+ - Introducing a unified display with optional **Total required for section**, **Current percentage** and **Pull percentage** (Requires MDT), projected values (parentheses) in combat for Required/Current, per-line completion suffixes, configurable layout (single-line or multi-line), and a switch between **percentage** and **count-based** modes.
+ - Introducing **Test Mode**, a new feature that allows you to simulate multiple Mythic+ situations (out-of-fight section in progress, pull in progress with a section in progress, section percentage done, ...).
+ - Introducing **Changelog Translation**, a new feature that allows you to translate the changelog into your language by copying it from a popup and pasting it into your translator tool.
+
 ## IMPROVEMENT
 
-- Russian translation updated, thank you [Hollicsh].
+- Russian translation updated, thank you **Hollicsh**.
