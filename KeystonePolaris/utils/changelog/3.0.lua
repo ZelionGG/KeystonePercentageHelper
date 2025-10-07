@@ -9,13 +9,13 @@ KeystonePolaris.Changelog[3000] = {
         ["enUS"] = {
             "|cff40e0d0A NEW NAME FOR A BIGGER VISION|r\n\n"
             .. "[Keystone Percentage Helper] becomes [Keystone Polaris] — a bold step that reflects the Mythic+ swiss‑army‑knife DNA I imagined and built with the community. \n\n"
-            .. "Your settings are migrated automatically (no action needed), if you happen to loose your settings, please report it. You can copy the [KeystonePercentageHelper.lua] in your [WTF/Account/YourAccountName/SavedVariables] folder to a new [KeystonePolaris.lua] file to get your settings back (close the game before doing that). \n\n"
+            .. "Your settings are migrated automatically (no action needed), if you happen to loose your settings, please report it and copy the [KeystonePercentageHelper.lua] in your [WTF/Account/YourAccountName/SavedVariables] folder to a new [KeystonePolaris.lua] file to get your settings back (close the game before doing that). \n\n"
             .. "New name. Same speed. Bigger ambitions. Follow the star — Polaris."
         },
         ["frFR"] = {
             "|cff40e0d0UN NOUVEAU NOM POUR UNE PLUS GRANDE VISION|r \n\n"
             .. "[Keystone Percentage Helper] devient [Keystone Polaris] — une étape ambitieuse qui reflète l'ADN de couteau suisse Mythique+ que j'ai voulu, imaginé et construit avec la communauté. \n\n"
-            .. "Vos paramètres sont migrés automatiquement (aucune action requise), si vous veniez à perdre vos paramètres, n'hésitez pas à le signaler sur GitHub, et en solution alternative, vous pouvez copier le [KeystonePercentageHelper.lua] dans votre dossier [WTF/Account/YourAccountName/SavedVariables] dans un nouveau fichier [KeystonePolaris.lua] (fermez le jeu avant de le faire). \n\n"
+            .. "Vos paramètres sont migrés automatiquement (aucune action requise), si vous veniez à perdre vos paramètres, n'hésitez pas à le signaler sur GitHub, et, en solution alternative, vous pouvez copier le [KeystonePercentageHelper.lua] dans votre dossier [WTF/Account/YourAccountName/SavedVariables] dans un nouveau fichier [KeystonePolaris.lua] (fermez le jeu avant de le faire). \n\n"
             .. "Nouveau nom. Même énergie. Plus d’ambition. Suivez l’étoile — Polaris."
         },
         ["koKR"] = {},
