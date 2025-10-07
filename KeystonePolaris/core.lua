@@ -48,6 +48,7 @@ KeystonePolaris.realPull = {
 KeystonePolaris.currentDungeonID = 0
 KeystonePolaris.currentSection = 1
 
+-- [TEMP-MIGRATION-KPH->KP] BEGIN: migration popup and ack (remove once rebrand is widely adopted)
 -- Show a one-time migration popup for users coming from Keystone Percentage Helper
 function KeystonePolaris:ShowMigrationPopup()
     if self.db and self.db.global and self.db.global.migrationAck then return end
@@ -90,8 +91,11 @@ function KeystonePolaris:ShowMigrationPopup()
     StaticPopup_Show("KPL_MIGRATION")
 end
 
+-- [TEMP-MIGRATION-KPH->KP] END
+
 -- Called when the addon is first loaded
 function KeystonePolaris:OnInitialize()
+    -- [TEMP-MIGRATION-KPH->KP] BEGIN: DB migration detection and popup gating (remove later)
     local migratedFromKPH = false
     local hadExistingKPDB = (_G.KeystonePolarisDB ~= nil) -- covers alpha users already on KP
     if not hadExistingKPDB and _G.KeystonePercentageHelperDB then
@@ -120,6 +124,7 @@ function KeystonePolaris:OnInitialize()
         end
     end
 
+    -- [TEMP-MIGRATION-KPH->KP] END
     -- Load dungeon data from expansion modules
     self:LoadExpansionDungeons()
 
