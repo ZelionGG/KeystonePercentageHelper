@@ -5,7 +5,7 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0");
 local L = AceLocale:NewLocale(AddonName, "ruRU", false, false);
 if not L then return end
 
--- Last translated October 7th, 2025.
+-- Last translated October 8th, 2025.
 -- Translation by Hollicsh (https://github.com/Hollicsh)
 
 -- Dungeons Group
@@ -211,11 +211,11 @@ L["RESET_ALL"] = "Сбросить все подземелья"
 L["RESET_CHANGED_ONLY"] = "Сбросить только измененные"
 L["CHANGED_ROUTES_DUNGEONS_LIST"] = "Обновлены маршруты следующих подземелий:"
 
--- Changelog (To Translate)
-L["COPY_INSTRUCTIONS"] = "Select All, then Ctrl+C to copy. Optional: DeepL https://www.deepl.com/translator"
-L["SELECT_ALL"] = "Select All"
-L["TRANSLATE"] = "Translate"
-L["TRANSLATE_DESC"] = "Copy this changelog in a popup to paste into your translator."
+-- Changelog
+L["COPY_INSTRUCTIONS"] = "Выделите всё, затем нажмите Ctrl+C, чтобы скопировать. Дополнительно: DeepL - https://www.deepl.com/translator"
+L["SELECT_ALL"] = "Выбрать всё"
+L["TRANSLATE"] = "Перевод"
+L["TRANSLATE_DESC"] = "Скопируйте этот список изменений во всплывающее окно и вставьте его в свой переводчик."
 
 -- Test Mode
 L["TEST_MODE"] = "Тестовый режим"
@@ -253,7 +253,7 @@ L["MAX_WIDTH"] = "Максимальная ширина (однострочна�
 L["MAX_WIDTH_DESC"] = "Максимальная ширина в пикселях для однострочного расположения; 0 = автоматически (без переноса)."
 L["REQUIRED_DEFAULT"] = "Требуется:"
 L["CURRENT_DEFAULT"] = "Текущий:"
-L["SECTION_REQUIRED_DEFAULT"] = "Total required for section:" -- To Translate
+L["SECTION_REQUIRED_DEFAULT"] = "Всего требуется для этой части подземелья:"
 L["PULL_DEFAULT"] = "Пулл:"
 
 -- Section required prefix
