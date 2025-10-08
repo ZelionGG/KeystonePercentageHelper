@@ -1,4 +1,4 @@
-## Interface: 110200
+## Interface: 110205, 120000
 ## Title: Keystone Percentage Helper (Migration Stub)
 ## Notes: Loads legacy SavedVariables for Keystone Polaris migration
 ## LoadOnDemand: 1
