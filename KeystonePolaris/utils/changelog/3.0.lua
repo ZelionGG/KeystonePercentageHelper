@@ -9,7 +9,7 @@ KeystonePolaris.Changelog[3000] = {
         ["enUS"] = {
             "|cff40e0d0A NEW NAME FOR A BIGGER VISION|r\n\n"
             .. "[Keystone Percentage Helper] becomes [Keystone Polaris] — a bold step that reflects the Mythic+ Swiss-army-knife DNA I imagined and built with the community. \n\n"
-            .. "Your settings are migrated automatically (no action needed), if you happen to loose your settings, please report it and copy the [KeystonePercentageHelper.lua] in your [WTF/Account/YourAccountName/SavedVariables] folder to a new [KeystonePolaris.lua] file to get your settings back (close the game before doing that). \n\n"
+            .. "Your settings are migrated automatically (no action needed), if you happen to lose your settings, please report it and copy the [KeystonePercentageHelper.lua] in your [WTF/Account/YourAccountName/SavedVariables] folder to a new [KeystonePolaris.lua] file to get your settings back (close the game before doing that). \n\n"
             .. "New name. Same speed. Bigger ambitions. Follow the star — Polaris. [#68]",
             "TOC updated for patch [11.2.5].",
         },
