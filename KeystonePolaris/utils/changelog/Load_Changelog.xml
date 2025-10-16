@@ -18,8 +18,11 @@
 	<Script file='Old/v1/1.7.1.lua'/>
 	<Script file='Old/v1/1.7.2.lua'/>
 	<Script file='Old/v1/1.7.21.lua'/>
+	<!-- OLD V2 -->
 	<Script file='Old/v2/2.0.lua'/>
 	<Script file='Old/v2/2.0.1.lua'/>
+	<!-- OLD V3 -->
+	<Script file='Old/v3/3.0.lua'/>
 	<!-- LIVE -->
-	<Script file='3.0.lua'/>
+	<Script file='3.0.1.lua'/>
 </Ui>

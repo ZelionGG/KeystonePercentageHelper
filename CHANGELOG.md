@@ -1,6 +1,6 @@
-## [3.0](https://github.com/ZelionGG/KeystonePolaris/releases/tag/3.0) (2025-10-06)
+## [3.0.1](https://github.com/ZelionGG/KeystonePolaris/releases/tag/3.0.1) (2025-10-14)
 
-[Full Changelog](https://github.com/ZelionGG/KeystonePolaris/compare/2.0.1...3.0) [Previous Releases](https://github.com/ZelionGG/KeystonePolaris/releases)
+[Full Changelog](https://github.com/ZelionGG/KeystonePolaris/compare/3.0...3.0.1) [Previous Releases](https://github.com/ZelionGG/KeystonePolaris/releases)
 
 ---
 
@@ -22,14 +22,9 @@ Once again, thanks a lot for the support!
 
 ## IMPORTANT
 
-- TOC updated for patch **11.2.5**.
-
-## NEW
-
- - Introducing a unified display with optional **Total required for section**, **Current percentage** and **Pull percentage** (Requires MDT), projected values (parentheses) in combat for Required/Current, per-line completion suffixes, configurable layout (single-line or multi-line), and a switch between **percentage** and **count-based** modes. **(#40, #69)**
- - Introducing **Test Mode**, a new feature that allows you to simulate multiple Mythic+ situations (out-of-fight section in progress, pull in progress with a section in progress, section percentage done, ...). **(#71)**
- - Introducing **Changelog Translation**, a new feature that allows you to translate the changelog into your language by copying it from a popup and pasting it into your translator tool.
+- TOC updated for PTR **11.2.7**.
 
 ## IMPROVEMENT
 
 - Russian translation updated, thank you **Hollicsh**.
+- Korean translation updated, thank you **BlueSea-jun**.
